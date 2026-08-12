@@ -80,6 +80,8 @@ tr.tot td{font-weight:700;border-top:1px solid var(--ink);border-bottom:none}
   <p class="hint" id="fNote"></p>
   <div class="row"><button class="act ghost sm" id="fEdit">Edit formula</button><button class="act ghost sm" id="fNew">New formula</button></div>
   <div id="fEditor"></div>
+
+  <div id="fParkedWrap"></div>
 </section>
 
 <section id="tAcc">
@@ -222,17 +224,19 @@ function resolve(items){
  return Object.entries(out).map(([id,pct])=>({m:M(id),pct})).filter(x=>x.m);
 }
 
+function activeForms(){return D.form.filter(f=>!f.parked)}
 function drawSel(){
  const s=$('#fSel'),cur=s.value;s.innerHTML='';
- D.form.forEach(f=>{const o=el('option','',f.name+'  ·  '+f.conc+'%');o.value=f.id;s.append(o)});
- if(cur&&D.form.some(f=>f.id===cur))s.value=cur;
+ const av=activeForms();
+ av.forEach(f=>{const o=el('option','',f.name+'  ·  '+f.conc+'%');o.value=f.id;s.append(o)});
+ if(cur&&av.some(f=>f.id===cur))s.value=cur;
  const b=$('#bFor');b.innerHTML='';
- D.form.forEach(f=>{const o=el('option','',f.name);o.value=f.id;b.append(o)});
+ av.forEach(f=>{const o=el('option','',f.name);o.value=f.id;b.append(o)});
 }
 function calc(){
- const f=D.form.find(x=>x.id===$('#fSel').value)||D.form[0];
+ const f=D.form.find(x=>x.id===$('#fSel').value)||activeForms()[0];
  const out=$('#fOut'),al=$('#fAlerts');out.innerHTML='';al.innerHTML='';
- if(!f){out.append(el('div','empty','No formulas yet.'));$('#fNote').textContent='';return}
+ if(!f){out.append(el('div','empty','No active formulas. Everything is parked, or add a new one.'));$('#fNote').textContent='';return}
  const W=parseFloat($('#fWt').value)||0,conc=W*f.conc/100,eth=W-conc;
  const r=resolve(f.items);
  const sum=r.reduce((a,b)=>a+b.pct,0);
@@ -271,6 +275,23 @@ function calc(){
  if(unver)al.append(mk('warn',unver+' restricted material'+(unver>1?'s':'')+' still marked unverified.'));
  $('#fNote').textContent='Maceration: '+f.mac+' week'+(f.mac===1?'':'s')+'. '+(f.note||'');
 }
+function drawParked(){
+ const wrap=$('#fParkedWrap');
+ const parked=D.form.filter(f=>f.parked);
+ if(!parked.length){wrap.innerHTML='';return}
+ wrap.innerHTML='';
+ wrap.append(el('h2','','Parked'));
+ wrap.append(el('p','hint','Not buildable yet. Excluded from the calculator and batch log until reactivated.'));
+ parked.forEach(f=>{
+  const c=el('div','card');
+  c.append(el('h3','',f.name));
+  c.append(el('p','hint',f.parked));
+  const e=el('button','act ghost sm','Edit / reactivate');
+  e.onclick=()=>itemEditor($('#fEditor'),f,true,refreshForms);
+  c.append(e);wrap.append(c);
+ });
+}
+function refreshForms(){drawSel();calc();drawParked()}
 function mk(k,h){const d=el('div','alert '+k);d.innerHTML=h;return d}
 
 function itemEditor(host,obj,allowAcc,after){
@@ -285,6 +306,9 @@ function itemEditor(host,obj,allowAcc,after){
   const f2=el('div','fld');f2.innerHTML='<label>Maceration (weeks)</label>';
   const i2=el('input');i2.type='number';i2.value=obj.mac||0;i2.oninput=()=>{obj.mac=+i2.value||0};f2.append(i2);
   r.append(f1,f2);c.append(r);
+  const pf=el('div','fld');pf.innerHTML='<label>Parked (reason — blank means active)</label>';
+  const pi=el('input');pi.value=obj.parked||'';pi.placeholder='e.g. needs Coumarin + lactones from T2';
+  pi.oninput=()=>{obj.parked=pi.value};pf.append(pi);c.append(pf);
  }
  const nf=el('div','fld');nf.innerHTML='<label>Note</label>';
  const na=el('textarea');na.value=obj.note||'';na.oninput=()=>{obj.note=na.value};nf.append(na);c.append(nf);
@@ -428,15 +452,15 @@ function drawBat(){
  });
 }
 
-function redraw(){drawSel();calc();drawAcc();drawMat();drawBat()}
+function redraw(){drawSel();calc();drawAcc();drawMat();drawBat();drawParked()}
 
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
  b.classList.add('on');$('#'+b.dataset.t).classList.add('on')});
 $('#fSel').onchange=calc;$('#fWt').oninput=calc;
-$('#fEdit').onclick=()=>{const f=D.form.find(x=>x.id===$('#fSel').value);if(f)itemEditor($('#fEditor'),f,true,()=>{drawSel();calc()})};
-$('#fNew').onclick=()=>{const f={id:uid(),name:'New formula',conc:15,mac:2,note:'',items:[]};D.form.push(f);save();drawSel();$('#fSel').value=f.id;itemEditor($('#fEditor'),f,true,()=>{drawSel();calc()})};
+$('#fEdit').onclick=()=>{const f=D.form.find(x=>x.id===$('#fSel').value);if(f)itemEditor($('#fEditor'),f,true,refreshForms)};
+$('#fNew').onclick=()=>{const f={id:uid(),name:'New formula',conc:15,mac:2,note:'',parked:'',items:[]};D.form.push(f);save();drawSel();$('#fSel').value=f.id;itemEditor($('#fEditor'),f,true,refreshForms)};
 $('#aNew').onclick=()=>{const a={id:uid(),name:'New accord',note:'',items:[]};D.acc.push(a);save();itemEditor($('#aEditor'),a,false,()=>{drawAcc();calc()})};
 $('#mNew').onclick=()=>{const m={id:uid(),name:'New material',conc:100,carrier:'',price:0,bottleSize:100,sup:'',ifra:null,source:'',ifraOk:false,note:'',stock:0};D.mat.push(m);save();drawMat();matEditor(m)};
 $('#bAdd').onclick=()=>{
