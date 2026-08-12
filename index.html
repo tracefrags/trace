@@ -189,8 +189,22 @@ function seed(){
 function perGram(m){return (m.bottleSize>0)?(m.price||0)/m.bottleSize:0}
 async function load(){
  const v=await Store.get(KEY);
- if(v){try{D=JSON.parse(v);sync('Loaded','ok');return}catch(e){}}
+ if(v){try{D=JSON.parse(v);migrate();sync('Loaded','ok');return}catch(e){}}
  seed();sync('Ready');save();
+}
+function migrate(){
+ let changed=false;
+ (D.mat||[]).forEach(m=>{
+  if(m.price===undefined){
+   // old schema stored per-gram cost directly as m.cost
+   m.bottleSize=100;
+   m.price=Math.round((m.cost||0)*100);
+   delete m.cost;
+   changed=true;
+  }
+  if(m.source===undefined){m.source='';changed=true}
+ });
+ if(changed)save();
 }
 function save(){clearTimeout(saveT);saveT=setTimeout(async()=>{
  const ok=await Store.set(KEY,JSON.stringify(D));sync(ok?'Saved':'Save failed',ok?'ok':'err')},400)}
@@ -441,7 +455,7 @@ $('#dFile').onchange=ev=>{
  const r=new FileReader();
  r.onload=()=>{try{const p=JSON.parse(r.result);
   if(!p.mat||!p.form)throw 0;
-  D=p;save();redraw();sync('Imported','ok')}catch(e){sync('Bad file','err')}};
+  D=p;migrate();save();redraw();sync('Imported','ok')}catch(e){sync('Bad file','err')}};
  r.readAsText(f);ev.target.value='';
 };
 
