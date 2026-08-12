@@ -18,6 +18,10 @@ header{padding:20px 0 12px;border-bottom:2px solid var(--brass)}
 .mark{font-family:Georgia,serif;font-size:24px;letter-spacing:6px;font-weight:700}
 .sub{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px}
 .sync{float:right;font-size:11px;color:var(--muted);padding-top:6px}
+.hdrRight{float:right;text-align:right}
+.hdrRight .sync{float:none;display:block;padding-top:6px}
+.benchlink{font-size:11px;color:var(--brass);text-decoration:none;display:inline-block;margin-top:4px}
+.benchlink:hover{text-decoration:underline}
 .sync.ok{color:var(--good)}.sync.err{color:var(--bad)}
 nav{display:flex;gap:1px;border-bottom:1px solid var(--line);overflow-x:auto;margin-bottom:18px}
 nav button{flex:1;min-width:78px;background:none;border:none;border-bottom:2px solid transparent;padding:11px 5px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
@@ -62,12 +66,13 @@ tr.tot td{font-weight:700;border-top:1px solid var(--ink);border-bottom:none}
 </head>
 <body>
 <div class="wrap">
-<header><div class="sync" id="sync">…</div><div class="mark">TRACE</div><div class="sub">Studio</div></header>
+<header><div class="hdrRight"><span class="sync" id="sync">…</span><a href="trace-bench.html" class="benchlink" target="_blank" rel="noopener">Bench →</a></div><div class="mark">TRACE</div><div class="sub">Studio</div></header>
 <nav>
 <button class="on" data-t="tFor">Formulas</button>
 <button data-t="tAcc">Accords</button>
 <button data-t="tMat">Materials</button>
 <button data-t="tBat">Batches</button>
+<button data-t="tNotes">Notes</button>
 </nav>
 
 <section id="tFor" class="on">
@@ -115,6 +120,17 @@ tr.tot td{font-weight:700;border-top:1px solid var(--ink);border-bottom:none}
   </div>
   <h2>Log</h2>
   <div id="bList"></div>
+</section>
+
+<section id="tNotes">
+  <h2>Technical notes</h2>
+  <p class="hint">Hard-won lessons, kept in one place so they don't get lost between bench sessions.</p>
+  <div id="notesList"></div>
+  <button class="act ghost sm" id="noteNew">Add note</button>
+
+  <h2>Shopping list</h2>
+  <p class="hint">Materials tagged T2 with zero stock — auto-generated from the Materials tab. Update stock there once you've bought something and it drops off here.</p>
+  <div class="card" id="shopList"></div>
 </section>
 
 <div class="foot">
@@ -180,7 +196,7 @@ const SEED_MAT=[
 const SEED_ACC=[];
 const SEED_FOR=[];
 
-let D={mat:[],acc:[],form:[],bat:[]},saveT=null;
+let D={mat:[],acc:[],form:[],bat:[],notes:[]},saveT=null;
 
 function seed(){
  D.mat=SEED_MAT.map(m=>({id:uid(),name:m[0],conc:m[1],carrier:m[2],price:m[3],bottleSize:m[4],sup:m[5],ifra:m[6],source:m[7],ifraOk:false,note:m[8],stock:0}));
@@ -206,6 +222,7 @@ function migrate(){
   }
   if(m.source===undefined){m.source='';changed=true}
  });
+ if(!Array.isArray(D.notes)){D.notes=[];changed=true}
  if(changed)save();
 }
 function save(){clearTimeout(saveT);saveT=setTimeout(async()=>{
@@ -414,7 +431,7 @@ function matEditor(m){
  const nf=el('div','fld');nf.innerHTML='<label>Note</label>';
  const na=el('textarea');na.value=m.note||'';na.oninput=()=>m.note=na.value;nf.append(na);c.append(nf);
  const bar=el('div','row');bar.style.marginTop='8px';
- const sv=el('button','act','Save');sv.onclick=()=>{save();host.innerHTML='';drawMat();calc()};
+ const sv=el('button','act','Save');sv.onclick=()=>{save();host.innerHTML='';drawMat();calc();drawShopping()};
  const dl=el('button','act danger','Delete');
  dl.onclick=()=>{
   const used=[...D.form,...D.acc].filter(f=>f.items.some(i=>!i.acc&&i.ref===m.id));
@@ -452,7 +469,34 @@ function drawBat(){
  });
 }
 
-function redraw(){drawSel();calc();drawAcc();drawMat();drawBat();drawParked()}
+function drawNotes(){
+ const box=$('#notesList');box.innerHTML='';
+ if(!D.notes.length){box.append(el('div','empty','No notes yet.'));return}
+ D.notes.forEach(n=>{
+  const c=el('div','card');
+  const ta=el('textarea');ta.value=n.text||'';ta.style.minHeight='40px';
+  ta.oninput=()=>{n.text=ta.value;save()};
+  c.append(ta);
+  const del=el('button','act danger','Delete');del.style.marginTop='7px';
+  del.onclick=()=>{D.notes=D.notes.filter(x=>x!==n);save();drawNotes()};
+  c.append(del);box.append(c);
+ });
+}
+function drawShopping(){
+ const box=$('#shopList');box.innerHTML='';
+ const need=D.mat.filter(m=>m.sup==='T2'&&(m.stock||0)<=0);
+ if(!need.length){box.append(el('div','empty','Nothing outstanding — every T2 material shows stock on hand.'));return}
+ const t=el('table');
+ t.innerHTML='<tr><th>Material</th><th class="num">Bottle</th></tr>';
+ need.sort((a,b)=>a.name.localeCompare(b.name)).forEach(m=>{
+  const tr=el('tr');
+  tr.append(el('td','',m.name));
+  tr.append(el('td','num','Rs '+m.price+' / '+m.bottleSize+'g'));
+  t.append(tr);
+ });
+ box.append(t);
+}
+function redraw(){drawSel();calc();drawAcc();drawMat();drawBat();drawParked();drawNotes();drawShopping()}
 
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
@@ -463,6 +507,7 @@ $('#fEdit').onclick=()=>{const f=D.form.find(x=>x.id===$('#fSel').value);if(f)it
 $('#fNew').onclick=()=>{const f={id:uid(),name:'New formula',conc:15,mac:2,note:'',parked:'',items:[]};D.form.push(f);save();drawSel();$('#fSel').value=f.id;itemEditor($('#fEditor'),f,true,refreshForms)};
 $('#aNew').onclick=()=>{const a={id:uid(),name:'New accord',note:'',items:[]};D.acc.push(a);save();itemEditor($('#aEditor'),a,false,()=>{drawAcc();calc()})};
 $('#mNew').onclick=()=>{const m={id:uid(),name:'New material',conc:100,carrier:'',price:0,bottleSize:100,sup:'',ifra:null,source:'',ifraOk:false,note:'',stock:0};D.mat.push(m);save();drawMat();matEditor(m)};
+$('#noteNew').onclick=()=>{D.notes.push({id:uid(),text:''});save();drawNotes()};
 $('#bAdd').onclick=()=>{
  const b={id:uid(),no:$('#bNo').value,date:$('#bDate').value,wt:$('#bWt').value,form:$('#bFor').value,note:$('#bNote').value,evals:[]};
  if(!b.no&&!b.note){sync('Needs a number','err');return}
