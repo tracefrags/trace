@@ -1,0 +1,19 @@
+{
+  "name": "TRACE Compose",
+  "short_name": "Compose",
+  "description": "Spatial fragrance formula builder with IFRA checking and cost",
+  "start_url": "./compose-map.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F2EDE4",
+  "theme_color": "#1B2621",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
