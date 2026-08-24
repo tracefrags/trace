@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRACE — Compose Map</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bone:#F2EDE4;--paper:#FBF9F5;--ink:#1B2621;--brass:#A67C3D;--muted:#8A8378;
+--line:#DED7CB;--warn:#9C7A28;--bad:#9C4A3F;--good:#4A6B52}
+body{background:var(--bone);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;padding:14px}
+.wrap{max-width:1340px;margin:0 auto}
+h1{font-family:Georgia,serif;font-size:19px;letter-spacing:5px;font-weight:700}
+.sub{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.bar{display:flex;gap:9px;flex-wrap:wrap;background:var(--paper);border:1px solid var(--line);
+ border-radius:6px;padding:9px;margin-bottom:12px;align-items:flex-end}
+.f{flex:1;min-width:96px}
+.f label{display:block;font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+input,select{width:100%;border:1px solid var(--line);border-radius:4px;padding:5px 7px;font:inherit;font-size:13px;background:#fff}
+.grid{display:grid;grid-template-columns:1fr 400px;gap:12px;align-items:start}
+@media(max-width:1060px){.grid{grid-template-columns:1fr}}
+.mapbox{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px;overflow-x:auto}
+svg{display:block}
+.node{cursor:pointer}
+.node circle{transition:r .12s}
+.node:hover circle{stroke:#A67C3D;stroke-width:2}
+.node text{font:10px system-ui,sans-serif;fill:#3A2C32;pointer-events:none}
+.node.on text{font-weight:700;fill:#1B2621}
+.node.sup text{fill:#B8B0A4}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:11px;position:sticky;top:12px;max-height:95vh;overflow-y:auto}
+.panel h3{font-family:Georgia,serif;font-size:14px}
+.pm{font-size:11px;color:var(--muted);margin-bottom:8px}
+.split{height:7px;border-radius:4px;overflow:hidden;display:flex;margin-bottom:3px;background:var(--line)}
+.split i{height:100%}
+.sl{display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-bottom:9px}
+.blk{border:1px solid var(--line);border-radius:5px;margin:6px 0;background:#fff}
+.blkh{display:flex;align-items:center;gap:6px;padding:4px 7px;background:#F0E9DD;font-size:10.5px;border-radius:4px 4px 0 0}
+.blkh b{flex:1;font-size:10px;color:var(--brass);letter-spacing:.6px;text-transform:uppercase}
+.blkh .bp{font-variant-numeric:tabular-nums;font-weight:700;font-size:11px}
+.blkh button{background:none;border:none;color:var(--bad);cursor:pointer;font-size:13px;padding:0 2px}
+.row{display:flex;align-items:center;gap:5px;padding:3px 6px;font-size:12px;border-bottom:1px solid #EFE9DE}
+.row:last-child{border-bottom:none}
+.row .d{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.row .n{flex:1;line-height:1.2;font-size:11.5px;cursor:help}
+.row input{width:50px;text-align:right;padding:2px 4px;font-size:11.5px}
+.row select.bs{width:32px;padding:2px 1px;font-size:10px;border-color:#EFE9DE;cursor:pointer}
+.row .g{width:74px;text-align:right;font-size:10px;color:var(--muted);line-height:1.25}
+.row .c{width:36px;text-align:right;font-size:10px;color:var(--brass);font-variant-numeric:tabular-nums}
+.row .x{background:none;border:none;color:var(--bad);cursor:pointer;font-size:13px;padding:0 1px}
+.sub2{display:block;font-size:8.5px;color:var(--brass);line-height:1.3}
+.row.tot{border-top:1.5px solid var(--ink);border-bottom:none;margin-top:4px;padding-top:5px;font-weight:600}
+.row.tot .sp{width:50px;text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums}
+.row.tot .g,.row.tot .c{color:var(--ink);font-size:10.5px}
+.msg{border-radius:4px;padding:6px 8px;font-size:11px;margin-bottom:5px;line-height:1.35}
+.msg.w{background:#F7EFDC;color:#6B5316}.msg.b{background:#F6E4E1;color:#7A3830}
+.msg.g{background:#E6EFE7;color:#33513A}.msg.n{background:#EDE6DA;color:#5F5A52}
+.emp{color:var(--muted);font-size:11.5px;font-style:italic;padding:9px 0}
+h4{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--brass);margin:10px 0 4px}
+.acts{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.btn{flex:1;min-width:76px;background:var(--ink);color:var(--bone);border:none;border-radius:4px;padding:6px;font:inherit;font-size:11.5px;cursor:pointer}
+.btn.gh{background:none;color:var(--muted);border:1px solid var(--line)}
+.bs2{padding:5px 0;border-bottom:1px solid #EFE9DE;font-size:11px;line-height:1.45}
+.bs2:last-child{border-bottom:none}
+.bs2 b{color:var(--brass);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase}
+.bs2 .tm{display:inline-block;width:52px;color:#B0A69A;font-size:10px}
+.bs2.good{color:var(--good)}.bs2.warn{color:var(--warn)}.bs2.bad{color:var(--bad)}
+.bs2.good b,.bs2.warn b,.bs2.bad b{color:inherit}
+#pv{display:none}
+@media print{
+ body{padding:0;background:#fff}
+ .wrap{display:none}
+ #pv{display:block;font:10px/1.4 system-ui,sans-serif;color:#000;padding:12mm}
+ #pv h2{font-family:Georgia,serif;font-size:16px;letter-spacing:3px;margin-bottom:2px}
+ #pv .meta{font-size:8.5px;color:#555;margin-bottom:8px;border-bottom:1.5px solid #A67C3D;padding-bottom:5px}
+ #pv table{width:100%;border-collapse:collapse;margin-bottom:8px}
+ #pv th{text-align:left;font-size:7.5px;text-transform:uppercase;letter-spacing:.6px;color:#666;border-bottom:1px solid #999;padding:3px}
+ #pv td{padding:2.5px 3px;border-bottom:1px solid #E8E8E8;font-size:9px}
+ #pv td.r{text-align:right;font-variant-numeric:tabular-nums}
+ #pv tr.bh td{background:#F0E9DD;font-weight:700;font-size:8px;text-transform:uppercase;letter-spacing:.5px}
+ #pv tr.tt td{border-top:1.5px solid #000;border-bottom:none;font-weight:700}
+ #pv .cols{display:flex;gap:8mm}
+ #pv .col{flex:1}
+ #pv .sec{font-size:7.5px;text-transform:uppercase;letter-spacing:1px;color:#A67C3D;margin:6px 0 2px;font-weight:700}
+ #pv .ln{font-size:8.5px;margin-bottom:1.5px;line-height:1.35}
+ #pv .fl{font-size:8px;padding:2.5px 4px;background:#F5F0E6;border-left:2px solid #A67C3D;margin-bottom:2px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>TRACE</h1><div class="sub">Compose — spatial map</div>
+
+<div class="bar">
+  <div class="f" style="flex:1.4"><label>Name</label><input id="nm" placeholder="Untitled"></div>
+  <div class="f"><label>Type</label><select id="ty"></select></div>
+  <div class="f"><label>Batch g</label><input type="number" id="wt" value="20" step="0.5" min="1"></div>
+  <div class="f" style="flex:1.3"><label>Concentrate</label><input id="cg" readonly style="background:#F2EDE4;color:#8A8378"></div>
+  <div class="f" style="flex:1.2"><label>Add block</label><select id="blkSel"></select></div>
+</div>
+
+<div class="grid">
+  <div class="mapbox"><svg id="map" width="880" height="740"></svg></div>
+  <div class="panel">
+    <h3 id="pt">Nothing selected</h3>
+    <div class="pm" id="pmeta">Click nodes on the map</div>
+    <div class="split" id="sp"></div>
+    <div class="sl"><span id="sl">—</span><span id="ss">0%</span></div>
+    <div id="msgs"></div>
+    <div id="sel"></div>
+    <div class="acts">
+      <button class="btn" id="norm">Normalise</button>
+      <button class="btn gh" id="reset">Reset</button>
+      <button class="btn gh" id="pdf">Export PDF</button>
+    </div>
+    <h4>Reading</h4>
+    <div id="brief" style="font-size:11px;color:var(--muted)">Select materials to see what this should smell like.</div>
+  </div>
+</div>
+</div>
+<div id="pv"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+// name, family, band, ifra(% finished |null), dilution%(100=neat), price Rs, pack g, verified
+const MAT=[
+ ['DHM','citrus','top',null,100,425,10,1],['Citral','citrus','top',0.6,100,380,10,0],
+ ['Bergamot EO','citrus','top',0.4,100,500,10,0],['Petitgrain EO','citrus','top',null,100,550,10,0],
+ ['Sweet Orange EO','citrus','top',null,100,350,10,1],['Calone','citrus','top',null,10,740,10,1],
+ ['Linalool','floral','top',null,100,450,10,1],
+ ['Hedione','floral','heart',null,100,650,10,1],['PEA','floral','heart',null,100,380,10,0],
+ ['Geraniol','floral','heart',5.3,100,350,10,0],['Citronellol','floral','heart',5.0,100,350,10,0],
+ ['Rose oxide','floral','heart',null,10,600,10,0],
+ ['β-damascone','fruity','heart',null,10,700,10,0],['Ald. C14 peach','fruity','heart',null,100,350,30,1],
+ ['Ald. C18 milk','fruity','heart',null,100,480,30,1],['Ethyl Maltol','fruity','heart',2.0,10,330,30,1],
+ ['Vanillin','fruity','heart',5.0,100,500,50,1],
+ ['Cinnamyl Alc.','spice','heart',0.5,100,370,10,1],['IsoEugenol','spice','heart',0.02,100,400,10,1],
+ ['Coumarin','spice','heart',3.0,10,340,30,1],['Tonka Bean','spice','heart',null,100,300,10,1],
+ ['Iso E Super','wood','base',null,100,400,10,1],['Sandenol','wood','base',null,100,400,10,1],
+ ['Vetiver EO','wood','base',null,100,600,10,0],['Benzoin','wood','base',2.0,100,450,10,1],
+ ['Ambroxan','wood','base',null,10,680,10,1],['Cashmeran','wood','base',null,100,1900,10,1],
+ ['Styrax','wood','base',0.6,100,420,10,1],['Guaiacwood','wood','base',null,10,320,10,1],
+ ['Oakmoss alt.','wood','base',0.1,10,370,30,1],['Patchouli EO','wood','base',null,100,1950,10,1],
+ ['Galaxolide','musk','base',21.4,100,350,10,1],['Eth. Brassylate','musk','base',null,100,380,10,1],
+ ['Habanolide','musk','base',null,100,900,10,1],['Benzyl Benzoate','musk','base',null,100,220,10,1],
+];
+const FAM=[['citrus','Citrus / Fresh','#C9973F'],['floral','Floral','#B4718C'],
+ ['fruity','Fruity / Sweet','#C97F4F'],['spice','Spice','#9C7A28'],
+ ['wood','Wood / Amber','#7A6A4F'],['musk','Musk','#8A8378']];
+const BAND=[['top','TOP','0–30 min',55],['heart','HEART','30 min – 3 hr',255],['base','BASE','3 hr +',455]];
+const TYPES=[['Cologne',4],['EdT',10],['EdP',15],['EdP intense',18],['Extrait',22],['Accord neat',100]];
+const ETH_G=1.65;
+
+const INFO={
+ 'DHM':['4–25%','citrus tops; Ambroxan; oakmoss','Heat-stable citrus. Cool Water runs it at 23% — strong enough to lead a fragrance alone.'],
+ 'Citral':['0.5–4%','DHM; bergamot; petitgrain','Sharp lemon, harsh neat. Sharpens another material\'s edge rather than standing alone.'],
+ 'Bergamot EO':['3–30%','lavender; oakmoss; rose','PHOTOTOXIC unless bergapten-free. Confirm the grade before wearing in sun.'],
+ 'Petitgrain EO':['3–15%','orange; neroli; vetiver','Survives heat far better than bergamot, and bridges down into the heart.'],
+ 'Sweet Orange EO':['3–15%','vanilla; cinnamon; caramel','True orange fruit. Nothing else in the kit substitutes.'],
+ 'Calone':['0.5–3%','Hedione; DHM; Iso E Super','Marine/melon. Trace doses — overdose reads as dated 90s aquatic.'],
+ 'Linalool':['2–10%','coumarin; oakmoss; citrus','Floral-lavender with a camphoraceous edge. Above ~10% it reads medicinal.'],
+ 'Hedione':['8–30%','any floral; Iso E Super; Calone','Adds air rather than smell. Florals sit flat without it.'],
+ 'PEA':['5–30%','geraniol; citronellol; damascone','Low impact, high dose. Rose bases run it at 25–30%.'],
+ 'Geraniol':['5–25%','citronellol; PEA; rose oxide','Rose body. Pairs with citronellol — neither carries a rose alone.'],
+ 'Citronellol':['5–25%','geraniol; PEA','The sweeter half of rose body.'],
+ 'Rose oxide':['0.5–4%','geraniol; PEA; damascone','Metallic-green sparkle. Trace only; more reads harsh.'],
+ 'β-damascone':['1–8%','rose pillars; Ald. C14','Jammy rose depth. Overdose goes stewed.'],
+ 'Ald. C14':['2–15%','rose; vanillin; Ald. C18','Peach lactone despite the aldehyde name. Classic with rose.'],
+ 'Ald. C18':['2–6%','vanillin; coumarin; sandalwood','Coconut before it is milk. Above ~5% it dominates as coconut.'],
+ 'Ethyl Maltol':['0.5–2%','vanillin; coumarin; benzoin','Caramel. The commonest cause of cloying, and it flattens what surrounds it.'],
+ 'Vanillin':['2–15%','benzoin; coumarin; ethyl maltol','Powder — dissolves in the ethanol, not the oils. Yellows over time.'],
+ 'Cinnamyl Alc.':['0.5–4%','vanillin; benzoin; orange','Warm cinnamon, far less restricted than cinnamal. Too heavy for a top note.'],
+ 'IsoEugenol':['0.05–0.5%','rose; carnation; clove','IFRA cap 0.02% — trace only, and needs a 1% dilution to weigh at all.'],
+ 'Coumarin':['3–25%','lavender; oakmoss; tonka','Toasted hay-almond. The fougère backbone and your nearest biscuit note.'],
+ 'Tonka Bean':['2–15%','coumarin; vanillin; tobacco','Natural coumarin source — rounder, batch-variable. Log the batch.'],
+ 'Iso E Super':['5–50%','everything','Smooths and diffuses. Above 30% it stops supporting and becomes the effect.'],
+ 'Sandenol':['5–25%','vanillin; Ald. C18; rose','Creamy sandalwood. Lactonic, so it bridges toward sweetness.'],
+ 'Vetiver EO':['3–20%','citrus; Iso E Super; oakmoss','Earthy and dry — your main counterweight to sweetness. Harsh early, smooths with rest.'],
+ 'Benzoin':['3–15%','vanillin; coumarin; labdanum','Resinoid — pushes maceration past 3 weeks. The 2% IFRA cap binds near 13%.'],
+ 'Ambroxan':['3–15%','Iso E Super; Hedione; woods','Pre-diluted 10% in IPM. Keep total IPM under ~20% of batch or it clouds.'],
+ 'Cashmeran':['2–20%','woods; musks; rose','Ambiguous and hard to place — the "smell it again" driver. Priciest per gram.'],
+ 'Styrax':['1–6%','guaiacwood; labdanum; leather','Leathery-smoky, base position — will not give smoke in the heart.'],
+ 'Guaiacwood':['2–10%','styrax; vetiver; rose','Sweet rosy smoke. Softer than cypriol, sits in the base.'],
+ 'Oakmoss alt.':['0.5–5%','bergamot; labdanum; coumarin','Chypre backbone. IFRA cap 0.1% — one of the tightest you work with.'],
+ 'Patchouli EO':['2–15%','rose; oakmoss; vetiver','Earthy, damp, dark. Grounds a chypre or an oriental.'],
+ 'Galaxolide':['5–30%','everything','Clean laundry musk. In almost everything you build — vary it or drydowns converge.'],
+ 'Eth. Brassylate':['3–20%','Galaxolide; Habanolide','Fruity-waxy musk. Reads banana to you specifically — check with a fresh nose.'],
+ 'Habanolide':['2–15%','Galaxolide; Ambroxan','Soft skin musk, a different register to Galaxolide.'],
+ 'Benzyl Benzoate':['1–10%','resinoids; heavy materials','Fixative and solvent, barely odorous. Slows the whole composition down.'],
+};
+const DESC={'DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citrus','Petitgrain':'green,dry-citrus',
+ 'Sweet Orange':'juicy,sweet-citrus','Calone':'marine,ozonic','Linalool':'floral,camphorous','Hedione':'radiant,airy',
+ 'PEA':'rosy,honeyed','Geraniol':'rosy,green','Citronellol':'rosy,soft','Rose oxide':'metallic,sparkling',
+ 'damascone':'jammy,boozy','C14':'peachy,creamy','C18':'coconut,milky','Ethyl Maltol':'caramel,candy',
+ 'Vanillin':'vanilla,powdery','Cinnamyl':'cinnamon,warm-spice','IsoEugenol':'clove,carnation',
+ 'Coumarin':'hay,toasted','Tonka':'hay,tobacco','Iso E Super':'velvety,transparent','Sandenol':'creamy,sandalwood',
+ 'Vetiver':'earthy,dry','Benzoin':'balsamic,resinous','Ambroxan':'ambergris,warm-skin','Cashmeran':'suede,spicy-musk',
+ 'Styrax':'leathery,smoky','Guaiacwood':'smoky,rosy-wood','Oakmoss':'mossy,bitter-green','Patchouli':'earthy,damp',
+ 'Galaxolide':'clean,laundry-musk','Brassylate':'musky,waxy','Habanolide':'skin-musk','Benzyl Benzoate':'faint-balsamic'};
+const PRESETS={
+ 'Radiance booster':[['Hedione',8],['Iso E Super',5],['Ambroxan',1]],
+ 'Clean musk base':[['Galaxolide',10],['Eth. Brassylate',5],['Ambroxan',3]],
+ 'Citrus opening':[['DHM',6],['Petitgrain EO',4],['Sweet Orange EO',3]],
+ 'Rose heart':[['PEA',12],['Geraniol',6],['Citronellol',5],['β-damascone',1.5],['Rose oxide',1]],
+ 'Caramel heart':[['Coumarin',8],['Vanillin',5],['Ethyl Maltol',1.5]],
+ 'Dry woody base':[['Iso E Super',12],['Vetiver EO',5],['Sandenol',5]],
+};
+const TEN=/galaxolide|ambroxan|cashmeran|benzoin|vanillin|maltol|habanolide|iso e|styrax|guaiac|oakmoss|patchouli|brassylate/i;
+const DIF=/hedione|iso e|ambroxan|DHM|calone|galaxolide/i;
+const M=n=>MAT.find(x=>x[0]===n);
+function info(n){for(const k in INFO)if(n.includes(k))return INFO[k];return null}
+function desc(n){for(const k in DESC)if(n.includes(k))return DESC[k].split(',');return[]}
+function perG(n){const m=M(n);return m&&m[6]?m[5]/m[6]:0}
+function weighAs(w){if(w>=0.10)return{t:w.toFixed(3)+'g',tier:0};
+ if(w>=0.01)return{t:(w*10).toFixed(2)+'g †',tier:1};return{t:(w*100).toFixed(2)+'g ‡',tier:2}}
+
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a={})=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
+let sel={},blocks=[],rowRefs={},bid=1;
+const COLW=143,X0=14,DY=22;
+const P=(()=>{const p={};BAND.forEach(([bk,,,by])=>FAM.forEach(([fk],fi)=>{
+ MAT.filter(m=>m[1]===fk&&m[2]===bk).forEach((m,i)=>{p[m[0]]={x:X0+fi*COLW+9,y:by+36+i*DY,fam:fk,band:bk}})}));return p})();
+
+const conc=()=>+$('#ty').value, W=()=>parseFloat($('#wt').value)||0, cgram=()=>W()*conc()/100;
+function shares(){const ns=Object.keys(sel),su=ns.reduce((a,n)=>a+(sel[n]||0),0);
+ const o={};ns.forEach(n=>o[n]=su>0?(sel[n]||0)/su*100:0);return{out:o,su}}
+const blockOf=n=>{const b=blocks.find(b=>b.m.includes(n));return b?b.id:''};
+
+function drawMap(){
+ const svg=$('#map');svg.innerHTML='';
+ BAND.forEach(([bk,bn,bt,by],bi)=>{
+  const h=bk==='top'?185:bk==='heart'?185:265;
+  svg.append(mk('rect',{x:6,y:by,width:868,height:h,fill:bi%2?'#F6F1E8':'#FBF9F5',rx:4}));
+  const l=mk('text',{x:12,y:by+13,'font-size':10,'font-weight':700,'letter-spacing':1.4,fill:'#1B2621'});l.textContent=bn;svg.append(l);
+  const t=mk('text',{x:12,y:by+25,'font-size':9,fill:'#B0A69A'});t.textContent=bt;svg.append(t);
+ });
+ FAM.forEach(([fk,fn,fc],fi)=>{const t=mk('text',{x:X0+fi*COLW+9,y:46,'font-size':9,'letter-spacing':.5,fill:fc,'font-weight':600});
+  t.textContent=fn.toUpperCase();svg.append(t)});
+ const ord={top:0,heart:1,base:2};
+ const pts=Object.keys(sel).map(n=>({n,...P[n]})).sort((a,b)=>ord[a.band]-ord[b.band]||a.x-b.x);
+ if(pts.length>1){let d='M '+pts[0].x+' '+pts[0].y;
+  for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],mx=(a.x+b.x)/2;
+   d+=` C ${mx} ${a.y}, ${mx} ${b.y}, ${b.x} ${b.y}`}
+  svg.append(mk('path',{d,fill:'none',stroke:'#A67C3D','stroke-width':1.6,'stroke-opacity':.55,'stroke-linecap':'round'}))}
+ const any=Object.keys(sel).length>0,{out:sh}=shares();
+ MAT.forEach(m=>{const[name,fam,,ifra]=m,p=P[name],on=sel[name]!==undefined;
+  const fc=FAM.find(f=>f[0]===fam)[2];
+  const g=mk('g',{class:'node'+(on?' on':'')+(any&&!on?' sup':'')});
+  const r=on?Math.max(5,Math.min(11,4+(sh[name]||0)*.22)):3.6;
+  g.append(mk('circle',{cx:p.x,cy:p.y,r,fill:on?fc:'#fff',stroke:on?fc:'#CFC6B8','stroke-width':on?0:1.2,'fill-opacity':any&&!on?.35:1}));
+  const disp=name.length>17?name.slice(0,16)+'…':name;
+  const t=mk('text',{x:p.x+13,y:p.y+3.5});t.textContent=disp;g.append(t);
+  if(ifra!=null){const w=mk('text',{x:p.x+17+disp.length*5.6,y:p.y+3.5,'font-size':10,'font-weight':700,fill:'#9C4A3F'});w.textContent='!';g.append(w)}
+  const inf=info(name),ti=mk('title');
+  ti.textContent=[name,desc(name).join(', '),
+   'typical '+(inf?inf[0]:'—'),'pairs with: '+(inf?inf[1]:'—'),
+   ifra!=null?'IFRA '+ifra+'% of finished product':'no IFRA limit',
+   m[4]<100?'supplied at '+m[4]+'% in carrier':'neat',
+   'Rs '+perG(name).toFixed(1)+'/g',inf?'\n'+inf[2]:''].filter(Boolean).join('  ·  ');
+  g.append(ti);
+  g.onclick=()=>{if(on){delete sel[name];blocks.forEach(b=>b.m=b.m.filter(x=>x!==name))}else sel[name]=5;draw()};
+  svg.append(g)});
+}
+
+function buildRows(){
+ const box=$('#sel');box.innerHTML='';rowRefs={};
+ const names=Object.keys(sel);
+ if(!names.length){box.innerHTML='<div class="emp">Nothing selected.</div>';return}
+ const ord={top:0,heart:1,base:2};
+ const mkRow=n=>{
+  const fc=FAM.find(f=>f[0]===P[n].fam)[2],m=M(n),inf=info(n);
+  const r=document.createElement('div');r.className='row';
+  const d=document.createElement('span');d.className='d';d.style.background=fc;
+  const nm=document.createElement('span');nm.className='n';
+  nm.innerHTML=n+(m[4]<100?'<span class="sub2">'+m[4]+'% in carrier</span>':'');
+  if(inf)nm.title=n+'\ntypical '+inf[0]+'\npairs with: '+inf[1]+'\n\n'+inf[2];
+  const ip=document.createElement('input');ip.type='number';ip.step='any';ip.min='0';ip.value=sel[n];
+  ip.oninput=()=>{sel[n]=ip.value===''?0:parseFloat(ip.value)||0;refresh()};
+  const bsel=document.createElement('select');bsel.className='bs';bsel.title='Assign to block';
+  bsel.innerHTML='<option value="">—</option>'+blocks.map(b=>`<option value="${b.id}">${b.n.slice(0,2)}</option>`).join('');
+  bsel.value=blockOf(n);
+  bsel.onchange=()=>{blocks.forEach(b=>b.m=b.m.filter(x=>x!==n));
+   const b=blocks.find(b=>b.id==bsel.value);if(b)b.m.push(n);draw()};
+  const g=document.createElement('span');g.className='g';
+  const c=document.createElement('span');c.className='c';
+  const x=document.createElement('button');x.className='x';x.textContent='×';
+  x.onclick=()=>{delete sel[n];blocks.forEach(b=>b.m=b.m.filter(y=>y!==n));draw()};
+  r.append(d,nm,ip,bsel,g,c,x);rowRefs[n]={g,c};return r};
+ blocks.forEach(b=>{
+  const mem=b.m.filter(n=>sel[n]!==undefined);if(!mem.length)return;
+  const wrap=document.createElement('div');wrap.className='blk';
+  const h=document.createElement('div');h.className='blkh';
+  h.innerHTML='<b>'+b.n+'</b><span class="bp" id="bp'+b.id+'"></span>';
+  const del=document.createElement('button');del.textContent='×';del.title='Remove block and its materials';
+  del.onclick=()=>{b.m.forEach(n=>delete sel[n]);blocks=blocks.filter(x=>x!==b);draw()};
+  h.append(del);wrap.append(h);
+  mem.sort((a,c)=>ord[P[a].band]-ord[P[c].band]).forEach(n=>wrap.append(mkRow(n)));
+  box.append(wrap)});
+ names.filter(n=>!blockOf(n)).sort((a,c)=>ord[P[a].band]-ord[P[c].band]).forEach(n=>box.append(mkRow(n)));
+ const tr=document.createElement('div');tr.className='row tot';
+ tr.innerHTML='<span class="d"></span><span class="n">Total</span><span class="sp" id="sPct"></span>'+
+  '<span style="width:32px"></span><span class="g" id="sG"></span><span class="c" id="sC"></span><span style="width:15px"></span>';
+ box.append(tr);
+}
+
+function draw(){buildRows();refresh()}
+function refresh(){
+ $('#cg').value=cgram().toFixed(2)+'g in '+(W()-cgram()).toFixed(2)+'g ethanol';
+ drawMap();
+ const names=Object.keys(sel),{out:sh,su}=shares(),cg=cgram();
+ $('#pt').textContent=$('#nm').value||'Untitled';
+ $('#pmeta').textContent=names.length?names.length+' materials · '+conc()+'% · '+W()+'g':'Click nodes on the map';
+ const bt={top:0,heart:0,base:0};names.forEach(n=>bt[P[n].band]+=sh[n]);
+ const sp=$('#sp');sp.innerHTML='';
+ [['top','#C9973F'],['heart','#B4718C'],['base','#5C2A41']].forEach(([k,c])=>{
+  const i=document.createElement('i');i.style.width=bt[k]+'%';i.style.background=c;sp.append(i)});
+ $('#sl').textContent=names.length?`top ${Math.round(bt.top)} · heart ${Math.round(bt.heart)} · base ${Math.round(bt.base)}`:'—';
+ const ss=$('#ss');ss.textContent=names.length?(Math.abs(su-100)<.5?'100%':su.toFixed(1)+'% → normalised'):'0%';
+ ss.style.color=Math.abs(su-100)<.5?'var(--good)':'var(--muted)';
+ let cost=0,est=false;
+ names.forEach(n=>{const r=rowRefs[n];if(!r)return;
+  const m=M(n),w=cg*sh[n]/100,wa=weighAs(w);
+  r.g.innerHTML=wa.t+(m[4]<100?'<span class="sub2">'+(sh[n]*m[4]/100).toFixed(2)+'% active</span>':'');
+  r.g.style.color=wa.tier?'var(--warn)':'var(--muted)';
+  const c=w*perG(n);cost+=c;if(!m[7])est=true;
+  r.c.textContent=c>=1?Math.round(c):c.toFixed(1);
+  r.c.title='Rs '+perG(n).toFixed(1)+'/g'+(m[7]?'':' — estimated')});
+ cost+=(W()-cg)*ETH_G;
+ blocks.forEach(b=>{const e=$('#bp'+b.id);
+  if(e)e.textContent=b.m.filter(n=>sel[n]!==undefined).reduce((a,n)=>a+sh[n],0).toFixed(1)+'%'});
+ const sP=$('#sPct');
+ if(sP){sP.textContent=su.toFixed(1)+'%';sP.style.color=Math.abs(su-100)<.5?'var(--good)':'var(--warn)';
+  $('#sG').textContent=W().toFixed(1)+'g';
+  $('#sC').textContent='Rs '+Math.round(cost)+(est?'*':'');
+  $('#sC').title='Batch total'+(est?'. * some prices estimated':'')+' · Rs '+Math.round(W()?cost/W()*50:0)+' per 50g bottle'}
+ msgs(bt,cg,names,sh);brief(bt,names,sh);
+ window._est=est;window._cost=cost;
+}
+
+function msgs(bt,cg,names,sh){
+ const box=$('#msgs');box.innerHTML='';
+ const add=(k,t)=>{const d=document.createElement('div');d.className='msg '+k;d.innerHTML=t;box.append(d)};
+ if(!names.length)return;
+ const viol=[];let carrier=0,t1=0,t2=0;
+ names.forEach(n=>{const m=M(n),act=sh[n]*conc()/100*(m[4]/100);
+  if(m[3]!=null&&act>m[3])viol.push(n+' at '+act.toFixed(2)+'% vs '+m[3]+'% — cap at '+(m[3]*100/(conc()*m[4]/100)).toFixed(1)+'% of concentrate');
+  if(m[4]<100)carrier+=cg*sh[n]/100*(1-m[4]/100);
+  const w=cg*sh[n]/100,tr=weighAs(w).tier;if(w>0&&tr===1)t1++;if(w>0&&tr===2)t2++});
+ viol.forEach(v=>add('b','<b>IFRA over</b> — '+v));
+ if(!viol.length&&names.some(n=>M(n)[3]!=null))add('g','IFRA limits clear.');
+ if(carrier>0){const p=carrier/W()*100;
+  if(p>20)add('b','Carrier load <b>'+p.toFixed(1)+'%</b> — past the ~22% cloud threshold.');
+  else if(p>12)add('w','Carrier load '+p.toFixed(1)+'% — watch it.')}
+ if(t1)add('w','<b>†</b> '+t1+' under 0.10g — dilute what you hold <b>1:9</b>, weigh the figure shown.');
+ if(t2)add('b','<b>‡</b> '+t2+' under 0.01g — a 1:9 dilution still will not reach the floor. Dilute <b>1:99</b> or raise the batch.');
+ if(names.length>2){
+  if(!bt.top)add('n','No top note — it will open abruptly.');
+  if(!bt.base)add('n','No base — gone within the hour.');
+  if(!bt.heart&&bt.top&&bt.base)add('n','No heart — top and base will feel disconnected.');
+  if(bt.top>45)add('w','Top-heavy at '+Math.round(bt.top)+'% — most evaporates in 30 min.')}
+}
+
+function readingData(bt,names,sh){
+ const fams={};let sweet=0,dry=0,ten=0,dif=0,res=0;
+ names.forEach(n=>{fams[P[n].fam]=(fams[P[n].fam]||0)+sh[n];
+  if(/maltol|vanill|benzoin|coumarin|tonka|milk|C18|Orange/i.test(n))sweet+=sh[n];
+  if(/vetiver|oakmoss|iso e|petitgrain|guaiac|styrax|patchouli/i.test(n))dry+=sh[n];
+  if(TEN.test(n))ten+=sh[n];if(DIF.test(n))dif+=sh[n];
+  if(/benzoin|styrax|oakmoss/i.test(n))res+=sh[n]});
+ const band=k=>names.filter(n=>P[n].band===k).sort((a,b)=>sh[b]-sh[a]).slice(0,3);
+ const words={};names.forEach(n=>desc(n).forEach(w=>words[w]=(words[w]||0)+sh[n]));
+ const has=r=>names.some(n=>r.test(n));
+ const isoE=sel['Iso E Super']?sh['Iso E Super']:0;
+ let genre='';
+ if(isoE>30)genre='minimalist skin-scent — Iso E at '+Math.round(isoE)+'% is an overdose, and that becomes the effect';
+ else if(has(/oakmoss/i)&&has(/bergamot/i)&&fams.floral>8)genre='chypre';
+ else if(has(/coumarin/i)&&has(/oakmoss|linalool/i)&&dry>12)genre='fougère';
+ else if(has(/calone/i)&&fams.citrus>12)genre='aquatic';
+ else if(sweet>25)genre='gourmand — sweetness is the subject';
+ else if(sweet>12)genre='gourmand accent — sweetness as facet';
+ else if(has(/geraniol|citronellol|rose oxide/i))genre='rose composition';
+ else if(fams.wood>35&&sweet<10)genre='dry woody-amber';
+ else if(fams.citrus>35)genre='cologne — citrus-led';
+ let cl,ck;
+ if(sweet>22&&dry<8){cl='poor — sweet with no dry contrast will bloom and cloy in heat';ck='bad'}
+ else if(res>18&&dry<10){cl='marginal — resinous weight gets heavy in humidity';ck='warn'}
+ else if(dry>15&&sweet<15){cl='good — dry and transparent, holds up in heat';ck='good'}
+ else{cl='workable — sweetness is countered';ck='ok'}
+ const s=[];
+ if(fams.floral>8&&!sel['Hedione'])s.push('Hedione — florals sit flat without it');
+ if(sweet>10&&dry<5)s.push('vetiver or Iso E Super for dryness');
+ if(fams.citrus>20&&!fams.wood)s.push('a wood base — citrus has nowhere to land');
+ if((sel['Geraniol']||sel['Citronellol'])&&!sel['β-damascone'])s.push('β-damascone — rose body without depth reads thin');
+ if(sel['Ethyl Maltol']&&sh['Ethyl Maltol']>12)s.push('ethyl maltol is high — it flattens what sits around it');
+ if(bt.base>0&&bt.base<20)s.push('more base — under 20% will not hold');
+ return{band,words:Object.entries(words).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]),genre,cl,ck,sugg:s,
+  lon:ten>45?'long — 6h+':ten>25?'moderate — 4–6h':ten>12?'short — 2–4h':'very short — under 2h',
+  pro:dif>45?'strong, fills a room':dif>22?"moderate, arm's length":'close to skin',
+  mac:res?'3+ weeks — resinoid present':has(/EO|Tonka/i)?'2 weeks — naturals present':'1 week — all synthetic',
+  hasAmb:has(/ambroxan|cashmeran|habanolide/i)}}
+
+function brief(bt,names,sh){
+ const b=$('#brief');
+ if(!names.length){b.textContent='Select materials to see what this should smell like.';return}
+ const d=readingData(bt,names,sh);
+ let t='<div class="bs2"><b>Wear arc</b><br>';
+ t+='<span class="tm">0–30m</span> '+(bt.top?d.band('top').join(', '):'nothing — opens into the heart')+'<br>';
+ t+='<span class="tm">30m–3h</span> '+(bt.heart?d.band('heart').join(', '):'gap')+'<br>';
+ t+='<span class="tm">3h+</span> '+(bt.base?d.band('base').join(', '):'nothing')+'</div>';
+ if(d.words.length)t+='<div class="bs2"><b>Character</b><br>'+d.words.join(' · ')+'</div>';
+ if(d.genre)t+='<div class="bs2"><b>Reads as</b><br>'+d.genre+'</div>';
+ t+='<div class="bs2"><b>Performance</b><br>longevity '+d.lon+' · projection '+d.pro+'</div>';
+ t+='<div class="bs2 '+d.ck+'"><b>Karachi climate</b><br>'+d.cl+'</div>';
+ t+='<div class="bs2"><b>Maceration</b><br>'+d.mac+'</div>';
+ if(d.hasAmb)t+='<div class="bs2"><b>Note</b><br>ambiguous base material present — the "smell it again" quality</div>';
+ if(d.sugg.length)t+='<div class="bs2"><b>Consider</b><br>'+d.sugg.join('<br>')+'</div>';
+ b.innerHTML=t;
+}
+
+function buildPDF(){
+ const names=Object.keys(sel);if(!names.length){alert('Nothing to export.');return}
+ const{out:sh,su}=shares(),cg=cgram(),ord={top:0,heart:1,base:2};
+ const bt={top:0,heart:0,base:0};names.forEach(n=>bt[P[n].band]+=sh[n]);
+ const d=readingData(bt,names,sh);
+ let rows='',cost=0;
+ const line=n=>{const m=M(n),w=cg*sh[n]/100,wa=weighAs(w),c=w*perG(n);cost+=c;
+  return`<tr><td>${n}${m[4]<100?' <i style="font-size:7.5px">('+m[4]+'% in carrier)</i>':''}</td>`+
+   `<td class="r">${sh[n].toFixed(1)}%</td><td class="r">${m[4]<100?(sh[n]*m[4]/100).toFixed(2)+'%':'—'}</td>`+
+   `<td class="r">${wa.t}</td><td class="r">${c>=1?Math.round(c):c.toFixed(1)}</td></tr>`};
+ blocks.forEach(b=>{const mem=b.m.filter(n=>sel[n]!==undefined);if(!mem.length)return;
+  rows+=`<tr class="bh"><td colspan="4">${b.n}</td><td class="r">${mem.reduce((a,n)=>a+sh[n],0).toFixed(1)}%</td></tr>`;
+  mem.sort((a,c)=>ord[P[a].band]-ord[P[c].band]).forEach(n=>rows+=line(n))});
+ const free=names.filter(n=>!blockOf(n)).sort((a,c)=>ord[P[a].band]-ord[P[c].band]);
+ if(free.length&&blocks.some(b=>b.m.some(n=>sel[n]!==undefined)))rows+='<tr class="bh"><td colspan="5">Unblocked</td></tr>';
+ free.forEach(n=>rows+=line(n));
+ const eth=W()-cg;cost+=eth*ETH_G;
+ rows+=`<tr><td>Ethanol</td><td class="r">—</td><td class="r">—</td><td class="r">${eth.toFixed(2)}g</td><td class="r">${Math.round(eth*ETH_G)}</td></tr>`;
+ rows+=`<tr class="tt"><td>Total</td><td class="r">${su.toFixed(1)}%</td><td class="r"></td><td class="r">${W().toFixed(1)}g</td><td class="r">Rs ${Math.round(cost)}</td></tr>`;
+ const viol=[];names.forEach(n=>{const m=M(n),act=sh[n]*conc()/100*(m[4]/100);
+  if(m[3]!=null&&act>m[3])viol.push(n+' — '+act.toFixed(2)+'% vs '+m[3]+'% limit')});
+ const dil=names.filter(n=>weighAs(cg*sh[n]/100).tier>0);
+ const ty=TYPES.find(t=>t[1]===conc());
+ $('#pv').innerHTML=`<h2>${($('#nm').value||'UNTITLED').toUpperCase()}</h2>
+ <div class="meta">TRACE · ${ty?ty[0]:''} ${conc()}% · ${W()}g batch · concentrate ${cg.toFixed(2)}g + ethanol ${eth.toFixed(2)}g · ${new Date().toLocaleDateString()}</div>
+ <table><tr><th>Material</th><th class="r">% conc</th><th class="r">active</th><th class="r">weigh</th><th class="r">Rs</th></tr>${rows}</table>
+ <div class="cols"><div class="col">
+  <div class="sec">Wear arc</div>
+  <div class="ln">0–30m · ${bt.top?d.band('top').join(', '):'—'}</div>
+  <div class="ln">30m–3h · ${bt.heart?d.band('heart').join(', '):'—'}</div>
+  <div class="ln">3h+ · ${bt.base?d.band('base').join(', '):'—'}</div>
+  <div class="sec">Structure</div><div class="ln">top ${Math.round(bt.top)}% · heart ${Math.round(bt.heart)}% · base ${Math.round(bt.base)}%</div>
+  <div class="sec">Character</div><div class="ln">${d.words.join(' · ')}</div>
+  ${d.genre?'<div class="sec">Reads as</div><div class="ln">'+d.genre+'</div>':''}
+ </div><div class="col">
+  <div class="sec">Performance</div><div class="ln">longevity ${d.lon}</div><div class="ln">projection ${d.pro}</div>
+  <div class="sec">Maceration</div><div class="ln">${d.mac}</div>
+  <div class="sec">Karachi climate</div><div class="ln">${d.cl}</div>
+  <div class="sec">Cost</div><div class="ln">Rs ${Math.round(cost)} this batch · Rs ${Math.round(W()?cost/W()*50:0)} per 50g bottle${window._est?' (some estimated)':''}</div>
+ </div></div>
+ <div class="sec">IFRA</div>${viol.length?viol.map(v=>'<div class="fl">OVER — '+v+'</div>').join(''):'<div class="ln">All limits clear at this concentration.</div>'}
+ ${dil.length?'<div class="sec">Weighing</div>'+dil.map(n=>{const t=weighAs(cg*sh[n]/100);
+   return'<div class="fl">'+n+' — dilute what you hold '+(t.tier===1?'1:9':'1:99')+', weigh '+t.t.replace(/[†‡]/g,'').trim()+'</div>'}).join(''):''}
+ ${d.sugg.length?'<div class="sec">Consider</div>'+d.sugg.map(s=>'<div class="ln">· '+s+'</div>').join(''):''}
+ <div style="margin-top:8px;font-size:7px;color:#888;border-top:1px solid #ccc;padding-top:4px">
+ IFRA figures are Category 4 (fine fragrance) as % of finished product, seeded from memory and unverified. Confirm against the official IFRA Standards before commercial use.</div>`;
+ window.print();
+}
+
+(function init(){
+ const s=$('#ty');TYPES.forEach(([n,c])=>{const o=document.createElement('option');o.value=c;o.textContent=n+' · '+c+'%';s.append(o)});
+ s.value=15;s.onchange=refresh;$('#wt').oninput=refresh;$('#nm').oninput=refresh;
+ const bs=$('#blkSel');
+ bs.innerHTML='<option value="">— choose —</option>'+Object.keys(PRESETS).map(k=>`<option>${k}</option>`).join('')+'<option value="__new">+ Empty block…</option>';
+ bs.onchange=()=>{const v=bs.value;if(!v)return;
+  if(v==='__new'){const n=prompt('Block name');if(n)blocks.push({id:bid++,n,m:[]})}
+  else{const b={id:bid++,n:v,m:[]};PRESETS[v].forEach(([mn,p])=>{if(M(mn)){sel[mn]=p;b.m.push(mn)}});blocks.push(b)}
+  bs.value='';draw()};
+ $('#norm').onclick=()=>{const ns=Object.keys(sel),su=ns.reduce((a,n)=>a+(sel[n]||0),0);
+  if(!su)return;ns.forEach(n=>sel[n]=Math.round(sel[n]/su*1000)/10);draw()};
+ $('#reset').onclick=()=>{if(Object.keys(sel).length&&!confirm('Clear everything?'))return;
+  sel={};blocks=[];bid=1;$('#nm').value='';$('#wt').value=20;$('#ty').value=15;draw()};
+ $('#pdf').onclick=buildPDF;
+ draw();
+})();
+</script>
+</body>
+</html>
