@@ -31,6 +31,9 @@ svg{display:block}
 .node text{font:10px system-ui,sans-serif;fill:#3A2C32;pointer-events:none}
 .node.on text{font-weight:700;fill:#1B2621}
 .node.sup text{fill:#B8B0A4}
+.node.sug text{fill:#8A6A2F;font-weight:600}
+.legend{font-size:9.5px;color:var(--muted);padding:4px 8px 0;display:flex;gap:14px;align-items:center}
+.legend i{display:inline-block;width:11px;height:11px;border:1.3px dashed #A67C3D;border-radius:50%;vertical-align:-2px;margin-right:4px}
 .panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:11px;position:sticky;top:12px;max-height:95vh;overflow-y:auto}
 .panel h3{font-family:Georgia,serif;font-size:14px}
 .pm{font-size:11px;color:var(--muted);margin-bottom:8px}
@@ -92,7 +95,8 @@ h4{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--bra
 </head>
 <body>
 <div class="wrap">
-<h1>TRACE</h1><div class="sub">Compose — spatial map</div>
+<h1>TRACE</h1><div class="sub">Compose — spatial map
+ <a href="index.html" style="float:right;color:var(--brass);text-decoration:none;text-transform:none;letter-spacing:0;font-size:11px">Studio →</a></div>
 
 <div class="bar">
   <div class="f" style="flex:1.4"><label>Name</label><input id="nm" placeholder="Untitled"></div>
@@ -103,7 +107,10 @@ h4{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--bra
 </div>
 
 <div class="grid">
-  <div class="mapbox"><svg id="map" width="880" height="740"></svg></div>
+  <div class="mapbox"><svg id="map" width="880" height="740"></svg>
+    <div class="legend"><span><i></i>ringed = pairs well with what you have selected</span>
+    <span style="color:#9C4A3F">!</span><span style="margin-left:-9px">= IFRA limit applies</span></div>
+  </div>
   <div class="panel">
     <h3 id="pt">Nothing selected</h3>
     <div class="pm" id="pmeta">Click nodes on the map</div>
@@ -113,9 +120,11 @@ h4{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--bra
     <div id="sel"></div>
     <div class="acts">
       <button class="btn" id="norm">Normalise</button>
-      <button class="btn gh" id="reset">Reset</button>
+      <button class="btn gh" id="save" style="display:none">Save to Studio</button>
       <button class="btn gh" id="pdf">Export PDF</button>
+      <button class="btn gh" id="reset">Reset</button>
     </div>
+    <div id="src" style="font-size:9px;color:var(--muted);margin-top:5px;text-align:center;cursor:help"></div>
     <h4>Reading</h4>
     <div id="brief" style="font-size:11px;color:var(--muted)">Select materials to see what this should smell like.</div>
   </div>
@@ -208,6 +217,61 @@ const PRESETS={
  'Caramel heart':[['Coumarin',8],['Vanillin',5],['Ethyl Maltol',1.5]],
  'Dry woody base':[['Iso E Super',12],['Vetiver EO',5],['Sandenol',5]],
 };
+const PAIRS={
+ 'DHM':['Petitgrain EO','Sweet Orange EO','Ambroxan','Iso E Super','Calone'],
+ 'Citral':['DHM','Bergamot EO','Petitgrain EO'],
+ 'Bergamot EO':['Linalool','Oakmoss alt.','Coumarin','PEA'],
+ 'Petitgrain EO':['Sweet Orange EO','Vetiver EO','DHM','Bergamot EO'],
+ 'Sweet Orange EO':['Vanillin','Cinnamyl Alc.','Tonka Bean','Petitgrain EO'],
+ 'Calone':['Hedione','DHM','Iso E Super'],
+ 'Linalool':['Coumarin','Oakmoss alt.','Bergamot EO','Vetiver EO'],
+ 'Hedione':['PEA','Geraniol','Iso E Super','Calone','Rose oxide'],
+ 'PEA':['Geraniol','Citronellol','β-damascone','Hedione'],
+ 'Geraniol':['Citronellol','PEA','Rose oxide','β-damascone'],
+ 'Citronellol':['Geraniol','PEA','Rose oxide'],
+ 'Rose oxide':['Geraniol','PEA','β-damascone'],
+ 'β-damascone':['PEA','Geraniol','Ald. C14 peach'],
+ 'Ald. C14 peach':['Vanillin','Ald. C18 milk','Sandenol','β-damascone'],
+ 'Ald. C18 milk':['Vanillin','Coumarin','Sandenol'],
+ 'Ethyl Maltol':['Vanillin','Coumarin','Benzoin','Tonka Bean'],
+ 'Vanillin':['Benzoin','Coumarin','Ethyl Maltol','Sandenol'],
+ 'Cinnamyl Alc.':['Vanillin','Benzoin','Sweet Orange EO'],
+ 'IsoEugenol':['Geraniol','PEA','Vanillin'],
+ 'Coumarin':['Linalool','Oakmoss alt.','Tonka Bean','Vanillin'],
+ 'Tonka Bean':['Coumarin','Vanillin','Styrax'],
+ 'Iso E Super':['Hedione','Ambroxan','Vetiver EO','Cashmeran'],
+ 'Sandenol':['Vanillin','Ald. C18 milk','PEA'],
+ 'Vetiver EO':['Iso E Super','Petitgrain EO','Oakmoss alt.','Guaiacwood'],
+ 'Benzoin':['Vanillin','Coumarin','Styrax'],
+ 'Ambroxan':['Iso E Super','Hedione','Cashmeran','DHM'],
+ 'Cashmeran':['Iso E Super','Ambroxan','Geraniol','Habanolide'],
+ 'Styrax':['Guaiacwood','Benzoin','Tonka Bean'],
+ 'Guaiacwood':['Styrax','Vetiver EO','Geraniol'],
+ 'Oakmoss alt.':['Bergamot EO','Coumarin','Linalool','Vetiver EO'],
+ 'Patchouli EO':['Geraniol','Oakmoss alt.','Vetiver EO'],
+ 'Galaxolide':['Iso E Super','Ambroxan','Hedione'],
+ 'Eth. Brassylate':['Galaxolide','Habanolide'],
+ 'Habanolide':['Galaxolide','Ambroxan','Cashmeran'],
+ 'Benzyl Benzoate':['Benzoin','Styrax'],
+};
+const norm=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
+function pairsFor(n){
+ const nn=norm(n);
+ for(const k in PAIRS){const kk=norm(k);if(nn.includes(kk)||kk.includes(nn))return PAIRS[k]}
+ return[];
+}
+function resolve(target){ // find the real library name for a pairing target
+ const t=norm(target);
+ const hit=MAT.find(m=>{const mn=norm(m[0]);return mn===t||mn.includes(t)||t.includes(mn)});
+ return hit?hit[0]:null;
+}
+function suggested(){
+ const s=new Set();
+ Object.keys(sel).forEach(n=>pairsFor(n).forEach(p=>{
+  const real=resolve(p);
+  if(real&&sel[real]===undefined)s.add(real)}));
+ return s;
+}
 const TEN=/galaxolide|ambroxan|cashmeran|benzoin|vanillin|maltol|habanolide|iso e|styrax|guaiac|oakmoss|patchouli|brassylate/i;
 const DIF=/hedione|iso e|ambroxan|DHM|calone|galaxolide/i;
 const M=n=>MAT.find(x=>x[0]===n);
@@ -219,19 +283,59 @@ function weighAs(w){if(w>=0.10)return{t:w.toFixed(3)+'g',tier:0};
 
 const NS='http://www.w3.org/2000/svg';
 const mk=(t,a={})=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
-let sel={},blocks=[],rowRefs={},bid=1;
-const SKEY='trace:compose';
+let sel={},blocks=[],rowRefs={},bid=1,studioIds=null;
+const SKEY='trace:compose', LKEY='trace:studio';
 const Store={
  async get(k){if(window.storage){try{const r=await window.storage.get(k,false);return r?r.value:null}catch(e){}}
   try{return localStorage.getItem(k)}catch(e){return null}},
  async set(k,v){if(window.storage){try{await window.storage.set(k,v,false);return}catch(e){}}
   try{localStorage.setItem(k,v)}catch(e){}}};
+
+// where a material sits on the map, inferred from its name
+const PLACE={'DHM':['citrus','top'],'Citral':['citrus','top'],'Bergamot':['citrus','top'],
+ 'Petitgrain':['citrus','top'],'Orange':['citrus','top'],'Calone':['citrus','top'],
+ 'Linalool':['floral','top'],'Cardamom':['spice','top'],
+ 'Hedione':['floral','heart'],'PEA':['floral','heart'],'Phenylethyl':['floral','heart'],
+ 'Geraniol':['floral','heart'],'Citronellol':['floral','heart'],'Rose oxide':['floral','heart'],
+ 'Jasmine':['floral','heart'],'damascone':['fruity','heart'],'C14':['fruity','heart'],
+ 'C18':['fruity','heart'],'Nonalactone':['fruity','heart'],'nonalactone':['fruity','heart'],
+ 'Decalactone':['fruity','heart'],'Maltol':['fruity','heart'],'Vanillin':['fruity','heart'],
+ 'Cinnamyl':['spice','heart'],'Eugenol':['spice','heart'],'Coumarin':['spice','heart'],
+ 'Tonka':['spice','heart'],
+ 'Iso E':['wood','base'],'Sandenol':['wood','base'],'Vetiver':['wood','base'],
+ 'Benzoin':['wood','base'],'Ambroxan':['wood','base'],'Cashmeran':['wood','base'],
+ 'Styrax':['wood','base'],'Guaiacwood':['wood','base'],'Oakmoss':['wood','base'],
+ 'Patchouli':['wood','base'],'Cypriol':['wood','base'],'Labdanum':['wood','base'],
+ 'Galaxolide':['musk','base'],'Brassylate':['musk','base'],'Habanolide':['musk','base'],
+ 'Benzyl Benzoate':['musk','base'],'Civetone':['musk','base']};
+function place(n){for(const k in PLACE)if(n.toLowerCase().includes(k.toLowerCase()))return PLACE[k];return['wood','base']}
+
+// replace the built-in list with the user's real library, if one exists
+async function loadLibrary(){
+ const v=await Store.get(LKEY); if(!v)return false;
+ let d; try{d=JSON.parse(v)}catch(e){return false}
+ if(!d.mat||!d.mat.length)return false;
+ const skip=/^(ethanol|dpg|ipm|isopropyl myristate|water)$/i;
+ const rows=[],ids={};
+ d.mat.forEach(m=>{
+  if(skip.test(m.name.trim()))return;
+  const[f,b]=place(m.name);
+  rows.push([m.name,f,b,m.ifra,m.conc,m.price,m.bottleSize,m.priceVerified?1:0]);
+  ids[m.name]=m.id;
+ });
+ if(!rows.length)return false;
+ MAT.length=0; rows.forEach(r=>MAT.push(r));
+ studioIds=ids;
+ return true;
+}
 let saveT=null;
 function persist(){clearTimeout(saveT);saveT=setTimeout(()=>Store.set(SKEY,JSON.stringify(
  {sel,blocks,bid,nm:$('#nm').value,ty:$('#ty').value,wt:$('#wt').value})),400)}
 const COLW=143,X0=14,DY=22;
-const P=(()=>{const p={};BAND.forEach(([bk,,,by])=>FAM.forEach(([fk],fi)=>{
- MAT.filter(m=>m[1]===fk&&m[2]===bk).forEach((m,i)=>{p[m[0]]={x:X0+fi*COLW+9,y:by+36+i*DY,fam:fk,band:bk}})}));return p})();
+let P={};
+function layout(){P={};BAND.forEach(([bk,,,by])=>FAM.forEach(([fk],fi)=>{
+ MAT.filter(m=>m[1]===fk&&m[2]===bk).forEach((m,i)=>{P[m[0]]={x:X0+fi*COLW+9,y:by+36+i*DY,fam:fk,band:bk}})}))}
+layout();
 
 const conc=()=>+$('#ty').value, W=()=>parseFloat($('#wt').value)||0, cgram=()=>W()*conc()/100;
 function shares(){const ns=Object.keys(sel),su=ns.reduce((a,n)=>a+(sel[n]||0),0);
@@ -255,16 +359,23 @@ function drawMap(){
    d+=` C ${mx} ${a.y}, ${mx} ${b.y}, ${b.x} ${b.y}`}
   svg.append(mk('path',{d,fill:'none',stroke:'#A67C3D','stroke-width':1.6,'stroke-opacity':.55,'stroke-linecap':'round'}))}
  const any=Object.keys(sel).length>0,{out:sh}=shares();
+ const sug=any?suggested():new Set();
  MAT.forEach(m=>{const[name,fam,,ifra]=m,p=P[name],on=sel[name]!==undefined;
+  const isSug=!on&&sug.has(name);
   const fc=FAM.find(f=>f[0]===fam)[2];
-  const g=mk('g',{class:'node'+(on?' on':'')+(any&&!on?' sup':'')});
+  const g=mk('g',{class:'node'+(on?' on':'')+(any&&!on&&!isSug?' sup':'')+(isSug?' sug':'')});
   const r=on?Math.max(5,Math.min(11,4+(sh[name]||0)*.22)):3.6;
-  g.append(mk('circle',{cx:p.x,cy:p.y,r,fill:on?fc:'#fff',stroke:on?fc:'#CFC6B8','stroke-width':on?0:1.2,'fill-opacity':any&&!on?.35:1}));
+  if(isSug)g.append(mk('circle',{cx:p.x,cy:p.y,r:8,fill:'none',stroke:'#A67C3D',
+    'stroke-width':1.3,'stroke-dasharray':'2.5 2.5','stroke-opacity':.85}));
+  g.append(mk('circle',{cx:p.x,cy:p.y,r,fill:on?fc:'#fff',stroke:on?fc:(isSug?'#A67C3D':'#CFC6B8'),
+    'stroke-width':on?0:1.2,'fill-opacity':any&&!on&&!isSug?.35:1}));
   const disp=name.length>17?name.slice(0,16)+'…':name;
   const t=mk('text',{x:p.x+13,y:p.y+3.5});t.textContent=disp;g.append(t);
   if(ifra!=null){const w=mk('text',{x:p.x+17+disp.length*5.6,y:p.y+3.5,'font-size':10,'font-weight':700,fill:'#9C4A3F'});w.textContent='!';g.append(w)}
   const inf=info(name),ti=mk('title');
+  const why=isSug?Object.keys(sel).filter(s=>pairsFor(s).some(p=>resolve(p)===name)):[];
   ti.textContent=[name,desc(name).join(', '),
+   why.length?'▸ pairs with your '+why.join(', '):'',
    'typical '+(inf?inf[0]:'—'),'pairs with: '+(inf?inf[1]:'—'),
    ifra!=null?'IFRA '+ifra+'% of finished product':'no IFRA limit',
    m[4]<100?'supplied at '+m[4]+'% in carrier':'neat',
@@ -492,15 +603,47 @@ function buildPDF(){
  $('#reset').onclick=()=>{if(Object.keys(sel).length&&!confirm('Clear everything?'))return;
   sel={};blocks=[];bid=1;$('#nm').value='';$('#wt').value=20;$('#ty').value=15;Store.set(SKEY,'');draw()};
  $('#pdf').onclick=buildPDF;
+ $('#save').onclick=saveToStudio;
  if('serviceWorker' in navigator)navigator.serviceWorker.register('compose-sw.js').catch(()=>{});
- Store.get(SKEY).then(v=>{
+ loadLibrary().then(ok=>{
+  layout();
+  const maxRows=Math.max(...BAND.map(([bk])=>Math.max(...FAM.map(([fk])=>MAT.filter(m=>m[1]===fk&&m[2]===bk).length))));
+  $('#map').setAttribute('height',Math.max(740,55+3*(36+maxRows*DY)+60));
+  $('#src').textContent=ok?'library: your Studio materials':'library: built-in defaults';
+  $('#src').title=ok?'Loaded from Studio. Add a material there and it appears here.'
+   :'No Studio data found on this device — using the built-in list. Open Studio and import your data to link them.';
+  $('#save').style.display=ok?'':'none';
+  return Store.get(SKEY);
+ }).then(v=>{
   if(v){try{const d=JSON.parse(v);
    sel=d.sel||{};blocks=d.blocks||[];bid=d.bid||1;
+   Object.keys(sel).forEach(n=>{if(!MAT.find(m=>m[0]===n))delete sel[n]});
+   blocks.forEach(b=>b.m=b.m.filter(n=>sel[n]!==undefined));
    if(d.nm)$('#nm').value=d.nm; if(d.ty)$('#ty').value=d.ty; if(d.wt)$('#wt').value=d.wt;
   }catch(e){}}
   draw();
  });
 })();
+
+async function saveToStudio(){
+ const names=Object.keys(sel);
+ if(!names.length){alert('Nothing to save.');return}
+ if(!studioIds){alert('No Studio library linked on this device.');return}
+ const v=await Store.get(LKEY); if(!v){alert('Studio data not found.');return}
+ const d=JSON.parse(v);
+ const{out:sh}=shares();
+ const missing=names.filter(n=>!studioIds[n]);
+ if(missing.length){alert('Not in the Studio library: '+missing.join(', '));return}
+ const res=/benzoin|styrax|oakmoss/i, nat=/EO|Tonka/i;
+ d.form.push({id:Math.random().toString(36).slice(2,9),
+  name:$('#nm').value||'From Compose',conc:conc(),
+  mac:names.some(n=>res.test(n))?3:names.some(n=>nat.test(n))?2:1,
+  note:'Built in Compose'+(blocks.length?' — blocks: '+blocks.filter(b=>b.m.some(n=>sel[n]!==undefined)).map(b=>b.n).join(', '):'')+'.',
+  parked:'',
+  items:names.map(n=>({ref:studioIds[n],acc:false,pct:Math.round(sh[n]*10)/10}))});
+ await Store.set(LKEY,JSON.stringify(d));
+ alert('Saved to Studio as "'+($('#nm').value||'From Compose')+'".');
+}
 </script>
 </body>
 </html>
