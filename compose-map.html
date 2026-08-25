@@ -199,6 +199,13 @@ const INFO={
  'Eth. Brassylate':['3–20%','Galaxolide; Habanolide','Fruity-waxy musk. Reads banana to you specifically — check with a fresh nose.'],
  'Habanolide':['2–15%','Galaxolide; Ambroxan','Soft skin musk, a different register to Galaxolide.'],
  'Benzyl Benzoate':['1–10%','resinoids; heavy materials','Fixative and solvent, barely odorous. Slows the whole composition down.'],
+ 'Cypriol':['1–8%','vetiver; guaiacwood; rose','Nagarmotha — smoky, dry, oud-adjacent. Sits heart-to-base, so it can give smoke in the middle where styrax cannot.'],
+ 'Ethylene Brassylate':['3–20%','Galaxolide; Habanolide','Fruity-waxy musk. Reads banana to you specifically — check with a fresh nose before correcting for it.'],
+ 'Decalactone':['0.5–3%','vanillin; Ald. C18; peach','Peach-creamy lactone. Potent — overwhelming above ~1%.'],
+ 'Nonalactone':['2–6%','vanillin; coumarin; sandalwood','Coconut before it is milk. Above ~5% it dominates as coconut.'],
+ 'Geraniol':['5–25%','citronellol; PEA; rose oxide','Rose body. Pairs with citronellol — neither carries a rose alone.'],
+ 'Rose Oxide':['0.5–4%','geraniol; PEA; damascone','Metallic-green sparkle. Trace only; more reads harsh.'],
+ 'Damascone':['1–8%','rose pillars; Ald. C14','Jammy rose depth. Overdose goes stewed.'],
 };
 const DESC={'DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citrus','Petitgrain':'green,dry-citrus',
  'Sweet Orange':'juicy,sweet-citrus','Calone':'marine,ozonic','Linalool':'floral,camphorous','Hedione':'radiant,airy',
@@ -208,7 +215,8 @@ const DESC={'DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citru
  'Coumarin':'hay,toasted','Tonka':'hay,tobacco','Iso E Super':'velvety,transparent','Sandenol':'creamy,sandalwood',
  'Vetiver':'earthy,dry','Benzoin':'balsamic,resinous','Ambroxan':'ambergris,warm-skin','Cashmeran':'suede,spicy-musk',
  'Styrax':'leathery,smoky','Guaiacwood':'smoky,rosy-wood','Oakmoss':'mossy,bitter-green','Patchouli':'earthy,damp',
- 'Galaxolide':'clean,laundry-musk','Brassylate':'musky,waxy','Habanolide':'skin-musk','Benzyl Benzoate':'faint-balsamic'};
+ 'Galaxolide':'clean,laundry-musk','Brassylate':'musky,waxy','Habanolide':'skin-musk','Benzyl Benzoate':'faint-balsamic','Cypriol':'smoky,dry-wood','Decalactone':'peachy,creamy',
+ 'Nonalactone':'coconut,milky','Rose Oxide':'metallic,sparkling','Damascone':'jammy,boozy'};
 const PRESETS={
  'Radiance booster':[['Hedione',8],['Iso E Super',5],['Ambroxan',1]],
  'Clean musk base':[['Galaxolide',10],['Eth. Brassylate',5],['Ambroxan',3]],
@@ -217,6 +225,32 @@ const PRESETS={
  'Caramel heart':[['Coumarin',8],['Vanillin',5],['Ethyl Maltol',1.5]],
  'Dry woody base':[['Iso E Super',12],['Vetiver EO',5],['Sandenol',5]],
 };
+// materials that appear under different names in different lists
+const ALIAS=[
+ ['aldc14','aldehydec14','gammaundecalactone','undecalactone','c14peach'],
+ ['aldc18','aldehydec18','gammanonalactone','nonalactone','c18milk'],
+ ['ethbrassylate','ethylenebrassylate'],
+ ['betadamascone','damascone'],
+ ['isoesuper','isoe'],
+ ['oakmossalt','oakmossalternative'],
+ ['dhm','dihydromyrcenol'],
+ ['pea','phenylethylalcohol'],
+ ['calone','calone1951'],
+ ['tonkabean','tonkabeanoil'],
+ ['cinnamylalc','cinnamylalcohol'],
+ ['isoeugenol'],
+ ['benzoin','benzoinsiamresinoid'],
+ ['styrax','styraxresinoid'],
+ ['roseoxide'],
+ ['cypriol','nagarmotha'],
+];
+const nrm=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
+function sameMaterial(a,b){
+ const x=nrm(a),y=nrm(b);
+ if(x===y||x.includes(y)||y.includes(x))return true;
+ return ALIAS.some(g=>g.some(t=>x.includes(t))&&g.some(t=>y.includes(t)));
+}
+
 const PAIRS={
  'DHM':['Petitgrain EO','Sweet Orange EO','Ambroxan','Iso E Super','Calone'],
  'Citral':['DHM','Bergamot EO','Petitgrain EO'],
@@ -253,16 +287,19 @@ const PAIRS={
  'Eth. Brassylate':['Galaxolide','Habanolide'],
  'Habanolide':['Galaxolide','Ambroxan','Cashmeran'],
  'Benzyl Benzoate':['Benzoin','Styrax'],
+ 'Cypriol':['Vetiver EO','Guaiacwood','Geraniol','Styrax'],
+ 'Ethylene Brassylate':['Galaxolide','Habanolide'],
+ 'Decalactone':['Vanillin','Ald. C18 milk','Sandenol'],
+ 'Nonalactone':['Vanillin','Coumarin','Sandenol'],
+ 'Rose Oxide':['Geraniol','PEA','β-damascone'],
+ 'Damascone':['PEA','Geraniol','Ald. C14 peach'],
 };
-const norm=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
 function pairsFor(n){
- const nn=norm(n);
- for(const k in PAIRS){const kk=norm(k);if(nn.includes(kk)||kk.includes(nn))return PAIRS[k]}
+ for(const k in PAIRS)if(sameMaterial(n,k))return PAIRS[k];
  return[];
 }
-function resolve(target){ // find the real library name for a pairing target
- const t=norm(target);
- const hit=MAT.find(m=>{const mn=norm(m[0]);return mn===t||mn.includes(t)||t.includes(mn)});
+function resolve(target){
+ const hit=MAT.find(m=>sameMaterial(m[0],target));
  return hit?hit[0]:null;
 }
 function suggested(){
@@ -310,31 +347,51 @@ const PLACE={'DHM':['citrus','top'],'Citral':['citrus','top'],'Bergamot':['citru
  'Benzyl Benzoate':['musk','base'],'Civetone':['musk','base']};
 function place(n){for(const k in PLACE)if(n.toLowerCase().includes(k.toLowerCase()))return PLACE[k];return['wood','base']}
 
-// replace the built-in list with the user's real library, if one exists
+
+// merge the user's real library over the built-in list — Studio wins on conflicts,
+// but nothing in the built-in list ever disappears
 async function loadLibrary(){
- const v=await Store.get(LKEY); if(!v)return false;
- let d; try{d=JSON.parse(v)}catch(e){return false}
- if(!d.mat||!d.mat.length)return false;
+ const v=await Store.get(LKEY); if(!v)return null;
+ let d; try{d=JSON.parse(v)}catch(e){return null}
+ if(!d.mat||!d.mat.length)return null;
  const skip=/^(ethanol|dpg|ipm|isopropyl myristate|water)$/i;
+ const builtIn=MAT.map(r=>r.slice());
  const rows=[],ids={};
  d.mat.forEach(m=>{
   if(skip.test(m.name.trim()))return;
+  if(rows.some(r=>sameMaterial(r[0],m.name)))return;   // no dupes within Studio either
   const[f,b]=place(m.name);
   rows.push([m.name,f,b,m.ifra,m.conc,m.price,m.bottleSize,m.priceVerified?1:0]);
   ids[m.name]=m.id;
  });
- if(!rows.length)return false;
+ if(!rows.length)return null;
+ let carried=0;
+ builtIn.forEach(r=>{
+  if(rows.some(x=>sameMaterial(x[0],r[0])))return;
+  rows.push(r);carried++;
+ });
  MAT.length=0; rows.forEach(r=>MAT.push(r));
  studioIds=ids;
- return true;
+ return {studio:rows.length-carried, carried};
 }
 let saveT=null;
 function persist(){clearTimeout(saveT);saveT=setTimeout(()=>Store.set(SKEY,JSON.stringify(
  {sel,blocks,bid,nm:$('#nm').value,ty:$('#ty').value,wt:$('#wt').value})),400)}
 const COLW=143,X0=14,DY=22;
-let P={};
-function layout(){P={};BAND.forEach(([bk,,,by])=>FAM.forEach(([fk],fi)=>{
- MAT.filter(m=>m[1]===fk&&m[2]===bk).forEach((m,i)=>{P[m[0]]={x:X0+fi*COLW+9,y:by+36+i*DY,fam:fk,band:bk}})}))}
+let P={},BANDY={};
+function layout(){
+ P={};BANDY={};
+ let y=55;
+ BAND.forEach(([bk])=>{
+  const rows=Math.max(1,...FAM.map(([fk])=>MAT.filter(m=>m[1]===fk&&m[2]===bk).length));
+  const h=36+rows*DY+14;
+  BANDY[bk]={y,h};
+  FAM.forEach(([fk],fi)=>MAT.filter(m=>m[1]===fk&&m[2]===bk)
+   .forEach((m,i)=>{P[m[0]]={x:X0+fi*COLW+9,y:y+36+i*DY,fam:fk,band:bk}}));
+  y+=h+14;
+ });
+ return y;
+}
 layout();
 
 const conc=()=>+$('#ty').value, W=()=>parseFloat($('#wt').value)||0, cgram=()=>W()*conc()/100;
@@ -344,8 +401,8 @@ const blockOf=n=>{const b=blocks.find(b=>b.m.includes(n));return b?b.id:''};
 
 function drawMap(){
  const svg=$('#map');svg.innerHTML='';
- BAND.forEach(([bk,bn,bt,by],bi)=>{
-  const h=bk==='top'?185:bk==='heart'?185:265;
+ BAND.forEach(([bk,bn,bt],bi)=>{
+  const{y:by,h}=BANDY[bk];
   svg.append(mk('rect',{x:6,y:by,width:868,height:h,fill:bi%2?'#F6F1E8':'#FBF9F5',rx:4}));
   const l=mk('text',{x:12,y:by+13,'font-size':10,'font-weight':700,'letter-spacing':1.4,fill:'#1B2621'});l.textContent=bn;svg.append(l);
   const t=mk('text',{x:12,y:by+25,'font-size':9,fill:'#B0A69A'});t.textContent=bt;svg.append(t);
@@ -605,14 +662,16 @@ function buildPDF(){
  $('#pdf').onclick=buildPDF;
  $('#save').onclick=saveToStudio;
  if('serviceWorker' in navigator)navigator.serviceWorker.register('compose-sw.js').catch(()=>{});
- loadLibrary().then(ok=>{
-  layout();
-  const maxRows=Math.max(...BAND.map(([bk])=>Math.max(...FAM.map(([fk])=>MAT.filter(m=>m[1]===fk&&m[2]===bk).length))));
-  $('#map').setAttribute('height',Math.max(740,55+3*(36+maxRows*DY)+60));
-  $('#src').textContent=ok?'library: your Studio materials':'library: built-in defaults';
-  $('#src').title=ok?'Loaded from Studio. Add a material there and it appears here.'
-   :'No Studio data found on this device — using the built-in list. Open Studio and import your data to link them.';
-  $('#save').style.display=ok?'':'none';
+ loadLibrary().then(r=>{
+  const h=layout();
+  $('#map').setAttribute('height',h+10);
+  if(r){$('#src').textContent='library: '+r.studio+' from Studio'+(r.carried?' + '+r.carried+' built-in':'');
+   $('#src').title=r.carried
+    ? r.carried+' material(s) are on this map but not yet in your Studio library — add them in Studio so cost and stock track properly.'
+    : 'All materials loaded from your Studio library.';}
+  else{$('#src').textContent='library: built-in defaults';
+   $('#src').title='No Studio data on this device. Open Studio and import your data to link them.';}
+  $('#save').style.display=r?'':'none';
   return Store.get(SKEY);
  }).then(v=>{
   if(v){try{const d=JSON.parse(v);
