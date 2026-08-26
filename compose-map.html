@@ -168,7 +168,7 @@ const INFO={
  'Citral':['0.5–4%','DHM; bergamot; petitgrain','Sharp lemon, harsh neat. Sharpens another material\'s edge rather than standing alone.'],
  'Bergamot EO':['3–30%','lavender; oakmoss; rose','PHOTOTOXIC unless bergapten-free. Confirm the grade before wearing in sun.'],
  'Petitgrain EO':['3–15%','orange; neroli; vetiver','Survives heat far better than bergamot, and bridges down into the heart.'],
- 'Sweet Orange EO':['3–15%','vanilla; cinnamon; caramel','True orange fruit. Nothing else in the kit substitutes.'],
+ 'Orange EO':['3–15%','vanilla; cinnamon; caramel','True orange fruit. Nothing else in the kit substitutes.'],
  'Calone':['0.5–3%','Hedione; DHM; Iso E Super','Marine/melon. Trace doses — overdose reads as dated 90s aquatic.'],
  'Linalool':['2–10%','coumarin; oakmoss; citrus','Floral-lavender with a camphoraceous edge. Above ~10% it reads medicinal.'],
  'Hedione':['8–30%','any floral; Iso E Super; Calone','Adds air rather than smell. Florals sit flat without it.'],
@@ -181,8 +181,8 @@ const INFO={
  'Ald. C18':['2–6%','vanillin; coumarin; sandalwood','Coconut before it is milk. Above ~5% it dominates as coconut.'],
  'Ethyl Maltol':['0.5–2%','vanillin; coumarin; benzoin','Caramel. The commonest cause of cloying, and it flattens what surrounds it.'],
  'Vanillin':['2–15%','benzoin; coumarin; ethyl maltol','Powder — dissolves in the ethanol, not the oils. Yellows over time.'],
- 'Cinnamyl Alc.':['0.5–4%','vanillin; benzoin; orange','Warm cinnamon, far less restricted than cinnamal. Too heavy for a top note.'],
- 'IsoEugenol':['0.05–0.5%','rose; carnation; clove','IFRA cap 0.02% — trace only, and needs a 1% dilution to weigh at all.'],
+ 'Cinnamyl Alcohol':['0.5–4%','vanillin; benzoin; orange','Warm cinnamon, far less restricted than cinnamal. Too heavy for a top note.'],
+ 'Iso Eugenol':['0.05–0.5%','rose; carnation; clove','IFRA cap 0.02% — trace only, and needs a 1% dilution to weigh at all.'],
  'Coumarin':['3–25%','lavender; oakmoss; tonka','Toasted hay-almond. The fougère backbone and your nearest biscuit note.'],
  'Tonka Bean':['2–15%','coumarin; vanillin; tobacco','Natural coumarin source — rounder, batch-variable. Log the batch.'],
  'Iso E Super':['5–50%','everything','Smooths and diffuses. Above 30% it stops supporting and becomes the effect.'],
@@ -193,7 +193,7 @@ const INFO={
  'Cashmeran':['2–20%','woods; musks; rose','Ambiguous and hard to place — the "smell it again" driver. Priciest per gram.'],
  'Styrax':['1–6%','guaiacwood; labdanum; leather','Leathery-smoky, base position — will not give smoke in the heart.'],
  'Guaiacwood':['2–10%','styrax; vetiver; rose','Sweet rosy smoke. Softer than cypriol, sits in the base.'],
- 'Oakmoss alt.':['0.5–5%','bergamot; labdanum; coumarin','Chypre backbone. IFRA cap 0.1% — one of the tightest you work with.'],
+ 'Oakmoss':['0.5–5%','bergamot; labdanum; coumarin','Chypre backbone. IFRA cap 0.1% — one of the tightest you work with.'],
  'Patchouli EO':['2–15%','rose; oakmoss; vetiver','Earthy, damp, dark. Grounds a chypre or an oriental.'],
  'Galaxolide':['5–30%','everything','Clean laundry musk. In almost everything you build — vary it or drydowns converge.'],
  'Eth. Brassylate':['3–20%','Galaxolide; Habanolide','Fruity-waxy musk. Reads banana to you specifically — check with a fresh nose.'],
@@ -208,10 +208,10 @@ const INFO={
  'Damascone':['1–8%','rose pillars; Ald. C14','Jammy rose depth. Overdose goes stewed.'],
 };
 const DESC={'DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citrus','Petitgrain':'green,dry-citrus',
- 'Sweet Orange':'juicy,sweet-citrus','Calone':'marine,ozonic','Linalool':'floral,camphorous','Hedione':'radiant,airy',
+ 'Orange EO':'juicy,sweet-citrus','Calone':'marine,ozonic','Linalool':'floral,camphorous','Hedione':'radiant,airy',
  'PEA':'rosy,honeyed','Geraniol':'rosy,green','Citronellol':'rosy,soft','Rose oxide':'metallic,sparkling',
  'damascone':'jammy,boozy','C14':'peachy,creamy','C18':'coconut,milky','Ethyl Maltol':'caramel,candy',
- 'Vanillin':'vanilla,powdery','Cinnamyl':'cinnamon,warm-spice','IsoEugenol':'clove,carnation',
+ 'Vanillin':'vanilla,powdery','Cinnamyl Alcohol':'cinnamon,warm-spice','Iso Eugenol':'clove,carnation',
  'Coumarin':'hay,toasted','Tonka':'hay,tobacco','Iso E Super':'velvety,transparent','Sandenol':'creamy,sandalwood',
  'Vetiver':'earthy,dry','Benzoin':'balsamic,resinous','Ambroxan':'ambergris,warm-skin','Cashmeran':'suede,spicy-musk',
  'Styrax':'leathery,smoky','Guaiacwood':'smoky,rosy-wood','Oakmoss':'mossy,bitter-green','Patchouli':'earthy,damp',
@@ -225,30 +225,45 @@ const PRESETS={
  'Caramel heart':[['Coumarin',8],['Vanillin',5],['Ethyl Maltol',1.5]],
  'Dry woody base':[['Iso E Super',12],['Vetiver EO',5],['Sandenol',5]],
 };
-// materials that appear under different names in different lists
+// materials that appear under different names in different lists.
+// matched on the WHOLE normalised name, never as a substring — 'isoe' must not
+// swallow 'isoeugenol'.
 const ALIAS=[
- ['aldc14','aldehydec14','gammaundecalactone','undecalactone','c14peach'],
- ['aldc18','aldehydec18','gammanonalactone','nonalactone','c18milk'],
+ ['aldc14peach','aldc14','aldehydec14peach','aldehydec14','gammaundecalactone','undecalactone'],
+ ['aldc18milk','aldc18coconut','aldc18','aldehydec18coconut','aldehydec18','gammanonalactone','nonalactone'],
  ['ethbrassylate','ethylenebrassylate'],
- ['betadamascone','damascone'],
+ ['betadamascone','damascone','bdamascone'],
  ['isoesuper','isoe'],
- ['oakmossalt','oakmossalternative'],
- ['dhm','dihydromyrcenol'],
- ['pea','phenylethylalcohol'],
+ ['oakmoss','oakmossalt','oakmossalternative'],
+ ['dhm','dhmdihydromyrcenol','dihydromyrcenol'],
+ ['pea','peaphenylethylalcohol','phenylethylalcohol'],
  ['calone','calone1951'],
  ['tonkabean','tonkabeanoil'],
  ['cinnamylalc','cinnamylalcohol'],
- ['isoeugenol'],
  ['benzoin','benzoinsiamresinoid'],
  ['styrax','styraxresinoid'],
  ['roseoxide'],
- ['cypriol','nagarmotha'],
+ ['cypriol','cypriolnagarmotha','nagarmotha'],
+ ['sweetorangeeo','orangeeo'],
+ ['gammadecalactone','decalactone'],
 ];
 const nrm=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
 function sameMaterial(a,b){
  const x=nrm(a),y=nrm(b);
- if(x===y||x.includes(y)||y.includes(x))return true;
- return ALIAS.some(g=>g.some(t=>x.includes(t))&&g.some(t=>y.includes(t)));
+ if(x===y)return true;
+ // alias groups match on the complete name only
+ const g=ALIAS.find(gr=>gr.includes(x));
+ if(g&&g.includes(y))return true;
+ // otherwise allow a containment match, but only when the shorter name is
+ // a whole leading or trailing word of the longer one
+ const[short,long]=x.length<=y.length?[x,y]:[y,x];
+ if(short.length>=4&&(long.startsWith(short)||long.endsWith(short))){
+  // guard against 'isoe' vs 'isoeugenol' style false hits
+  const aliasA=ALIAS.find(gr=>gr.includes(x)), aliasB=ALIAS.find(gr=>gr.includes(y));
+  if(aliasA&&aliasB&&aliasA!==aliasB)return false;
+  return true;
+ }
+ return false;
 }
 
 const PAIRS={
@@ -256,7 +271,7 @@ const PAIRS={
  'Citral':['DHM','Bergamot EO','Petitgrain EO'],
  'Bergamot EO':['Linalool','Oakmoss alt.','Coumarin','PEA'],
  'Petitgrain EO':['Sweet Orange EO','Vetiver EO','DHM','Bergamot EO'],
- 'Sweet Orange EO':['Vanillin','Cinnamyl Alc.','Tonka Bean','Petitgrain EO'],
+ 'Orange EO':['Vanillin','Cinnamyl Alc.','Tonka Bean','Petitgrain EO'],
  'Calone':['Hedione','DHM','Iso E Super'],
  'Linalool':['Coumarin','Oakmoss alt.','Bergamot EO','Vetiver EO'],
  'Hedione':['PEA','Geraniol','Iso E Super','Calone','Rose oxide'],
@@ -269,8 +284,8 @@ const PAIRS={
  'Ald. C18 milk':['Vanillin','Coumarin','Sandenol'],
  'Ethyl Maltol':['Vanillin','Coumarin','Benzoin','Tonka Bean'],
  'Vanillin':['Benzoin','Coumarin','Ethyl Maltol','Sandenol'],
- 'Cinnamyl Alc.':['Vanillin','Benzoin','Sweet Orange EO'],
- 'IsoEugenol':['Geraniol','PEA','Vanillin'],
+ 'Cinnamyl Alcohol':['Vanillin','Benzoin','Sweet Orange EO'],
+ 'Iso Eugenol':['Geraniol','PEA','Vanillin'],
  'Coumarin':['Linalool','Oakmoss alt.','Tonka Bean','Vanillin'],
  'Tonka Bean':['Coumarin','Vanillin','Styrax'],
  'Iso E Super':['Hedione','Ambroxan','Vetiver EO','Cashmeran'],
@@ -281,7 +296,7 @@ const PAIRS={
  'Cashmeran':['Iso E Super','Ambroxan','Geraniol','Habanolide'],
  'Styrax':['Guaiacwood','Benzoin','Tonka Bean'],
  'Guaiacwood':['Styrax','Vetiver EO','Geraniol'],
- 'Oakmoss alt.':['Bergamot EO','Coumarin','Linalool','Vetiver EO'],
+ 'Oakmoss':['Bergamot EO','Coumarin','Linalool','Vetiver EO'],
  'Patchouli EO':['Geraniol','Oakmoss alt.','Vetiver EO'],
  'Galaxolide':['Iso E Super','Ambroxan','Hedione'],
  'Eth. Brassylate':['Galaxolide','Habanolide'],
@@ -358,11 +373,12 @@ async function loadLibrary(){
  const builtIn=MAT.map(r=>r.slice());
  const rows=[],ids={};
  d.mat.forEach(m=>{
-  if(skip.test(m.name.trim()))return;
-  if(rows.some(r=>sameMaterial(r[0],m.name)))return;   // no dupes within Studio either
-  const[f,b]=place(m.name);
-  rows.push([m.name,f,b,m.ifra,m.conc,m.price,m.bottleSize,m.priceVerified?1:0]);
-  ids[m.name]=m.id;
+  const name=(m.name||'').trim();
+  if(!name||skip.test(name))return;
+  if(rows.some(r=>sameMaterial(r[0],name)))return;
+  const[f,b]=place(name);
+  rows.push([name,f,b,m.ifra,m.conc,m.price,m.bottleSize,m.priceVerified?1:0]);
+  ids[name]=m.id;
  });
  if(!rows.length)return null;
  let carried=0;
