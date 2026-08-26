@@ -360,7 +360,27 @@ const PLACE={'DHM':['citrus','top'],'Citral':['citrus','top'],'Bergamot':['citru
  'Patchouli':['wood','base'],'Cypriol':['wood','base'],'Labdanum':['wood','base'],
  'Galaxolide':['musk','base'],'Brassylate':['musk','base'],'Habanolide':['musk','base'],
  'Benzyl Benzoate':['musk','base'],'Civetone':['musk','base']};
-function place(n){for(const k in PLACE)if(n.toLowerCase().includes(k.toLowerCase()))return PLACE[k];return['wood','base']}
+// exact names from the real library take priority — checked before any substring guess
+const PLACE_EXACT={
+ 'Ald. C14 (peach)':['fruity','heart'],'Ald. C18 (coconut)':['fruity','heart'],
+ 'PEA (Phenylethyl alcohol)':['floral','heart'],'Iso Eugenol':['spice','heart'],
+ 'Iso E Super':['wood','base'],'Rose Oxide':['floral','heart'],
+ 'beta-Damascone':['fruity','heart'],'Orange EO':['citrus','top'],
+ 'Oakmoss':['wood','base'],'Cinnamyl Alcohol':['spice','heart'],
+ 'Tonka Bean Oil':['spice','heart'],'Ethylene Brassylate':['musk','base'],
+ 'Calone':['citrus','top'],'Styrax Resinoid':['wood','base'],
+ 'Benzoin Siam Resinoid':['wood','base'],'DHM (Dihydromyrcenol)':['citrus','top'],
+ 'Cypriol (Nagarmotha)':['wood','base'],'Oakmoss alternative':['wood','base'],
+ 'gamma-Nonalactone':['fruity','heart'],'gamma-Decalactone':['fruity','heart'],
+};
+function place(n){
+ const key=Object.keys(PLACE_EXACT).find(k=>k.toLowerCase()===n.trim().toLowerCase());
+ if(key)return PLACE_EXACT[key];
+ // fall back to substring, longest key first so 'Phenylethyl' beats 'PEA'
+ const ks=Object.keys(PLACE).sort((a,b)=>b.length-a.length);
+ for(const k of ks)if(n.toLowerCase().includes(k.toLowerCase()))return PLACE[k];
+ return['wood','base'];
+}
 
 
 // merge the user's real library over the built-in list — Studio wins on conflicts,
