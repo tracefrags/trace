@@ -309,11 +309,23 @@ const PAIRS={
  'Rose Oxide':['Geraniol','PEA','β-damascone'],
  'Damascone':['PEA','Geraniol','Ald. C14 peach'],
 };
-function pairsFor(n){
- for(const k in PAIRS)if(sameMaterial(n,k))return PAIRS[k];
- return[];
+// Resolved, symmetric pairing graph. PAIRS as written is directional — if
+// Ethyl Maltol lists Coumarin, selecting Coumarin must also ring Ethyl Maltol.
+let GRAPH={};
+function buildGraph(){
+ GRAPH={};
+ const add=(a,b)=>{ if(!a||!b||a===b)return; (GRAPH[a]=GRAPH[a]||new Set()).add(b); };
+ Object.keys(PAIRS).forEach(k=>{
+  const src=resolve(k); if(!src)return;        // key not present in this library
+  (PAIRS[k]||[]).forEach(t=>{
+   const dst=resolve(t); if(!dst)return;       // skip materials not owned
+   add(src,dst); add(dst,src);                 // both directions
+  });
+ });
 }
 function pairsFor(n){
+ const key=resolve(n);
+ if(key&&GRAPH[key])return[...GRAPH[key]];
  for(const k in PAIRS)if(sameMaterial(n,k))return PAIRS[k];
  return[];
 }
@@ -761,6 +773,7 @@ function buildPDF(){
  if('serviceWorker' in navigator)navigator.serviceWorker.register('compose-sw.js').catch(()=>{});
  loadLibrary().then(r=>{
   const h=layout();
+  buildGraph();
   $('#map').setAttribute('height',h+10);
   if(r){$('#src').textContent='library: '+r.studio+' from Studio'+(r.carried?' + '+r.carried+' built-in':'');
    $('#src').title=r.carried
