@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRACE — Open</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bone:#F2EDE4;--ink:#1B2621;--brass:#A67C3D;--muted:#8A8378;--line:#DED7CB;
+ --bad:#9C4A3F;--warn:#9C7A28;--good:#4A6B52}
+body{background:var(--bone);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;padding:16px}
+.wrap{max-width:1280px;margin:0 auto}
+h1{font-family:Georgia,serif;font-size:19px;letter-spacing:5px}
+.sub{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.sub a{color:var(--brass);text-decoration:none;text-transform:none;letter-spacing:0;margin-left:10px}
+.bar{display:flex;gap:8px;align-items:center;margin:12px 0 16px;flex-wrap:wrap}
+.bar button{background:none;border:1px solid var(--line);border-radius:20px;padding:4px 12px;
+ font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer}
+.bar button.on{background:var(--ink);color:var(--bone);border-color:var(--ink)}
+.count{font-size:11px;color:var(--muted);margin-left:auto}
+.board{columns:4 260px;column-gap:14px}
+@media(max-width:900px){.board{columns:2 240px}}
+@media(max-width:560px){.board{columns:1}}
+.note{break-inside:avoid;margin:0 0 14px;padding:12px 13px;border-radius:3px;
+ box-shadow:0 1px 3px rgba(60,45,40,.13);position:relative;display:inline-block;width:100%}
+.note.y{background:#F7EFD8}.note.p{background:#F3E4E4}.note.g{background:#E6EEE4}
+.note.b{background:#E4EAEF}.note.n{background:#EFE9DE}
+.note h3{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--brass);margin-bottom:7px}
+.note .why{display:block;font-size:11px;color:#6B6259;line-height:1.4;margin-top:4px;font-style:italic}
+label{display:flex;gap:7px;align-items:flex-start;padding:4px 0;font-size:12.5px;line-height:1.35;cursor:pointer}
+label input{margin-top:2px;accent-color:var(--brass);flex-shrink:0}
+label.done span{opacity:.45;text-decoration:line-through}
+.clock{background:#fff;border-radius:3px;padding:8px 9px;margin-bottom:8px}
+.clock b{font-size:12.5px;display:block}
+.clock input{border:1px solid var(--line);border-radius:3px;padding:2px 5px;font:inherit;font-size:11px;width:118px;margin-top:3px}
+.clock .st{font-size:11px;margin-top:4px}
+.clock .st.rdy{color:var(--good);font-weight:600}
+.clock .st.wait{color:var(--muted)}
+.prog{height:4px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:5px}
+.prog i{display:block;height:100%;background:var(--brass)}
+.add{width:100%;border:1px dashed var(--line);background:none;border-radius:3px;padding:6px;
+ font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer;margin-top:4px}
+.foot{font-size:11px;color:var(--muted);text-align:center;margin-top:20px;padding-top:12px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>TRACE</h1>
+<div class="sub">Open — everything waiting
+ <a href="compose-map.html">Compose →</a><a href="index.html">Studio →</a></div>
+
+<div class="bar" id="filters"></div>
+<div class="board" id="board"></div>
+<div class="foot">Ticked items persist on this device. <a href="#" id="reset" style="color:var(--brass)">Clear all ticks</a></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const KEY='trace:open';
+const Store={
+ async get(k){if(window.storage){try{const r=await window.storage.get(k,false);return r?r.value:null}catch(e){}}
+  try{return localStorage.getItem(k)}catch(e){return null}},
+ async set(k,v){if(window.storage){try{await window.storage.set(k,v,false);return}catch(e){}}
+  try{localStorage.setItem(k,v)}catch(e){}}};
+let S={done:{},dates:{},custom:{}};
+
+const CLOCKS=[
+ ['pt','Peach-tobacco (orange + vanilla)',21,'Day-4 note logged: orange gone by 15min, base smoky and restrained, no peach yet. Reassess at 21 — has peach surfaced, has the heart gained definition, does the opening still collapse.'],
+ ['sa','Slow Amber — more-linalool variant',21,'Your own conclusion: bring linalool down to let the toffee through.'],
+ ['rs','Rose Study — after adding the pillars',14,'Geraniol, citronellol, damascone, rose oxide added to the existing 20g. Give the new pillars time to integrate.'],
+];
+
+const NOTES=[
+ ['SAFETY','p',[
+  ['citrusroot','Citrus Root — do not wear in sun','Bergamot sits at 4.5% of finished product against a 0.4% phototoxicity limit. Real burn risk, not a technicality. Study only, never bottled for anyone else.'],
+  ['bergfcf','Confirm whether your bergamot is bergapten-free','Decides whether Citrus Root and Rose Study are salvageable or permanently study-only.'],
+  ['firstrain','First Rain — Citral 1.20% vs 0.6% limit',''],
+  ['rosestudy','Rose Study — Bergamot 1.05% vs 0.4% limit',''],
+ ]],
+ ['DECIDE','y',[
+  ['jasmine','Jasmine absolute — keep on T2 or drop?','Rs 1,800, the priciest unverified line, and now used by nothing after the Slow Amber II rebuild.'],
+  ['milk','Milk Biscuit — salvage or pivot?','Salvage needs 2 parts corrector per 1 part concentrate and triples the volume. Pivoting to coconut-vanilla costs a third of the material and gives something intentional.'],
+  ['t2cuts','Civetone, Benzaldehyde, floral placeholder','You asked to be reminded at T2. Benzaldehyde is no longer speculative — cherry needs it.'],
+  ['scentnames','Scent names: plain or classical?','First Rain / Citrus Root / Slow Amber, versus THE NOTE.-style APOLLO / HERA. Plain fits your voice; classical travels further with strangers.'],
+ ]],
+ ['BUY NEXT','g',[
+  ['benzald','Benzaldehyde','The one gap between Blood Mist as plum and as cherry. Cheap. Oxidises — buy small, keep dark.'],
+  ['pinkpep','Pink Pepper EO','Unlocks the SWYI-style bright-spicy opening. Nothing you own approximates it well.'],
+  ['cypriol','Cypriol (nagarmotha)','Heart-position smoke — the missing piece for Driftwood as designed.'],
+  ['saffron','Saffron / safranal','Carries most of what reads as oud in the budget oud tier.'],
+  ['pyrazine','2-Acetylpyrazine','The actual toasted-wheat note. Without it Milk Biscuit can never be Milkolu.'],
+ ]],
+ ['VERIFY','b',[
+  ['ifra24','24 of 35 materials still on my estimates','Marked with ⌁ in Compose. Paste the real text from BioShop product pages into Studio as you go.'],
+  ['coumarin','Coumarin IFRA — I corrected 3.0% to 1.5%','Two sources disagreed. Confirm on the actual IFRA Standard.'],
+  ['cashmeran','Cashmeran range — corrected 2–20% to 0.2–3%','My original figure was badly wrong. Worth confirming before dosing.'],
+  ['lactoneprice','Price the lactones and rose materials','Geraniol, citronellol, rose oxide, damascone are all still estimates in the library.'],
+ ]],
+ ['APPS','n',[
+  ['upload','Upload latest compose-map.html + trace-studio-data.json',''],
+  ['delold','Delete trace-bench.html, compose.html, trace-studio.html from the repo',''],
+  ['benchdata','Check Bench for orphaned data before deleting it','Bench stored under trace:data — gate ticks and study text lived only there.'],
+  ['install','Install Compose to the home screen','INSTALL-COMPOSE.md has the steps.'],
+ ]],
+ ['BRAND','n',[
+  ['placeholders','Fill [BRAND NAME] and [Founder Name] in the older documents','Pitch deck, R&D brief, Phase 1 plan, business brief all still carry placeholders.'],
+  ['rename','Rename Quiet Toffee to Slow Amber in the batch records','Batch log still references the old working title.'],
+  ['sealdark','Decide a dark seal variant for stamping','Light grey will not print as a rubber stamp or hold at favicon size.'],
+  ['bottles','Source a 50ml cylinder in Karachi','The resin sleeve design depends on the actual bottle geometry.'],
+ ]],
+];
+
+function daysSince(d){if(!d)return null;const t=(Date.now()-new Date(d))/86400000;return isNaN(t)?null:Math.floor(t)}
+
+function render(){
+ const b=$('#board');b.innerHTML='';
+ const filt=window._f||'all';
+
+ if(filt==='all'||filt==='MACERATING'){
+  const n=document.createElement('div');n.className='note g';
+  n.innerHTML='<h3>Macerating</h3>';
+  CLOCKS.forEach(([id,name,need,why])=>{
+   const c=document.createElement('div');c.className='clock';
+   const d=S.dates[id]||'';const el=daysSince(d);
+   c.innerHTML='<b>'+name+'</b>';
+   const inp=document.createElement('input');inp.type='date';inp.value=d;
+   inp.onchange=()=>{S.dates[id]=inp.value;save();render()};
+   c.append(inp);
+   const st=document.createElement('div');
+   if(el===null){st.className='st wait';st.textContent='set the mix date'}
+   else if(el>=need){st.className='st rdy';st.textContent='ready — day '+el+' of '+need}
+   else{st.className='st wait';st.textContent='day '+el+' of '+need+' · '+(need-el)+' to go'}
+   c.append(st);
+   const p=document.createElement('div');p.className='prog';
+   const i=document.createElement('i');i.style.width=Math.min(100,el===null?0:el/need*100)+'%';
+   p.append(i);c.append(p);
+   if(why){const w=document.createElement('div');w.className='why';w.textContent=why;c.append(w)}
+   n.append(c);
+  });
+  b.append(n);
+ }
+
+ NOTES.forEach(([title,cls,items])=>{
+  if(filt!=='all'&&filt!==title)return;
+  const n=document.createElement('div');n.className='note '+cls;
+  n.innerHTML='<h3>'+title+'</h3>';
+  items.forEach(([id,txt,why])=>{
+   const l=document.createElement('label');
+   const c=document.createElement('input');c.type='checkbox';c.checked=!!S.done[id];
+   c.onchange=()=>{S.done[id]=c.checked;save();l.classList.toggle('done',c.checked);tally()};
+   const s=document.createElement('span');s.innerHTML=txt+(why?'<span class="why">'+why+'</span>':'');
+   l.append(c,s);if(c.checked)l.classList.add('done');
+   n.append(l);
+  });
+  (S.custom[title]||[]).forEach((txt,ix)=>{
+   const id='c_'+title+'_'+ix;
+   const l=document.createElement('label');
+   const c=document.createElement('input');c.type='checkbox';c.checked=!!S.done[id];
+   c.onchange=()=>{S.done[id]=c.checked;save();l.classList.toggle('done',c.checked);tally()};
+   const s=document.createElement('span');s.textContent=txt;
+   l.append(c,s);if(c.checked)l.classList.add('done');
+   n.append(l);
+  });
+  const add=document.createElement('button');add.className='add';add.textContent='+ add';
+  add.onclick=()=>{const t=prompt('New item for '+title);if(!t)return;
+   (S.custom[title]=S.custom[title]||[]).push(t);save();render()};
+  n.append(add);
+  b.append(n);
+ });
+ tally();
+}
+function tally(){
+ let tot=0,done=0;
+ NOTES.forEach(([t,,items])=>{items.forEach(([id])=>{tot++;if(S.done[id])done++});
+  (S.custom[t]||[]).forEach((_,ix)=>{tot++;if(S.done['c_'+t+'_'+ix])done++})});
+ $('#count').textContent=done+' of '+tot+' done';
+}
+function save(){Store.set(KEY,JSON.stringify(S))}
+
+(async()=>{
+ const v=await Store.get(KEY);
+ if(v){try{S={...S,...JSON.parse(v)}}catch(e){}}
+ const f=$('#filters');
+ ['all','MACERATING',...NOTES.map(n=>n[0])].forEach(k=>{
+  const btn=document.createElement('button');btn.textContent=k==='all'?'Everything':k.toLowerCase();
+  if(k==='all')btn.classList.add('on');
+  btn.onclick=()=>{window._f=k;[...f.querySelectorAll('button')].forEach(x=>x.classList.remove('on'));
+   btn.classList.add('on');render()};
+  f.append(btn);
+ });
+ const c=document.createElement('span');c.className='count';c.id='count';f.append(c);
+ $('#reset').onclick=e=>{e.preventDefault();if(confirm('Clear every tick?')){S.done={};save();render()}};
+ render();
+})();
+</script>
+</body>
+</html>

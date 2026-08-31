@@ -152,7 +152,7 @@ const MAT=[
  ['Vetiver EO','wood','base',null,100,600,10,0],['Benzoin','wood','base',2.0,100,450,10,1],
  ['Ambroxan','wood','base',null,10,680,10,1],['Cashmeran','wood','base',null,100,1900,10,1],
  ['Styrax','wood','base',0.6,100,420,10,1],['Guaiacwood','wood','base',null,10,320,10,1],
- ['Oakmoss alt.','wood','base',0.1,10,370,30,1],['Patchouli EO','wood','base',null,100,1950,10,1],
+ ['Oakmoss alt.','wood','base',0.1,10,370,30,1],
  ['Galaxolide','musk','base',21.4,100,350,10,1],['Eth. Brassylate','musk','base',null,100,380,10,1],
  ['Habanolide','musk','base',null,100,900,10,1],['Benzyl Benzoate','musk','base',null,100,220,10,1],
 ];
@@ -194,7 +194,6 @@ const INFO={
  'Styrax':['1–6%','guaiacwood; labdanum; leather','Leathery-smoky, base position — will not give smoke in the heart.'],
  'Guaiacwood':['2–10%','styrax; vetiver; rose','Sweet rosy smoke. Softer than cypriol, sits in the base.'],
  'Oakmoss':['0.5–5%','bergamot; labdanum; coumarin','Chypre backbone. IFRA cap 0.1% — one of the tightest you work with.'],
- 'Patchouli EO':['2–15%','rose; oakmoss; vetiver','Earthy, damp, dark. Grounds a chypre or an oriental.'],
  'Galaxolide':['5–30%','Iso E Super; PEA; Hedione; coumarin; geraniol','BioShop pairings: +Iso E Super = Grojsman/Eternity base · +PEA = rose musk · +coumarin = fougère musk · +geraniol 3–5% = rose-geranium lift. Musk anosmia is common, so blend structurally different musks (Ethylene Brassylate, Cashmeran) rather than relying on this alone.'],
  'Eth. Brassylate':['1–10%','rose; Ambroxan; coumarin; vanillin; Sandenol','Soft clean macrocyclic musk. BioShop: 1–10% of concentrate, 2–6% typical. Reads banana to you specifically — check with a fresh nose.'],
  'Habanolide':['2–15%','Galaxolide; Iso E Super; Hedione; Ambroxan; Eth. Brassylate','Clean macrocyclic musk. BioShop: 2–5% added to an oud-rose or amber base gives a modern airy halo without breaking the traditional character.'],
@@ -214,7 +213,7 @@ const DESC={'DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citru
  'Vanillin':'vanilla,powdery','Cinnamyl Alcohol':'cinnamon,warm-spice','Iso Eugenol':'clove,carnation',
  'Coumarin':'hay,toasted','Tonka':'hay,tobacco','Iso E Super':'velvety,transparent','Sandenol':'creamy,sandalwood',
  'Vetiver':'earthy,dry','Benzoin':'balsamic,resinous','Ambroxan':'ambergris,warm-skin','Cashmeran':'suede,spicy-musk',
- 'Styrax':'leathery,smoky','Guaiacwood':'smoky,rosy-wood','Oakmoss':'mossy,bitter-green','Patchouli':'earthy,damp',
+ 'Styrax':'leathery,smoky','Guaiacwood':'smoky,rosy-wood','Oakmoss':'mossy,bitter-green',
  'Galaxolide':'clean,laundry-musk','Brassylate':'musky,waxy','Habanolide':'skin-musk','Benzyl Benzoate':'faint-balsamic','Cypriol':'smoky,dry-wood','Decalactone':'peachy,creamy',
  'Nonalactone':'coconut,milky','Rose Oxide':'metallic,sparkling','Damascone':'jammy,boozy'};
 const PRESETS={
@@ -297,7 +296,6 @@ const PAIRS={
  'Styrax':['Guaiacwood','Benzoin','Tonka Bean'],
  'Guaiacwood':['Styrax','Vetiver EO','Geraniol'],
  'Oakmoss':['Bergamot EO','Coumarin','Linalool','Vetiver EO'],
- 'Patchouli EO':['Geraniol','Oakmoss alt.','Vetiver EO'],
  'Galaxolide':['Iso E Super','PEA','Hedione','Coumarin','Geraniol','Ethylene Brassylate'],
  'Eth. Brassylate':['Galaxolide','Habanolide','Ambroxan','Coumarin','Vanillin','Geraniol'],
  'Habanolide':['Galaxolide','Iso E Super','Hedione','Ambroxan','Ethylene Brassylate'],
@@ -400,7 +398,7 @@ const PLACE={'DHM':['citrus','top'],'Citral':['citrus','top'],'Bergamot':['citru
  'Iso E':['wood','base'],'Sandenol':['wood','base'],'Vetiver':['wood','base'],
  'Benzoin':['wood','base'],'Ambroxan':['wood','base'],'Cashmeran':['wood','base'],
  'Styrax':['wood','base'],'Guaiacwood':['wood','base'],'Oakmoss':['wood','base'],
- 'Patchouli':['wood','base'],'Cypriol':['wood','base'],'Labdanum':['wood','base'],
+ 'Cypriol':['wood','base'],'Labdanum':['wood','base'],
  'Galaxolide':['musk','base'],'Brassylate':['musk','base'],'Habanolide':['musk','base'],
  'Benzyl Benzoate':['musk','base'],'Civetone':['musk','base']};
 // exact names from the real library take priority — checked before any substring guess
