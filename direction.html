@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRACE — Direction</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bone);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;padding:16px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-family:Georgia,serif;font-size:19px;letter-spacing:5px}
+.sub{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.sub a{color:var(--brass);text-decoration:none;text-transform:none;letter-spacing:0;margin-left:10px}
+.key{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 18px;font-size:11px;color:var(--muted);align-items:center}
+.key span{display:flex;gap:5px;align-items:center}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+.d-chosen{background:var(--ink)}
+.d-lean{background:none;border:2px solid var(--brass)}
+.d-open{background:none;border:1.5px dashed #C0B7A8}
+.d-no{background:#E8E0D4;position:relative}
+.d-no::after{content:'';position:absolute;left:1px;right:1px;top:4px;height:1.5px;background:var(--bad)}
+
+.branch{background:var(--paper);border:1px solid var(--line);border-radius:6px;margin-bottom:12px;overflow:hidden}
+.bh{display:flex;align-items:baseline;gap:10px;padding:10px 13px;background:#F0E9DD;cursor:pointer}
+.bh b{font-family:Georgia,serif;font-size:14px;flex-shrink:0}
+.bh .q{font-size:11.5px;color:var(--muted);flex:1}
+.bh .pick{font-size:11px;color:var(--brass);font-weight:600;text-align:right}
+.opts{display:flex;flex-wrap:wrap;gap:7px;padding:11px 13px}
+.opt{border:1.5px dashed #C0B7A8;border-radius:16px;padding:5px 12px;font-size:12px;cursor:pointer;
+ background:none;color:#6B6259;font-family:inherit;transition:all .12s;position:relative}
+.opt:hover{border-color:var(--brass)}
+.opt.lean{border:2px solid var(--brass);border-style:solid;color:var(--ink)}
+.opt.chosen{background:var(--ink);color:var(--bone);border:2px solid var(--ink)}
+.opt.no{background:#EFE9DE;color:#B0A69A;border-style:solid;border-color:#E0D8CA;text-decoration:line-through}
+.note{padding:0 13px 11px;font-size:11.5px;color:var(--muted);line-height:1.45}
+.note b{color:var(--ink)}
+.sum{background:var(--ink);color:var(--bone);border-radius:6px;padding:14px 16px;margin-bottom:16px}
+.sum h2{font-family:Georgia,serif;font-size:14px;margin-bottom:8px;color:#E8C77E}
+.sum .row{font-size:12px;padding:3px 0;display:flex;gap:8px}
+.sum .row i{color:#C9AFBA;font-style:normal;min-width:120px;font-size:11px}
+.foot{font-size:11px;color:var(--muted);text-align:center;margin-top:18px}
+.foot a{color:var(--brass)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>TRACE</h1>
+<div class="sub">Direction — nothing set in stone
+ <a href="open.html">Open →</a><a href="compose-map.html">Compose →</a></div>
+
+<div class="key">
+ <span><i class="dot d-chosen"></i>decided</span>
+ <span><i class="dot d-lean"></i>leaning</span>
+ <span><i class="dot d-open"></i>still open</span>
+ <span><i class="dot d-no"></i>ruled out</span>
+ <span style="margin-left:auto">click any option to cycle it</span>
+</div>
+
+<div class="sum" id="sum"></div>
+<div id="tree"></div>
+<div class="foot">Choices persist on this device. <a href="#" id="reset">Reset all</a></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const KEY='trace:direction';
+const Store={
+ async get(k){if(window.storage){try{const r=await window.storage.get(k,false);return r?r.value:null}catch(e){}}
+  try{return localStorage.getItem(k)}catch(e){return null}},
+ async set(k,v){if(window.storage){try{await window.storage.set(k,v,false);return}catch(e){}}
+  try{localStorage.setItem(k,v)}catch(e){}}};
+const CYCLE=['open','lean','chosen','no'];
+let S={};
+
+// branch, question, [options], default states, note
+const TREE=[
+ ['Positioning','who is this actually for?',
+  [['Niche purist — enthusiasts only','no'],['Accessible premium','chosen'],
+   ['Mass-market dupe tier','no'],['Luxury / high-price','open']],
+  'You chose reach over purity earlier. That single decision cascades into naming, disclosure and packaging — most of the tensions below trace back to it.'],
+
+ ['First release','how many scents at launch?',
+  [['Single hero scent','lean'],['Trio','open'],['Discovery set of 3 × 10ml','lean'],
+   ['Five or more','no']],
+  'A trio needs three formulas at commercial quality; you have one candidate. A single hero plus a discovery set is the honest reflection of where the work actually is.'],
+
+ ['The hero','which scent leads?',
+  [['Slow Amber II — caramel/toffee','chosen'],['Orange-Peach-Tobacco','lean'],
+   ['Climate — the humidity thesis','open'],['First Rain','open']],
+  'Slow Amber II is the only formula built to commercial intent. Climate is the most defensible <b>story</b> — a fragrance designed for this climate rather than imported into it — but it is untested.'],
+
+ ['Ingredient disclosure','what goes on the back?',
+  [['Full material list','no'],['Poetic note pyramid','lean'],
+   ['Allergen list only (legal minimum)','chosen'],['Pyramid + batch number','lean']],
+  'Full disclosure suits a niche-purist brand, which you decided against. It reads as chemistry to your actual buyer and kills the narrative. <b>Keep the proof in the marketing — batch numbers, the notebook, the bench — not on the label.</b>'],
+
+ ['The story','what is the brand actually about?',
+  [['Place — Karachi, monsoon, salt air','lean'],['Process — one person, logged batches','lean'],
+   ['Climate — built for heat and humidity','open'],['Founder personal narrative','open'],
+   ['Pure aesthetics, no story','no']],
+  'Place and process are not competing — process is how you earn the right to tell the place story. Climate is the sharpest commercial angle and nobody local is claiming it.'],
+
+ ['Naming','how are scents named?',
+  [['Plain English — First Rain, Slow Amber','chosen'],
+   ['Classical — Apollo, Hera','no'],['Urdu / local language','open'],['Numbered only','no']],
+  'Plain English fits your voice and reads internationally. THE NOTE. proves classical works in this market, but it is theirs already.'],
+
+ ['Packaging','the physical object',
+  [['Bone / off-white printed box','chosen'],['Matte black','no'],
+   ['Bare kraft, unprinted','no'],['Resin sleeve, dyed per scent','chosen'],
+   ['Gift sleeve option at checkout','lean']],
+  'Bone plus dyed translucent resin was settled. The gift sleeve is unresolved and matters — gifting is a real demand driver here and bare packaging reads as cheap when handed over.'],
+
+ ['Price','where does it sit?',
+  [['Under Rs 1,500','no'],['Rs 1,800–2,500 launch','lean'],
+   ['Rs 3,000–4,000 established','lean'],['Rs 5,000+','open']],
+  'Launch low to build reviews, then raise. THE NOTE. spans Rs 1,680–5,800, which is the band to sit inside rather than undercut.'],
+
+ ['First channel','where do you sell?',
+  [['Instagram + WhatsApp direct','chosen'],['Daraz from day one','no'],
+   ['Daraz once reviews exist','lean'],['Physical stockist','open'],['Own website','open']],
+  'Direct first is right — margin, and you control the story. Daraz once there is social proof to point at.'],
+
+ ['Marketing register','how do you speak?',
+  [['Process documentation, no face','lean'],['Founder on camera','open'],
+   ['Trend-led reels','no'],['Paid ads from launch','no'],
+   ['Paid, small, seasonal only','lean']],
+  'You have a strong aversion to the performing register. Process documentation is the honest alternative and compounds — but it is slower, and you should expect that.'],
+
+ ['Seal / mark','the maker\'s mark',
+  [['Two fig leaves + sevenfold rosette','lean'],['Sevenfold rosette alone','open'],
+   ['Crescent + ح','open'],['Wordmark only, no seal','no']],
+  'Light grey was chosen for print. A dark variant is still needed for stamping and small sizes — it will not hold at favicon scale otherwise.'],
+];
+
+function render(){
+ const t=$('#tree');t.innerHTML='';
+ TREE.forEach(([name,q,opts,note],bi)=>{
+  const b=document.createElement('div');b.className='branch';
+  const picked=opts.filter((o,i)=>(S[bi+'_'+i]||o[1])==='chosen').map(o=>o[0]);
+  const lean=opts.filter((o,i)=>(S[bi+'_'+i]||o[1])==='lean').map(o=>o[0]);
+  const h=document.createElement('div');h.className='bh';
+  h.innerHTML='<b>'+name+'</b><span class="q">'+q+'</span><span class="pick">'+
+   (picked.length?picked.join(' · '):lean.length?lean.join(' · ')+' (leaning)':'undecided')+'</span>';
+  b.append(h);
+  const o=document.createElement('div');o.className='opts';
+  opts.forEach(([label,def],i)=>{
+   const k=bi+'_'+i, st=S[k]||def;
+   const btn=document.createElement('button');btn.className='opt'+(st==='open'?'':' '+st);
+   btn.textContent=label;
+   btn.onclick=()=>{const cur=S[k]||def;S[k]=CYCLE[(CYCLE.indexOf(cur)+1)%4];save();render()};
+   o.append(btn);
+  });
+  b.append(o);
+  const n=document.createElement('div');n.className='note';n.innerHTML=note;b.append(n);
+  t.append(b);
+ });
+ summary();
+}
+function summary(){
+ const s=$('#sum');
+ let decided=0,open=0,rows='';
+ TREE.forEach(([name,,opts],bi)=>{
+  const ch=opts.filter((o,i)=>(S[bi+'_'+i]||o[1])==='chosen').map(o=>o[0]);
+  if(ch.length){decided++;rows+='<div class="row"><i>'+name+'</i>'+ch.join(' · ')+'</div>'}
+  else open++;
+ });
+ s.innerHTML='<h2>Settled so far — '+decided+' of '+TREE.length+'</h2>'+rows+
+  (open?'<div class="row" style="margin-top:6px;color:#C9AFBA"><i>still open</i>'+open+' branches</div>':'');
+}
+function save(){Store.set(KEY,JSON.stringify(S))}
+(async()=>{
+ const v=await Store.get(KEY); if(v){try{S=JSON.parse(v)}catch(e){}}
+ $('#reset').onclick=e=>{e.preventDefault();if(confirm('Reset every choice?')){S={};save();render()}};
+ render();
+})();
+</script>
+</body>
+</html>

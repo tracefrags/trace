@@ -8,10 +8,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="compose-manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="theme.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bone:#F2EDE4;--paper:#FBF9F5;--ink:#1B2621;--brass:#A67C3D;--muted:#8A8378;
---line:#DED7CB;--warn:#9C7A28;--bad:#9C4A3F;--good:#4A6B52}
 body{background:var(--bone);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;padding:14px}
 .wrap{max-width:1340px;margin:0 auto}
 h1{font-family:Georgia,serif;font-size:19px;letter-spacing:5px;font-weight:700}
@@ -216,13 +215,19 @@ const DESC={'DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citru
  'Styrax':'leathery,smoky','Guaiacwood':'smoky,rosy-wood','Oakmoss':'mossy,bitter-green',
  'Galaxolide':'clean,laundry-musk','Brassylate':'musky,waxy','Habanolide':'skin-musk','Benzyl Benzoate':'faint-balsamic','Cypriol':'smoky,dry-wood','Decalactone':'peachy,creamy',
  'Nonalactone':'coconut,milky','Rose Oxide':'metallic,sparkling','Damascone':'jammy,boozy'};
+// Accords documented by BioShop in their own ingredient pages, plus two of ours.
+// Percentages are of the whole formula, as BioShop states them.
 const PRESETS={
+ 'Rose accord (BioShop method)':[['Geraniol',14],['Citronellol',7],['PEA (Phenylethyl alcohol)',5],['Rose Oxide',1.5]],
+ 'Vanilla ladder':[['Vanillin',0.2],['Benzyl Benzoate',0.3],['Ethyl Maltol',0.1]],
+ 'Petitgrain cologne 4-2-1':[['Petitgrain EO',5],['Bergamot EO',2.5],['Vetiver EO',0.5]],
+ 'Balsamic module 1:2:2':[['Styrax Resinoid',1],['Benzoin Siam Resinoid',2]],
+ 'Fougère (tonka-lavender-moss)':[['Tonka Bean Oil',3],['Linalool',4],['Oakmoss',0.5],['Coumarin',3]],
+ 'DHM fresh accord':[['DHM (Dihydromyrcenol)',10],['Bergamot EO',4],['Galaxolide',6],['Linalool',2]],
+ 'Cashmere accord':[['Cashmeran',2],['Galaxolide',5],['Ethylene Brassylate',3],['Iso E Super',2]],
+ 'Skin-scent base':[['Cashmeran',2],['Habanolide',1],['Ambroxan',0.5]],
+ 'Grojsman base':[['Iso E Super',10],['Galaxolide',8]],
  'Radiance booster':[['Hedione',8],['Iso E Super',5],['Ambroxan',1]],
- 'Clean musk base':[['Galaxolide',10],['Eth. Brassylate',5],['Ambroxan',3]],
- 'Citrus opening':[['DHM',6],['Petitgrain EO',4],['Sweet Orange EO',3]],
- 'Rose heart':[['PEA',12],['Geraniol',6],['Citronellol',5],['β-damascone',1.5],['Rose oxide',1]],
- 'Caramel heart':[['Coumarin',8],['Vanillin',5],['Ethyl Maltol',1.5]],
- 'Dry woody base':[['Iso E Super',12],['Vetiver EO',5],['Sandenol',5]],
 };
 // materials that appear under different names in different lists.
 // matched on the WHOLE normalised name, never as a substring — 'isoe' must not
