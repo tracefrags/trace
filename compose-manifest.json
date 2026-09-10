@@ -2,7 +2,7 @@
   "name": "TRACE Compose",
   "short_name": "Compose",
   "description": "Spatial fragrance formula builder with IFRA checking and cost",
-  "start_url": "./compose-map.html",
+  "start_url": "./home.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

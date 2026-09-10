@@ -1,5 +1,5 @@
 const CACHE = 'trace-compose-v1';
-const FILES = ['./compose-map.html', './compose-manifest.json', './icon.svg'];
+const FILES = ['./home.html', './theme.css', './compose-map.html', './compose-manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).catch(() => {}));

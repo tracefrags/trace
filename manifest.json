@@ -2,7 +2,7 @@
   "name": "TRACE Studio",
   "short_name": "TRACE",
   "description": "Perfumery formulation, IFRA checking and batch records",
-  "start_url": "./",
+  "start_url": "./home.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1B2621">
+<link rel="stylesheet" href="theme.css">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>TRACE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.wrap{max-width:760px;width:100%}
+header{text-align:center;margin-bottom:6px}
+.mark{font-family:var(--font-display);font-size:34px;letter-spacing:12px;font-weight:700}
+.sub{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+.rule{height:2px;background:var(--brass);margin:18px auto 26px;max-width:120px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+a.card{display:block;background:var(--paper);border:1px solid var(--line);border-radius:6px;
+ padding:18px 20px;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--brass);transform:translateY(-1px)}
+a.card b{font-family:var(--font-display);font-size:17px;display:block;margin-bottom:5px}
+a.card span{font-size:12px;color:var(--muted);line-height:1.45;display:block}
+a.card .tag{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--brass);margin-bottom:7px;display:block}
+.foot{text-align:center;font-size:11px;color:var(--muted);margin-top:24px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="mark">TRACE</div>
+  <div class="sub">Karachi</div>
+</header>
+<div class="rule"></div>
+
+<div class="grid">
+  <a class="card" href="compose-map.html">
+    <span class="tag">Build</span>
+    <b>Compose</b>
+    <span>The spatial map. Click materials to build a formula, see pairings light up, check IFRA and cost live, export a one-page PDF.</span>
+  </a>
+  <a class="card" href="index.html">
+    <span class="tag">Library</span>
+    <b>Studio</b>
+    <span>Materials, prices, stock and IFRA limits. Formulas, accords, batch log with maceration clocks. The single source of truth.</span>
+  </a>
+  <a class="card" href="open.html">
+    <span class="tag">Track</span>
+    <b>Open</b>
+    <span>Everything waiting — maceration timers, decisions pending, what to buy next, what still needs verifying.</span>
+  </a>
+  <a class="card" href="direction.html">
+    <span class="tag">Decide</span>
+    <b>Direction</b>
+    <span>Brand and launch decisions. Positioning, first release, story, pricing, packaging — what's settled and what's still open.</span>
+  </a>
+</div>
+
+<div class="foot">
+  Data lives on this device.<br>
+  Studio holds the library; Compose and Open read from it.
+</div>
+</div>
+</body>
+</html>
