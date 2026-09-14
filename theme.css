@@ -6,11 +6,11 @@
 
 :root{
   /* ---- core palette ---------------------------------- */
-  --bone:   #14151a;   /* page background — the brand's base */
-  --paper:  #efede8;   /* cards, panels — a shade lighter than bone */
+  --bone:   #76736d;   /* page background — the brand's base */
+  --paper:  #76736d;   /* cards, panels — a shade lighter than bone */
   --ink:    #efede8;   /* text, selected states — near-black green */
   --brass:  #c4622d;   /* accent, links, headings — muted gold */
-  --muted:  #8A8378;   /* secondary text */
+  --muted:  #f2ede4;   /* secondary text */
   --line:   #76736d;   /* borders, dividers */
 
   /* ---- status colours -------------------------------- */
