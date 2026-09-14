@@ -17,28 +17,28 @@ h1{font-family:Georgia,serif;font-size:19px;letter-spacing:5px}
 .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
 .d-chosen{background:var(--ink)}
 .d-lean{background:none;border:2px solid var(--brass)}
-.d-open{background:none;border:1.5px dashed #C0B7A8}
-.d-no{background:#E8E0D4;position:relative}
+.d-open{background:none;border:1.5px dashed var(--text-3)}
+.d-no{background:var(--surface4);position:relative}
 .d-no::after{content:'';position:absolute;left:1px;right:1px;top:4px;height:1.5px;background:var(--bad)}
 
 .branch{background:var(--paper);border:1px solid var(--line);border-radius:6px;margin-bottom:12px;overflow:hidden}
-.bh{display:flex;align-items:baseline;gap:10px;padding:10px 13px;background:#F0E9DD;cursor:pointer}
+.bh{display:flex;align-items:baseline;gap:10px;padding:10px 13px;background:var(--surface3);cursor:pointer}
 .bh b{font-family:Georgia,serif;font-size:14px;flex-shrink:0}
 .bh .q{font-size:11.5px;color:var(--muted);flex:1}
 .bh .pick{font-size:11px;color:var(--brass);font-weight:600;text-align:right}
 .opts{display:flex;flex-wrap:wrap;gap:7px;padding:11px 13px}
-.opt{border:1.5px dashed #C0B7A8;border-radius:16px;padding:5px 12px;font-size:12px;cursor:pointer;
- background:none;color:#6B6259;font-family:inherit;transition:all .12s;position:relative}
+.opt{border:1.5px dashed var(--text-3);border-radius:16px;padding:5px 12px;font-size:12px;cursor:pointer;
+ background:none;color:var(--text-2);font-family:inherit;transition:all .12s;position:relative}
 .opt:hover{border-color:var(--brass)}
 .opt.lean{border:2px solid var(--brass);border-style:solid;color:var(--ink)}
 .opt.chosen{background:var(--ink);color:var(--bone);border:2px solid var(--ink)}
-.opt.no{background:#EFE9DE;color:#B0A69A;border-style:solid;border-color:#E0D8CA;text-decoration:line-through}
+.opt.no{background:var(--line);color:var(--text-3);border-style:solid;border-color:var(--line);text-decoration:line-through}
 .note{padding:0 13px 11px;font-size:11.5px;color:var(--muted);line-height:1.45}
 .note b{color:var(--ink)}
 .sum{background:var(--ink);color:var(--bone);border-radius:6px;padding:14px 16px;margin-bottom:16px}
-.sum h2{font-family:Georgia,serif;font-size:14px;margin-bottom:8px;color:#E8C77E}
+.sum h2{font-family:Georgia,serif;font-size:14px;margin-bottom:8px;color:var(--primary-t)}
 .sum .row{font-size:12px;padding:3px 0;display:flex;gap:8px}
-.sum .row i{color:#C9AFBA;font-style:normal;min-width:120px;font-size:11px}
+.sum .row i{color:var(--text-2);font-style:normal;min-width:120px;font-size:11px}
 .foot{font-size:11px;color:var(--muted);text-align:center;margin-top:18px}
 .foot a{color:var(--brass)}
 </style>
@@ -91,9 +91,9 @@ const TREE=[
   'Slow Amber II is the only formula built to commercial intent. Climate is the most defensible <b>story</b> — a fragrance designed for this climate rather than imported into it — but it is untested.'],
 
  ['Ingredient disclosure','what goes on the back?',
-  [['Full material list','no'],['Poetic note pyramid','lean'],
-   ['Allergen list only (legal minimum)','chosen'],['Pyramid + batch number','lean']],
-  'Full disclosure suits a niche-purist brand, which you decided against. It reads as chemistry to your actual buyer and kills the narrative. <b>Keep the proof in the marketing — batch numbers, the notebook, the bench — not on the label.</b>'],
+  [['Pyramid + translated full list','chosen'],['Poetic note pyramid alone','lean'],
+   ['Allergen list only (legal minimum)','open'],['Raw material list, untranslated','no']],
+  'REVISED after Bastille Parfums. They publish <b>both</b> a poetic pyramid and all 29 materials — and translate every synthetic into scent language: "Ambroxan (wood, ambergris)", "Cashmeran (musk, wood)", "Hedione (fresh jasmine)". The problem was never the listing, it was listing <b>untranslated</b>. They also frame the count as the argument: 29 ingredients versus up to 300 in a classic perfume. Your formulas run 12–19 — a stronger version of the same claim. Do not copy their "95% natural" line; yours are mostly synthetic. Your equivalent is <b>short, disclosed, built for this climate</b>.'],
 
  ['The story','what is the brand actually about?',
   [['Place — Karachi, monsoon, salt air','lean'],['Process — one person, logged batches','lean'],
@@ -106,16 +106,21 @@ const TREE=[
    ['Classical — Apollo, Hera','no'],['Urdu / local language','open'],['Numbered only','no']],
   'Plain English fits your voice and reads internationally. THE NOTE. proves classical works in this market, but it is theirs already.'],
 
+ ['Palette','the brand looks how?',
+  [['Off-black, high contrast','lean'],['Cool true white, hard type','lean'],
+   ['Warm bone + brass','no'],['Saturated colour per scent','chosen']],
+  'REVISED. Warm bone plus Georgia serif plus letterspaced caps plus antique brass reads as heritage apothecary. The cause is low contrast and warmth. Modern reads as HIGH contrast: Valentino is black against gold, Spicebomb is gunmetal, Byredo is stark white with hard black type. Off-white can work, but only if nothing else is soft. Drop Georgia and the brass.'],
+
  ['Packaging','the physical object',
-  [['Bone / off-white printed box','chosen'],['Matte black','no'],
-   ['Bare kraft, unprinted','no'],['Resin sleeve, dyed per scent','chosen'],
+  [['Resin sleeve, dyed per scent','chosen'],['Form-driven sleeve, no pattern','lean'],
+   ['Jali / traditional motif','no'],['Bone printed box','no'],
    ['Gift sleeve option at checkout','lean']],
-  'Bone plus dyed translucent resin was settled. The gift sleeve is unresolved and matters — gifting is a real demand driver here and bare packaging reads as cheap when handed over.'],
+  'The sleeve is the silhouette — your equivalent of the Flowerbomb grenade, at a cost a glass mould could never justify. Jali dropped: it codes traditional-Pakistani, which is not the brand. Do not replace it with another motif — Flowerbomb is FACETED, not decorated. Form carries recognition; pattern reads as souvenir, and fine detail prints badly in cheap resin.'],
 
  ['Price','where does it sit?',
   [['Under Rs 1,500','no'],['Rs 1,800–2,500 launch','lean'],
    ['Rs 3,000–4,000 established','lean'],['Rs 5,000+','open']],
-  'Launch low to build reviews, then raise. THE NOTE. spans Rs 1,680–5,800, which is the band to sit inside rather than undercut.'],
+  'Launch low to build reviews, then raise. THE NOTE. spans Rs 1,680–5,800 — sit inside that band, do not undercut it. Bastille\'s architecture is worth copying: smallest bottle as the entry price, and a <b>discovery set priced below the smallest bottle</b> (€32 vs €39) so trial has no hesitation. Their gift box is only a €7 premium — a conversion tool, not a margin play.'],
 
  ['First channel','where do you sell?',
   [['Instagram + WhatsApp direct','chosen'],['Daraz from day one','no'],
@@ -129,9 +134,9 @@ const TREE=[
   'You have a strong aversion to the performing register. Process documentation is the honest alternative and compounds — but it is slower, and you should expect that.'],
 
  ['Seal / mark','the maker\'s mark',
-  [['Two fig leaves + sevenfold rosette','lean'],['Sevenfold rosette alone','open'],
-   ['Crescent + ح','open'],['Wordmark only, no seal','no']],
-  'Light grey was chosen for print. A dark variant is still needed for stamping and small sizes — it will not hold at favicon scale otherwise.'],
+  [['Wordmark only — the sleeve IS the mark','chosen'],['Two fig leaves + sevenfold rosette','no'],
+   ['Sevenfold rosette alone','no'],['Crescent + ح','no']],
+  'REVISED. Valentino has no seal, it has studs. Flowerbomb has no seal, it has a grenade. In both cases the mark IS the object, and a logo on top would dilute it. You were carrying four competing marks for a job the sleeve already does. Wordmark plus sleeve is the whole system: cheaper, more modern, and structurally identical to the brands you are pointing at.'],
 ];
 
 function render(){
@@ -167,7 +172,7 @@ function summary(){
   else open++;
  });
  s.innerHTML='<h2>Settled so far — '+decided+' of '+TREE.length+'</h2>'+rows+
-  (open?'<div class="row" style="margin-top:6px;color:#C9AFBA"><i>still open</i>'+open+' branches</div>':'');
+  (open?'<div class="row" style="margin-top:6px;color:var(--text-2)"><i>still open</i>'+open+' branches</div>':'');
 }
 function save(){Store.set(KEY,JSON.stringify(S))}
 (async()=>{

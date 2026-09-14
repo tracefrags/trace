@@ -1,76 +1,104 @@
 /* ==========================================================
-   TRACE — brand theme
-   Change the values here and every app updates at once.
-   Linked by: index.html · compose-map.html · open.html · direction.html
+   TRACE — brand theme · dark
+   Single source of truth. Edit here, every app follows.
+   Linked by: home · index · compose-map · open · direction
    ========================================================== */
 
 :root{
-  /* ---- core palette ---------------------------------- */
-  --bone:   #F2EDE4;   /* page background — the brand's base */
-  --paper:  #FBF9F5;   /* cards, panels — a shade lighter than bone */
-  --ink:    #1B2621;   /* text, selected states — near-black green */
-  --brass:  #A67C3D;   /* accent, links, headings — muted gold */
-  --muted:  #8A8378;   /* secondary text */
-  --line:   #DED7CB;   /* borders, dividers */
+  /* ---- base + elevation --------------------------------
+     white overlaid on #14151A at increasing opacity.
+     Higher number = closer to the viewer.                 */
+  --bg:       #14151A;   /*  0%  page                       */
+  --surface:  #202125;   /*  5%  cards, panels              */
+  --surface2: #24252A;   /*  7%  nested panels, rows         */
+  --surface3: #292A2F;   /*  9%  headers, block titles       */
+  --surface4: #303135;   /* 12%  hover, active               */
+  --surface5: #3A3A3F;   /* 16%  inputs, wells               */
 
-  /* ---- status colours -------------------------------- */
-  --good:   #4A6B52;
-  --warn:   #9C7A28;
-  --bad:    #9C4A3F;
-  --goodbg: #E6EFE7;
-  --warnbg: #F7EFDC;
-  --badbg:  #F6E4E1;
+  /* ---- brand -------------------------------------------- */
+  --primary:   #E8563C;  /* flame — accent, tags, alerts     */
+  --primary-d: #C4442D;  /* pressed / darker fill            */
+  --primary-t: #F18E7B;  /* tint, on darker surfaces         */
+  --secondary: #3CCEE8;  /* cyan — links, data, second voice */
+  --secondary-d:#2BA8BF;
+  --secondary-t:#7FDFF0;
 
-  /* ---- olfactory family colours (Compose map) --------- */
-  --fam-citrus: #C9973F;
-  --fam-floral: #B4718C;
-  --fam-fruity: #C97F4F;
-  --fam-spice:  #9C7A28;
-  --fam-wood:   #7A6A4F;
-  --fam-musk:   #8A8378;
+  /* ---- text --------------------------------------------- */
+  --text:   #EDEBE6;     /* 15.3:1 — body                    */
+  --text-2: #9A968E;     /*  6.2:1 — secondary               */
+  --text-3: #6E6A63;     /*  3.4:1 — labels only, never body */
+  --line:   #2A2B31;     /* borders, rules                   */
 
-  /* ---- band tints (Compose map) ----------------------- */
-  --band-a: #FBF9F5;
-  --band-b: #F6F1E8;
-  --block:  #F0E9DD;   /* block headers, sticky-note headers */
+  /* ---- status ------------------------------------------- */
+  --good: #4FC28A;
+  --warn: #E0A33C;
+  --bad:  #E8563C;
+  --goodbg: #1B2B23;
+  --warnbg: #2E2718;
+  --badbg:  #2E1C18;
 
-  /* ---- typography ------------------------------------ */
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* ---- legacy names, mapped so existing CSS keeps working */
+  --bone:  var(--bg);
+  --paper: var(--surface);
+  --ink:   var(--text);
+  --brass: var(--primary);
+  --muted: var(--text-2);
+
+  /* ---- olfactory families (Compose map) ------------------
+     lifted for legibility on a dark ground                  */
+  --fam-citrus: #E8B14F;
+  --fam-floral: #E087A8;
+  --fam-fruity: #F0895C;
+  --fam-spice:  #D4A23C;
+  --fam-wood:   #B09A72;
+  --fam-musk:   #9A968E;
+
+  --band-a: #1A1B20;
+  --band-b: #202125;
+  --block:  #292A2F;
+
+  /* ---- scent colours — product only, never in UI --------- */
+  --scent-amber:   #FF8A1F;
+  --scent-peach:   #F0A830;
+  --scent-climate: #3CCEE8;
+  --scent-serpent: #1F8FA8;
+  --scent-blood:   #B01E4A;
+
+  /* ---- type --------------------------------------------- */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   --wordmark-size: 19px;
-  --wordmark-spacing: 5px;
+  --wordmark-spacing: 6px;
 }
 
-/* ---- shared brand furniture -------------------------- */
-body{
-  background: var(--bone);
-  color: var(--ink);
-  font: 14px/1.5 var(--font-body);
+@font-face{
+  font-family:'Space Grotesk';
+  src:url('SpaceGrotesk.ttf') format('truetype');
+  font-weight:300 700; font-display:swap;
 }
-.mark, .wordmark, h1.brand{
-  font-family: var(--font-display);
-  font-size: var(--wordmark-size);
-  letter-spacing: var(--wordmark-spacing);
-  font-weight: 700;
+
+body{ background:var(--bg); color:var(--text); font:14px/1.5 var(--font-body); }
+.mark,.wordmark,h1.brand{
+  font-family:var(--font-display); font-size:var(--wordmark-size);
+  letter-spacing:var(--wordmark-spacing); font-weight:600;
 }
-.sub, .brandsub{
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: var(--muted);
-  text-transform: uppercase;
-}
+.sub,.brandsub{ font-size:10px; letter-spacing:2px; color:var(--text-3); text-transform:uppercase; }
+::selection{ background:var(--primary); color:#fff; }
+input,select,textarea{ background:var(--surface5); color:var(--text); border-color:var(--line); }
+input:focus,select:focus{ outline:1px solid var(--primary); outline-offset:0; }
+a{ color:var(--secondary); }
 
 /* ==========================================================
+   RULES
+   · Accent is fill and marker, never body text.
+   · Accent stays near 10% of the visual field — tags, rules,
+     flags. Large areas of #E8563C glare.
+   · --text-3 is for labels only; it is 3.4:1 and fails as body.
+   · Scent colours appear on product, never in the interface.
    TO REBRAND
-   1. Colours — edit the hex values above. That is the whole job
-      for anything rendered in CSS.
-   2. Wordmark — the literal text "TRACE" appears in the <h1> or
-      .mark element of each of the four HTML files. Search and replace.
-   3. Icon — icon.svg is a separate file. Replace it, keeping the
-      filename, and both manifests pick it up.
-   4. Map colours — compose-map.html draws its SVG nodes from a
-      JS array (FAM) that repeats the family hexes. Those are noted
-      above as --fam-* but JS cannot read CSS variables directly,
-      so they must also be changed in that array. Search for
-      'const FAM=' in compose-map.html.
+   1. Colours — edit above. That is the whole job for CSS.
+   2. Wordmark — the text "TRACE" in each app's <h1>.
+   3. Icon — replace icon.svg, keep the filename.
+   4. Map node colours repeat in compose-map's JS array FAM,
+      because JS cannot read CSS variables. Search 'const FAM='.
    ========================================================== */
