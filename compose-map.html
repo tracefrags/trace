@@ -9,6 +9,7 @@
 <link rel="manifest" href="compose-manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bone);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;padding:14px}
@@ -145,6 +146,7 @@ h4{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--bra
 
 <script>
 const $=s=>document.querySelector(s);
+const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 // name, family, band, ifra(% finished |null), dilution%(100=neat), price Rs, pack g, verified
 const MAT=[
  ['DHM','citrus','top',null,100,425,10,1],['Citral','citrus','top',0.6,100,380,10,0],
@@ -167,9 +169,14 @@ const MAT=[
  ['Galaxolide','musk','base',21.4,100,350,10,1],['Eth. Brassylate','musk','base',null,100,380,10,1],
  ['Habanolide','musk','base',null,100,900,10,1],['Benzyl Benzoate','musk','base',null,100,220,10,1],
 ];
-const FAM=[['citrus','Citrus / Fresh','#E8B14F'],['floral','Floral','#E087A8'],
- ['fruity','Fruity / Sweet','#F0895C'],['spice','Spice','#D4A23C'],
- ['wood','Wood / Amber','#B09A72'],['musk','Musk','#9A968E']];
+const FAMKEYS=[['citrus','Citrus / Fresh'],['floral','Floral'],['fruity','Fruity / Sweet'],
+ ['spice','Spice'],['wood','Wood / Amber'],['musk','Musk']];
+function famColour(k){
+  const v=getComputedStyle(document.documentElement).getPropertyValue('--fam-'+k).trim();
+  return v||'#B09A72';
+}
+let FAM=FAMKEYS.map(([k,n])=>[k,n,famColour(k)]);
+function refreshFam(){ FAM=FAMKEYS.map(([k,n])=>[k,n,famColour(k)]); }
 const BAND=[['top','TOP','0–30 min',55],['heart','HEART','30 min – 3 hr',255],['base','BASE','3 hr +',455]];
 const TYPES=[['Cologne',4],['EdT',10],['EdP',15],['EdP intense',18],['Extrait',22],['Accord neat',100]];
 const ETH_G=1.65;
@@ -509,9 +516,9 @@ function drawMap(){
  const svg=$('#map');svg.innerHTML='';
  BAND.forEach(([bk,bn,bt],bi)=>{
   const{y:by,h}=BANDY[bk];
-  svg.append(mk('rect',{x:6,y:by,width:868,height:h,fill:bi%2?'#1A1B20':'#202125',rx:4}));
-  const l=mk('text',{x:12,y:by+13,'font-size':10,'font-weight':700,'letter-spacing':1.4,fill:'#EDEBE6'});l.textContent=bn;svg.append(l);
-  const t=mk('text',{x:12,y:by+25,'font-size':9,fill:'#6E6A63'});t.textContent=bt;svg.append(t);
+  svg.append(mk('rect',{x:6,y:by,width:868,height:h,fill:bi%2?cssVar('--band-a'):cssVar('--band-b'),rx:4}));
+  const l=mk('text',{x:12,y:by+13,'font-size':10,'font-weight':700,'letter-spacing':1.4,fill:cssVar('--text')});l.textContent=bn;svg.append(l);
+  const t=mk('text',{x:12,y:by+25,'font-size':9,fill:cssVar('--text-3')});t.textContent=bt;svg.append(t);
  });
  FAM.forEach(([fk,fn,fc],fi)=>{const t=mk('text',{x:X0+fi*COLW+9,y:46,'font-size':9,'letter-spacing':.5,fill:fc,'font-weight':600});
   t.textContent=fn.toUpperCase();svg.append(t)});
@@ -520,7 +527,7 @@ function drawMap(){
  if(pts.length>1){let d='M '+pts[0].x+' '+pts[0].y;
   for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],mx=(a.x+b.x)/2;
    d+=` C ${mx} ${a.y}, ${mx} ${b.y}, ${b.x} ${b.y}`}
-  svg.append(mk('path',{d,fill:'none',stroke:'#E8563C','stroke-width':1.6,'stroke-opacity':.6,'stroke-linecap':'round'}))}
+  svg.append(mk('path',{d,fill:'none',stroke:cssVar('--primary'),'stroke-width':1.6,'stroke-opacity':.6,'stroke-linecap':'round'}))}
  const any=Object.keys(sel).length>0,{out:sh}=shares();
  const sug=any?suggested():new Set();
  MAT.forEach(m=>{const[name,fam,,ifra]=m,p=P[name],on=sel[name]!==undefined;
@@ -530,11 +537,11 @@ function drawMap(){
   const r=on?Math.max(5,Math.min(11,4+(sh[name]||0)*.22)):3.6;
   if(isSug)g.append(mk('circle',{cx:p.x,cy:p.y,r:8,fill:'none',stroke:'#E8563C',
     'stroke-width':1.3,'stroke-dasharray':'2.5 2.5','stroke-opacity':.85}));
-  g.append(mk('circle',{cx:p.x,cy:p.y,r,fill:on?fc:'#24252A',stroke:on?fc:(isSug?'#E8563C':'#3A3A3F'),
+  g.append(mk('circle',{cx:p.x,cy:p.y,r,fill:on?fc:cssVar('--surface2'),stroke:on?fc:(isSug?cssVar('--primary'):cssVar('--surface5')),
     'stroke-width':on?0:1.2,'fill-opacity':any&&!on&&!isSug?.35:1}));
   const disp=name.length>17?name.slice(0,16)+'…':name;
   const t=mk('text',{x:p.x+13,y:p.y+3.5});t.textContent=disp;g.append(t);
-  if(ifra!=null){const w=mk('text',{x:p.x+17+disp.length*5.6,y:p.y+3.5,'font-size':10,'font-weight':700,fill:'#E8563C'});w.textContent='!';g.append(w)}
+  if(ifra!=null){const w=mk('text',{x:p.x+17+disp.length*5.6,y:p.y+3.5,'font-size':10,'font-weight':700,fill:cssVar('--bad')});w.textContent='!';g.append(w)}
   const inf=info(name),ti=mk('title');
   const ur=usageRange(name);
   const why=isSug?Object.keys(sel).filter(s=>pairsFor(s).some(p=>resolve(p)===name)):[];
@@ -599,7 +606,8 @@ function buildRows(){
  box.append(tr);
 }
 
-function draw(){buildRows();refresh()}
+function draw(){refreshFam();layout();buildRows();refresh()}
+window.draw=draw;
 function refresh(){
  $('#cg').value=cgram().toFixed(2)+'g in '+(W()-cgram()).toFixed(2)+'g ethanol';
  drawMap();

@@ -102,3 +102,46 @@ a{ color:var(--secondary); }
    4. Map node colours repeat in compose-map's JS array FAM,
       because JS cannot read CSS variables. Search 'const FAM='.
    ========================================================== */
+
+/* ==========================================================
+   LIGHT — for the apps, where you read dense numbers for an
+   hour. Dark stays the default and the public face.
+   Toggle adds .light to <html>; theme.js handles it.
+   ========================================================== */
+:root.light{
+  --bg:       #F4F2ED;
+  --surface:  #FFFFFF;
+  --surface2: #EFEDE7;
+  --surface3: #E7E4DC;
+  --surface4: #DFDBD2;
+  --surface5: #FFFFFF;
+
+  --primary:   #B03A24;   /* 5.40:1 — darkened; flame fails on light */
+  --primary-d: #8E2D1B;
+  --primary-t: #E8563C;   /* the brand flame, for fills only */
+  --secondary: #15788C;   /* 4.58:1 */
+  --secondary-d:#0F5C6B;
+  --secondary-t:#3CCEE8;
+
+  --text:   #14151A;      /* 16.3:1 */
+  --text-2: #5E5B55;      /*  6.1:1 */
+  --text-3: #75716B;      /*  4.3:1 */
+  --line:   #DDD9D1;
+
+  --good: #256842;  --warn: #7E560F;  --bad: #B03A24;
+  --goodbg: #E4EFE7; --warnbg: #F7EFDC; --badbg: #F8E6E1;
+
+  --fam-citrus: #C9973F; --fam-floral: #B4718C; --fam-fruity: #C97F4F;
+  --fam-spice:  #9C7A28; --fam-wood:   #7A6A4F; --fam-musk:   #8A8378;
+  --band-a: #FBF9F5; --band-b: #F4F1EA; --block: #EBE7DE;
+}
+
+/* toggle button — injected by theme.js */
+.themeToggle{
+  position:fixed; right:14px; bottom:14px; z-index:999;
+  background:var(--surface3); color:var(--text-2); border:1px solid var(--line);
+  border-radius:20px; padding:6px 13px; font:inherit; font-size:11px;
+  letter-spacing:1.2px; cursor:pointer; text-transform:uppercase;
+}
+.themeToggle:hover{ color:var(--text); border-color:var(--primary); }
+@media print{ .themeToggle{display:none} }
