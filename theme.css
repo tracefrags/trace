@@ -6,12 +6,12 @@
 
 :root{
   /* ---- core palette ---------------------------------- */
-  --bone:   #F2EDE4;   /* page background — the brand's base */
-  --paper:  #FBF9F5;   /* cards, panels — a shade lighter than bone */
-  --ink:    #1B2621;   /* text, selected states — near-black green */
-  --brass:  #A67C3D;   /* accent, links, headings — muted gold */
+  --bone:   #14151a;   /* page background — the brand's base */
+  --paper:  #efede8;   /* cards, panels — a shade lighter than bone */
+  --ink:    #efede8;   /* text, selected states — near-black green */
+  --brass:  #c4622d;   /* accent, links, headings — muted gold */
   --muted:  #8A8378;   /* secondary text */
-  --line:   #DED7CB;   /* borders, dividers */
+  --line:   #76736d;   /* borders, dividers */
 
   /* ---- status colours -------------------------------- */
   --good:   #4A6B52;
