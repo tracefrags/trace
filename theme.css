@@ -18,21 +18,21 @@
   /* ---- brand -------------------------------------------- */
   --primary:   #E8563C;  /* flame — accent, tags, alerts     */
   --primary-d: #C4442D;  /* pressed / darker fill            */
-  --primary-t: #F18E7B;  /* tint, on darker surfaces         */
+  --primary-t: #F9AE9B;  /* label tint — 8.8:1 on base       */
   --secondary: #3CCEE8;  /* cyan — links, data, second voice */
   --secondary-d:#2BA8BF;
   --secondary-t:#7FDFF0;
 
   /* ---- text --------------------------------------------- */
   --text:   #EDEBE6;     /* 15.3:1 — body                    */
-  --text-2: #9A968E;     /*  6.2:1 — secondary               */
-  --text-3: #6E6A63;     /*  3.4:1 — labels only, never body */
+  --text-2: #A5A199;     /*  7.0:1 — secondary               */
+  --text-3: #97938B;     /*  5.9:1 — labels                  */
   --line:   #2A2B31;     /* borders, rules                   */
 
   /* ---- status ------------------------------------------- */
   --good: #4FC28A;
   --warn: #E0A33C;
-  --bad:  #E8563C;
+  --bad:  #F2705A;   /* 6.6:1 — alert text, lifted from the flame */
   --goodbg: #1B2B23;
   --warnbg: #2E2718;
   --badbg:  #2E1C18;
@@ -41,7 +41,7 @@
   --bone:  var(--bg);
   --paper: var(--surface);
   --ink:   var(--text);
-  --brass: var(--primary);
+  --brass: var(--primary-t);
   --muted: var(--text-2);
 
   /* ---- olfactory families (Compose map) ------------------
@@ -118,14 +118,14 @@ a{ color:var(--secondary); }
 
   --primary:   #B03A24;   /* 5.40:1 — darkened; flame fails on light */
   --primary-d: #8E2D1B;
-  --primary-t: #E8563C;   /* the brand flame, for fills only */
+  --primary-t: #8A2C1A;   /* label tint on light — 7.5:1 */
   --secondary: #15788C;   /* 4.58:1 */
   --secondary-d:#0F5C6B;
   --secondary-t:#3CCEE8;
 
   --text:   #14151A;      /* 16.3:1 */
-  --text-2: #5E5B55;      /*  6.1:1 */
-  --text-3: #75716B;      /*  4.3:1 */
+  --text-2: #54514B;      /*  7.0:1 */
+  --text-3: #5C5953;      /*  6.3:1 */
   --line:   #DDD9D1;
 
   --good: #256842;  --warn: #7E560F;  --bad: #B03A24;
