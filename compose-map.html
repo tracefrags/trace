@@ -388,7 +388,74 @@ function suggested(){
   if(real&&sel[real]===undefined)s.add(real)}));
  return s;
 }
+// Materials that should not sit together, curated from BioShop AVOID statements.
+// Stored ONCE per pair and checked BOTH WAYS — a warning on A's page is a warning
+// for B too, which is not how the source data reads.
 const TEN=/galaxolide|ambroxan|cashmeran|benzoin|vanillin|maltol|habanolide|iso e|styrax|guaiac|oakmoss|patchouli|brassylate/i;
+const CONFLICTS=[
+ ['DHM','Calone','over-saturates the fresh register',{'DHM':8},'B','their marine accord specifies DHM 5-8%'],
+ ['DHM','AAG','two green-aquatic drivers compete',{'DHM':8},'E','no figure given; mirrors the Calone threshold'],
+ ['Calone','AAG','both ozonic — 4:1 AAG:Calone is the accord, beyond that it muddles',{'AAG':0.4},'D','from their 4:1 AAG:Calone accord ratio'],
+ ['DHM','Iso Eugenol','incongruent fresh-spicy clash',null,'B','stated as an absolute clash, no dose given'],
+ ['Hedione','Iso Eugenol','phenolic sharpness competes with Hedione transparency',{'Iso Eugenol':0.01},'I','Iso Eugenol IFRA cap 0.02% of finished'],
+ ['Calone','Iso Eugenol','clean marine against warm phenolic',null,'E','structural logic, not stated'],
+ ['Orange EO','Iso Eugenol','phenolic + citrus — discolouration risk',{'Orange EO':8},'E','they say ’high concentrations’ with no number'],
+ ['Petitgrain EO','Oakmoss','both EU sensitisers — risk compounds',{'Oakmoss':0.05},'I','Oakmoss IFRA cap 0.1% of finished'],
+ ['Iso Eugenol','Oakmoss','both strong sensitisers',null,'B','stated: avoid with other strong sensitisers'],
+ ['Cinnamyl Alc','Iso Eugenol','both EU allergens at max rate',{'Cinnamyl Alc':1.5},'E','both EU allergens; threshold is mine'],
+ ['Coumarin','Tonka','COUMARIN STACKING — total must stay under 1.5% of finished',{'Coumarin':2.0},'I','coumarin IFRA 1.5% of finished'],
+ ['Ald. C14','Ald. C18','over-lactoning — artificial candy effect',{'Ald. C14':0.8},'E','’high percentages’ stated, no number'],
+ ['Ald. C14','Aldehyde C16','lactone overload',{'Ald. C14':0.8},'E','’high percentages’ stated, no number'],
+ ['Ald. C18','Aldehyde C16','lactone overload',{'Ald. C18':6},'E','’high percentages’ stated, no number'],
+ ['Cashmeran','Orange EO','strong citrus with no bridging middle note',{'Cashmeran':2},'E','stated qualitatively; threshold is mine'],
+ ['Cashmeran','Petitgrain EO','strong citrus with no bridging middle note',{'Cashmeran':2},'E','stated qualitatively; threshold is mine'],
+ ['Guaiacwood','Orange EO','smokiness suppresses citrus lift',{'Guaiacwood':4},'E','’overdosing in citrus blends’ — no number'],
+ ['Guaiacwood','Bergamot','smokiness suppresses citrus lift',{'Guaiacwood':4},'E','’overdosing in citrus blends’ — no number'],
+ ['Sandenol','Citral','aggressive aldehyde needs a bridging material',{'Citral':0.6},'E','’aggressive aldehydes’ — no number'],
+ ['Vetiver','Calone','vetiver overwhelms delicate aquatics',{'Vetiver':5},'E','’keep concentrations measured’ — no number'],
+ ['Vetiver','Galaxolide','sharp synthetic musk against vetiver can dissonate',{'Vetiver':8},'E','’at high ratios’ — no number'],
+ ['Citronellol','Benzyl Benzoate','citronellol flattens under overdosed benzyl benzoate',{'Benzyl Benzoate':6},'E','my inference'],
+ ['Bergamot','Peppermint','two assertive camphoraceous tops compete',{'Peppermint':0.3},'B','stated: eucalyptus-type camphoraceous clash'],
+ ['Ethyl Maltol','Furaneol','multiple primary sweeteners — pick ONE lead',{'Furaneol':0.05},'B','stated: avoid multiple primary sweeteners'],
+ ['Ethyl Maltol','Maple Lactone','multiple sweeteners — keep one as lead',{'Maple Lactone':0.2},'E','threshold mine'],
+ ['Ethyl Maltol','Ethyl Vanillin','cumulative sweetness overpowers',{'Ethyl Vanillin':0.3},'B','stated explicitly by name'],
+ ['Furaneol','Maple Lactone','multiple sweeteners — pick ONE lead',{'Furaneol':0.05},'E','threshold mine'],
+ ['Vanillin','Ethyl Vanillin','use the ladder ratio 4:2:1, not both at full dose',{'Ethyl Vanillin':0.3},'D','from their 0.2:0.1:0.05 vanilla ladder'],
+ ['Vanillin','Benzaldehyde','vanillin + strong aldehyde — contrast turns harsh',{'Benzaldehyde':0.3},'B','stated: avoid vanillin with strong aldehydes'],
+ ['Aldehyde C16','Ethyl Maltol','jammy + candy without calibration reads synthetic',{'Aldehyde C16':0.06},'B','stated: without careful calibration'],
+ ['Birch Tar','Calone','tar smoke destroys a marine accord',null,'E','structural logic'],
+ ['Birch Tar','Orange EO','tar suppresses citrus lift',{'Birch Tar':0.03},'E','structural logic'],
+ ['Birch Tar','Petitgrain EO','tar suppresses citrus lift',{'Birch Tar':0.03},'E','structural logic'],
+ ['Civet','Calone','animalic against clean marine',{'Civet':0.02},'E','structural logic'],
+ ['Indole','Calone','indolic warmth against clean marine',{'Indole':0.03},'E','structural logic'],
+ ['Sulfurol','Calone','savoury-milky against marine is incongruent',{'Sulfurol':0.02},'E','structural logic'],
+ ['Peppermint','Calone','two cooling registers compete',{'Peppermint':0.2},'E','structural logic'],
+ ['Safranal','Calone','leathery-medicinal against clean marine',{'Safranal':0.01},'E','structural logic'],
+ ['Frankincense','Orange EO','resinous smoke mutes citrus lift',{'Frankincense':8},'E','structural logic'],
+ ['Labdanum','Calone','heavy amber against a fresh marine top',{'Labdanum':1.0},'E','structural logic'],
+ ['Cedarwood','Calone','dry wood flattens the aquatic effect',{'Cedarwood':6},'E','structural logic'],
+];
+function conflictsIn(names, shares){
+ const out=[], seen=new Set();
+ const actual=n=>{const m=M(n); return m ? (shares[n]||0)*m[4]/100 : 0;};
+ CONFLICTS.forEach(([a,b,why,cap,src,srcwhy])=>{
+  const ma=names.filter(n=>sameMaterial(n,a)||nrm(n).includes(nrm(a)));
+  const mb=names.filter(n=>sameMaterial(n,b)||nrm(n).includes(nrm(b)));
+  ma.forEach(x=>mb.forEach(y=>{
+   if(x===y)return;
+   const k=[x,y].sort().join('|'); if(seen.has(k))return; seen.add(k);
+   if(!cap){ out.push([x,y,why,'avoid at any dose',true,src,srcwhy]); return; }
+   const key=Object.keys(cap)[0], lim=cap[key];
+   const who=(sameMaterial(x,key)||nrm(x).includes(nrm(key)))?x:y;
+   const act=actual(who);
+   out.push([x,y,why,
+     'safe while '+who+' stays under '+lim+'% actual — you are at '+act.toFixed(3)+'%',
+     act>lim, src, srcwhy]);
+  }));
+ });
+ return out;
+}
+
 const DIF=/hedione|iso e|ambroxan|DHM|calone|galaxolide/i;
 const M=n=>MAT.find(x=>x[0]===n);
 function info(n){for(const k in INFO)if(n.includes(k))return INFO[k];return null}
@@ -423,6 +490,13 @@ const PLACE={'DHM':['citrus','top'],'Citral':['citrus','top'],'Bergamot':['citru
  'Benzoin':['wood','base'],'Ambroxan':['wood','base'],'Cashmeran':['wood','base'],
  'Styrax':['wood','base'],'Guaiacwood':['wood','base'],'Oakmoss':['wood','base'],
  'Cypriol':['wood','base'],'Labdanum':['wood','base'],
+ 'Civet':['musk','base'],'Aldehyde C16':['fruity','heart'],'Peppermint':['citrus','top'],
+ 'Birch Tar':['wood','base'],'Frankincense':['wood','base'],'Fructone':['fruity','heart'],
+ 'Black Pepper':['spice','top'],'Safranal':['spice','heart'],'Indole':['floral','heart'],
+ 'Sulfurol':['fruity','heart'],'Furaneol':['fruity','heart'],'Maple Lactone':['fruity','heart'],
+ 'AAG':['citrus','top'],'Benzaldehyde':['fruity','heart'],'Cedarwood':['wood','base'],
+ 'cis-3-Hexenol':['citrus','top'],'Heliotropin':['fruity','heart'],'Ethyl Vanillin':['fruity','heart'],
+ 'Lavender':['floral','top'],'Ylang Ylang':['floral','heart'],'Labdanum':['wood','base'],
  'Galaxolide':['musk','base'],'Brassylate':['musk','base'],'Habanolide':['musk','base'],
  'Benzyl Benzoate':['musk','base'],'Civetone':['musk','base']};
 // exact names from the real library take priority — checked before any substring guess
@@ -663,6 +737,9 @@ function msgs(bt,cg,names,sh){
  if(carrier>0){const p=carrier/W()*100;
   if(p>20)add('b','Carrier load <b>'+p.toFixed(1)+'%</b> — past the ~22% cloud threshold.');
   else if(p>12)add('w','Carrier load '+p.toFixed(1)+'% — watch it.')}
+ conflictsIn(names,sh).forEach(([a,b,why,verdict,over,src,srcwhy])=>
+  add(over?'b':'w', (over?'<b>OVER THRESHOLD</b> — ':'<b>Watch</b> — ')+a+' + '+b+
+   '<br><span style=\'opacity:.85\'>'+why+'</span>'+'<br><span style=\'opacity:.7;font-size:10px\'>'+verdict+'</span>'+'<br><span style=\'font-size:9.5px;opacity:.8\'>'+({B:'&#10003; BioShop stated',D:'&#10003; derived from a BioShop figure',I:'&#10003; published IFRA limit',E:'&#8902; MY ESTIMATE — no published figure'}[src]||'')+' &middot; '+(srcwhy||'')+'</span>'));
  if(t1)add('w','<b>†</b> '+t1+' under 0.10g — dilute what you hold <b>1:9</b>, weigh the figure shown.');
  if(t2)add('b','<b>‡</b> '+t2+' under 0.01g — a 1:9 dilution still will not reach the floor. Dilute <b>1:99</b> or raise the batch.');
  if(names.length>2){
