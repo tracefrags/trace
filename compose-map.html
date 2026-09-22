@@ -134,16 +134,9 @@ h4{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--bra
       A 1:2:1 ratio is 2:4:2 drops. Precise enough for “do these belong together”.<br><br>
       <b style="color:var(--text)">Blotter strength</b> — how far the bottle sits above its own
       top-of-use level decides this, not whether it arrived pre-diluted.<br><br>
-      <b style="color:var(--good)">Smell as is (≤30× over)</b> — Iso E Super · Galaxolide · PEA ·
-      Hedione · Coumarin · Ethyl Maltol · Labdanum · Linalool · Sandenol · Ambroxan · Habanolide ·
-      Geraniol · Frankincense · Lavender · DHM · Eth. Brassylate · Benzyl Benzoate · Heliotropin ·
-      Petitgrain · Vetiver · Ald. C18 · Orange · Rose Oxide · Cedarwood · Bergamot · Benzoin ·
-      Calone · Vanillin · Tonka · Fructone · AAG · Benzaldehyde · Ethyl Vanillin · Ylang Ylang<br><br>
-      <b style="color:var(--warn)">Dilute 1:9 first (30–120×)</b> — Cashmeran · Styrax ·
-      Black Pepper · Maple Lactone · Cinnamyl Alcohol · Citronellol · cis-3-Hexenol · Citral ·
-      Oakmoss · Ald. C14 · Birch Tar · Indole · Furaneol<br><br>
-      <b style="color:var(--bad)">Dilute 1:99 first (&gt;120×)</b> — Aldehyde C16 ·
-      β-Damascone 10% · Civet · Sulfurol · Peppermint · Safranal<br><br>
+      <b style="color:var(--good)">Smell as is (≤30× over)</b> — Guaiacwood · Iso E Super · Galaxolide · Maple Lactone · Labdanum · PEA · Coumarin · Heliotropin · Hedione · Ethyl Maltol · Benzaldehyde · cis-3-Hexenol · Ethyl Vanillin · Linalool · Sandenol · Ambroxan · Habanolide · Geraniol · Frankincense · Lavender · DHM · Ethylene Brassylate · Benzyl Benzoate · Petitgrain · Vetiver · Ald. C18 (coconut) · Orange · Rose Oxide · Aldehyde C16 · Cedarwood · Bergamot · Benzoin · Calone · Vanillin · Tonka Bean Oil · Fructone · Black Pepper · Indole · Ylang Ylang<br><br>
+      <b style="color:var(--warn)">Dilute 1:9 first (30–120×)</b> — Birch Tar · Sulfurol · Furaneol · Civet · Cashmeran · Styrax · AAG · Cinnamyl Alcohol · Citronellol · Citral · Oakmoss · Ald. C14 (peach)<br><br>
+      <b style="color:var(--bad)">Dilute 1:99 first (&gt;120×)</b> — beta-Damascone · Peppermint · Safranal<br><br>
       <b style="color:var(--text)">Explore neat, build on dilutions.</b> Neat is cheap in time,
       expensive in material — and many materials smell misleadingly different at full strength.
     </div>
@@ -186,7 +179,7 @@ function famColour(k){
 let FAM=FAMKEYS.map(([k,n])=>[k,n,famColour(k)]);
 function refreshFam(){ FAM=FAMKEYS.map(([k,n])=>[k,n,famColour(k)]); }
 const BAND=[['top','TOP','0–30 min',55],['heart','HEART','30 min – 3 hr',255],['base','BASE','3 hr +',455]];
-const TYPES=[['Cologne',4],['EdT',10],['EdP',15],['EdP intense',18],['Extrait',22],['Accord neat',100]];
+const TYPES=[['Cologne',4],['EdT',10],['EdP',15],['EdP intense',18],['Extrait',22],['Extrait',25],['Extrait',28],['Accord neat',100]];
 const ETH_G=1.65;
 
 const INFO={
@@ -246,16 +239,23 @@ const DESC={'DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citru
 // Percentages are of the whole formula, as BioShop states them.
 const PRESETS={
  'Rose accord (BioShop method)':[['Geraniol',14],['Citronellol',7],['PEA (Phenylethyl alcohol)',5],['Rose Oxide',1.5]],
- 'Vanilla ladder':[['Vanillin',0.2],['Benzyl Benzoate',0.3],['Ethyl Maltol',0.1]],
+ // BioShop ladder 0.2 : 0.1 : 0.05 ACTUAL — heliotropin and ethyl vanillin are 10% stocks, hence 1.0 and 0.5
+ 'Vanilla ladder':[['Vanillin',0.2],['Heliotropin',1.0],['Ethyl Vanillin',0.5]],
+ // BioShop marine accord: Calone 0.2-0.5% actual + DHM 5-8% + Hedione
+ 'Marine accord (BioShop)':[['Calone',3],['DHM (Dihydromyrcenol)',6],['Hedione',4]],
+ 'Green accord':[['cis-3-Hexenol',6],['AAG',2],['Petitgrain EO',4],['Hedione',5]],
  'Petitgrain cologne 4-2-1':[['Petitgrain EO',5],['Bergamot EO',2.5],['Vetiver EO',0.5]],
- 'Balsamic module 1:2:2':[['Styrax Resinoid',1],['Benzoin Siam Resinoid',2]],
- 'Fougère (tonka-lavender-moss)':[['Tonka Bean Oil',3],['Linalool',4],['Oakmoss',0.5],['Coumarin',3]],
+ // styrax 1 : labdanum 2 : benzoin 2 as sold — in ACTUAL material labdanum (10% stock) is only 0.2 parts
+ 'Amber module 1:2:2':[['Styrax Resinoid',1],['Labdanum',2],['Benzoin Siam Resinoid',2]],
+ 'Fougère (lavender-coumarin-moss)':[['Lavender EO',5],['Coumarin',5],['Tonka Bean Oil',3],['Oakmoss',0.5]],
  'DHM fresh accord':[['DHM (Dihydromyrcenol)',10],['Bergamot EO',4],['Galaxolide',6],['Linalool',2]],
  'Cashmere accord':[['Cashmeran',2],['Galaxolide',5],['Ethylene Brassylate',3],['Iso E Super',2]],
  'Skin-scent base':[['Cashmeran',2],['Habanolide',1],['Ambroxan',0.5]],
  'Grojsman base':[['Iso E Super',10],['Galaxolide',8]],
  'Radiance booster':[['Hedione',8],['Iso E Super',5],['Ambroxan',1]],
 };
+let LIB_ACC={};   // accords from Studio, filled by loadLibrary
+
 // materials that appear under different names in different lists.
 // matched on the WHOLE normalised name, never as a substring — 'isoe' must not
 // swallow 'isoeugenol'.
@@ -279,6 +279,10 @@ const ALIAS=[
  ['gammadecalactone','decalactone'],
 ];
 const nrm=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
+function sameMolecule(a,b){
+ const strip=t=>String(t).replace(/\s+\d+(\.\d+)?%\s*$/,'');
+ return sameMaterial(strip(a),strip(b));
+}
 function sameMaterial(a,b){
  const x=nrm(a),y=nrm(b);
  if(x===y)return true;
@@ -289,6 +293,12 @@ function sameMaterial(a,b){
  // a whole leading or trailing word of the longer one
  const[short,long]=x.length<=y.length?[x,y]:[y,x];
  if(short.length>=4&&(long.startsWith(short)||long.endsWith(short))){
+  // what the longer name adds decides it:
+  //   a number   -> a different stock strength ('Calone 1%' is not 'Calone')
+  //   a chemical prefix -> a different molecule ('Ethyl Vanillin' is not 'Vanillin')
+  const rest=long.startsWith(short)?long.slice(short.length):long.slice(0,long.length-short.length);
+  if(/^\d+$/.test(rest))return false;
+  if(/^(ethyl|methyl|iso|dihydro|cis|trans|allyl|alpha|beta|gamma|delta|para|ortho|hydroxy|acetyl)+$/.test(rest))return false;
   // guard against 'isoe' vs 'isoeugenol' style false hits
   const aliasA=ALIAS.find(gr=>gr.includes(x)), aliasB=ALIAS.find(gr=>gr.includes(y));
   if(aliasA&&aliasB&&aliasA!==aliasB)return false;
@@ -403,7 +413,7 @@ const TEN=/galaxolide|ambroxan|cashmeran|benzoin|vanillin|maltol|habanolide|iso 
 const CONFLICTS=[
  ['DHM','Calone','over-saturates the fresh register',{'DHM':8},'B','their marine accord specifies DHM 5-8%'],
  ['DHM','AAG','two green-aquatic drivers compete',{'DHM':8},'E','no figure given; mirrors the Calone threshold'],
- ['Calone','AAG','both ozonic — 4:1 AAG:Calone is the accord, beyond that it muddles',{'AAG':0.4},'D','from their 4:1 AAG:Calone accord ratio'],
+ ['Calone','AAG','both ozonic — 4:1 AAG:Calone is the accord, beyond that it muddles',{'AAG':0.3},'D','from their 4:1 AAG:Calone accord ratio'],
  ['DHM','Iso Eugenol','incongruent fresh-spicy clash',null,'B','stated as an absolute clash, no dose given'],
  ['Hedione','Iso Eugenol','phenolic sharpness competes with Hedione transparency',{'Iso Eugenol':0.01},'I','Iso Eugenol IFRA cap 0.02% of finished'],
  ['Calone','Iso Eugenol','clean marine against warm phenolic',null,'E','structural logic, not stated'],
@@ -425,18 +435,17 @@ const CONFLICTS=[
  ['Citronellol','Benzyl Benzoate','citronellol flattens under overdosed benzyl benzoate',{'Benzyl Benzoate':6},'E','my inference'],
  ['Bergamot','Peppermint','two assertive camphoraceous tops compete',{'Peppermint':0.3},'B','stated: eucalyptus-type camphoraceous clash'],
  ['Ethyl Maltol','Furaneol','multiple primary sweeteners — pick ONE lead',{'Furaneol':1.5},'B','stated: avoid multiple primary sweeteners'],
- ['Ethyl Maltol','Maple Lactone','multiple sweeteners — keep one as lead',{'Maple Lactone':0.2},'E','threshold mine'],
- ['Ethyl Maltol','Ethyl Vanillin','cumulative sweetness overpowers',{'Ethyl Vanillin':0.3},'B','stated explicitly by name'],
- ['Furaneol','Maple Lactone','multiple sweeteners — pick ONE lead',{'Furaneol':1.5},'B','threshold mine'],
- ['Vanillin','Ethyl Vanillin','use the ladder ratio 4:2:1, not both at full dose',{'Ethyl Vanillin':0.3},'D','from their 0.2:0.1:0.05 vanilla ladder'],
- ['Vanillin','Benzaldehyde','vanillin + strong aldehyde — contrast turns harsh',{'Benzaldehyde':0.3},'B','stated: avoid vanillin with strong aldehydes'],
- ['Aldehyde C16','Ethyl Maltol','jammy + candy without calibration reads synthetic',{'Aldehyde C16':0.06},'B','stated: without careful calibration'],
+ ['Ethyl Maltol','Maple Lactone','multiple sweeteners — keep one as lead',{'Maple Lactone':2.0},'E','threshold mine'],
+ ['Ethyl Maltol','Ethyl Vanillin','cumulative sweetness overpowers',{'Ethyl Vanillin':1.0},'B','stated explicitly by name'],
+ ['Vanillin','Ethyl Vanillin','use the ladder ratio 4:2:1, not both at full dose',{'Ethyl Vanillin':1.0},'D','from their 0.2:0.1:0.05 vanilla ladder'],
+ ['Vanillin','Benzaldehyde','vanillin + strong aldehyde — contrast turns harsh',{'Benzaldehyde':1.0},'B','stated: avoid vanillin with strong aldehydes'],
+ ['Aldehyde C16','Ethyl Maltol','jammy + candy without calibration reads synthetic',{'Aldehyde C16':0.5},'B','stated: without careful calibration'],
  ['Birch Tar','Calone','tar smoke destroys a marine accord',null,'E','structural logic'],
  ['Birch Tar','Orange EO','tar dominates fast and turns a blend acrid in citrus',{'Birch Tar':0.5},'B','structural logic'],
  ['Birch Tar','Petitgrain EO','tar dominates fast and turns a blend acrid in citrus',{'Birch Tar':0.5},'B','structural logic'],
  ['Birch Tar','Geraniol','BioShop: avoid heavy use in light florals',{'Birch Tar':0.5}],
  ['Civet','Calone','animalic against clean marine',{'Civet':0.1},'B','structural logic'],
- ['Indole','Calone','indolic warmth against clean marine',{'Indole':0.03},'E','structural logic'],
+ ['Indole','Calone','indolic warmth against clean marine',{'Indole':0.1},'E','structural logic'],
  ['Sulfurol','Calone','savoury-milky against marine is incongruent',{'Sulfurol':0.2},'B','structural logic'],
  ['Peppermint','Calone','two cooling registers compete',{'Peppermint':0.2},'E','structural logic'],
  ['Safranal','Calone','leathery-medicinal against clean marine',{'Safranal':0.01},'E','structural logic'],
@@ -448,14 +457,14 @@ function conflictsIn(names, shares){
  const out=[], seen=new Set();
  const actual=n=>{const m=M(n); return m ? (shares[n]||0)*m[4]/100 : 0;};
  CONFLICTS.forEach(([a,b,why,cap,src,srcwhy])=>{
-  const ma=names.filter(n=>sameMaterial(n,a)||nrm(n).includes(nrm(a)));
-  const mb=names.filter(n=>sameMaterial(n,b)||nrm(n).includes(nrm(b)));
+  const ma=names.filter(n=>sameMolecule(n,a)||nrm(n).startsWith(nrm(a)));
+  const mb=names.filter(n=>sameMolecule(n,b)||nrm(n).startsWith(nrm(b)));
   ma.forEach(x=>mb.forEach(y=>{
    if(x===y)return;
    const k=[x,y].sort().join('|'); if(seen.has(k))return; seen.add(k);
    if(!cap){ out.push([x,y,why,'avoid at any dose',true,src,srcwhy]); return; }
    const key=Object.keys(cap)[0], lim=cap[key];
-   const who=(sameMaterial(x,key)||nrm(x).includes(nrm(key)))?x:y;
+   const who=(sameMolecule(x,key)||nrm(x).startsWith(nrm(key)))?x:y;
    const act=actual(who);
    out.push([x,y,why,
      'safe while '+who+' stays under '+lim+'% actual — you are at '+act.toFixed(3)+'%',
@@ -559,6 +568,12 @@ async function loadLibrary(){
    const list=m.pairs.split(/[;,]/).map(x=>x.trim()).filter(Boolean);
    if(list.length)PAIRS[name]=list;
   }
+ });
+ LIB_ACC={};
+ const nameOf={}; d.mat.forEach(m=>nameOf[m.id]=(m.name||'').trim());
+ (d.acc||[]).forEach(a=>{
+  const items=(a.items||[]).map(i=>[nameOf[i.ref],i.pct]).filter(x=>x[0]);
+  if(items.length)LIB_ACC[a.name]=items;
  });
  if(!rows.length)return null;
  let carried=0;
@@ -692,9 +707,13 @@ function buildRows(){
 function draw(){refreshFam();layout();buildRows();refresh()}
 window.draw=draw;
 function refresh(){
- $('#cg').value=cgram().toFixed(2)+'g in '+(W()-cgram()).toFixed(2)+'g ethanol';
  drawMap();
  const names=Object.keys(sel),{out:sh,su}=shares(),cg=cgram();
+ const aroma=names.reduce((a,n)=>{const m=M(n);return a+(m?(sh[n]||0)*(m[4]||100)/100:0)},0);
+ const eff=aroma*conc()/100;
+ $('#cg').value=cgram().toFixed(2)+'g in '+(W()-cgram()).toFixed(2)+'g ethanol'+
+   (names.length?'  ·  '+eff.toFixed(1)+'% effective':'');
+ $('#cg').title=names.length?'Only '+aroma.toFixed(1)+'% of the concentrate is real aroma; the rest is carrier from pre-diluted stocks. At '+conc()+'% nominal, the bottle holds '+eff.toFixed(1)+'% aromatic material.':'';
  $('#pt').textContent=$('#nm').value||'Untitled';
  $('#pmeta').textContent=names.length?names.length+' materials · '+conc()+'% · '+W()+'g':'Click nodes on the map';
  const bt={top:0,heart:0,base:0};names.forEach(n=>bt[P[n].band]+=sh[n]);
@@ -868,10 +887,26 @@ function buildPDF(){
  const s=$('#ty');TYPES.forEach(([n,c])=>{const o=document.createElement('option');o.value=c;o.textContent=n+' · '+c+'%';s.append(o)});
  s.value=15;s.onchange=refresh;$('#wt').oninput=refresh;$('#nm').oninput=refresh;
  const bs=$('#blkSel');
- bs.innerHTML='<option value="">— choose —</option>'+Object.keys(PRESETS).map(k=>`<option>${k}</option>`).join('')+'<option value="__new">+ Empty block…</option>';
+ window.buildBlockSel=()=>{
+  const lib=Object.keys(LIB_ACC);
+  bs.innerHTML='<option value="">— choose —</option>'+
+   (lib.length?'<optgroup label="Your accords (Studio)">'+lib.map(k=>`<option value="lib:${k}">${k}</option>`).join('')+'</optgroup>':'')+
+   '<optgroup label="Presets">'+Object.keys(PRESETS).map(k=>`<option value="pre:${k}">${k}</option>`).join('')+'</optgroup>'+
+   '<option value="__new">+ Empty block…</option>';
+ };
+ buildBlockSel();
+ // an accord is stored at 100%; ask what share of the formula it should take
+ const SECTION={'OPT Top':17,'OPT Heart':32,'OPT Base':51};
  bs.onchange=()=>{const v=bs.value;if(!v)return;
   if(v==='__new'){const n=prompt('Block name');if(n)blocks.push({id:bid++,n,m:[]})}
-  else{const b={id:bid++,n:v,m:[]};PRESETS[v].forEach(([mn,p])=>{if(M(mn)){sel[mn]=p;b.m.push(mn)}});blocks.push(b)}
+  else if(v.startsWith('lib:')){
+   const k=v.slice(4); const share=parseFloat(prompt('What % of the formula should "'+k+'" take?', SECTION[k]||20));
+   if(share>0){const b={id:bid++,n:k,m:[]};
+    LIB_ACC[k].forEach(([mn,p])=>{if(M(mn)){sel[mn]=Math.round((sel[mn]||0)*100+p*share)/100;if(!b.m.includes(mn))b.m.push(mn)}});
+    blocks.push(b);}
+  }
+  else{const k=v.slice(4);const b={id:bid++,n:k,m:[]};
+   PRESETS[k].forEach(([mn,p])=>{if(M(mn)){sel[mn]=p;b.m.push(mn)}});blocks.push(b)}
   bs.value='';draw()};
  $('#norm').onclick=()=>{const ns=Object.keys(sel),su=ns.reduce((a,n)=>a+(sel[n]||0),0);
   if(!su)return;ns.forEach(n=>sel[n]=Math.round(sel[n]/su*1000)/10);draw()};
@@ -883,6 +918,7 @@ function buildPDF(){
  loadLibrary().then(r=>{
   const h=layout();
   buildGraph();
+  if(window.buildBlockSel)buildBlockSel();
   $('#map').setAttribute('height',h+10);
   if(r){$('#src').textContent='library: '+r.studio+' from Studio'+(r.carried?' + '+r.carried+' built-in':'');
    $('#src').title=r.carried
