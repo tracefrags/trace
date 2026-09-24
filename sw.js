@@ -1,5 +1,5 @@
-const CACHE = 'trace-v2';
-const FILES = ['./', './home.html', './encyclopedia.html', './theme.js', './theme.css', './index.html', './manifest.json', './icon.svg'];
+const CACHE = 'trace-v3';
+const FILES = ['./', './home.html', './encyclopedia.html', './sync.html', './theme.js', './theme.css', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).catch(() => {}));

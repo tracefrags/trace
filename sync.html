@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14151A">
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>TRACE — Sync</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{padding:18px 16px 60px}
+.wrap{max-width:980px;margin:0 auto}
+header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.mk{font-family:var(--font-display);font-size:19px;letter-spacing:6px;font-weight:600}
+.sub{font-size:10px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase}
+header a{margin-left:auto;color:var(--primary-t);text-decoration:none;font-size:12px}
+.lede{font-size:12.5px;color:var(--text-2);margin:8px 0 14px;line-height:1.55;max-width:760px}
+.warn{background:var(--warnbg);color:var(--text);border-radius:6px;padding:10px 13px;font-size:12px;margin-bottom:14px;line-height:1.5}
+.warn b{color:var(--warn)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.card h2{font-size:13px;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:4px}
+.card p.d{font-size:12px;color:var(--text-2);margin-bottom:10px;line-height:1.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.btn{font:inherit;font-size:12px;padding:7px 13px;border-radius:5px;border:1px solid var(--line);
+ background:var(--surface3);color:var(--text);cursor:pointer}
+button.pri{background:var(--text);color:var(--bg);border-color:var(--text)}
+button:disabled{opacity:.5;cursor:default}
+input[type=text]{padding:6px 9px;border-radius:5px;border:1px solid var(--line);font:inherit;font-size:12px}
+input[type=file]{font-size:12px;color:var(--text-2)}
+.stats{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.stats div{background:var(--surface2);border-radius:4px;padding:6px 10px;font-size:12px}
+.stats i{display:block;font-style:normal;font-size:9.5px;letter-spacing:1px;color:var(--text-3);text-transform:uppercase}
+.plan{margin-top:12px}
+.grp{margin:12px 0 4px;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--text-2);display:flex;gap:8px;align-items:center}
+.grp button{font-size:10.5px;padding:2px 8px}
+.it{display:flex;gap:9px;align-items:flex-start;padding:6px 8px;border-radius:4px;font-size:12.5px}
+.it:nth-child(odd){background:var(--surface2)}
+.it input{margin-top:3px}
+.it .nm{font-weight:600;min-width:170px}
+.it .dt{color:var(--text-2);flex:1;font-size:12px}
+.chip{font-size:10px;letter-spacing:.6px;padding:1px 7px;border-radius:3px;white-space:nowrap}
+.c-add{color:var(--good);border:1px solid currentColor}
+.c-update{color:var(--secondary);border:1px solid currentColor} :root.light .c-update{color:var(--secondary-d)}
+.c-differs{color:var(--warn);border:1px solid currentColor}
+.c-warn{color:var(--bad);border:1px solid currentColor}
+details.x{margin-top:4px;font-size:11.5px;color:var(--text-2)}
+details.x summary{cursor:pointer;color:var(--text-3)}
+details.x .b{background:var(--surface);border-radius:4px;padding:6px 8px;margin-top:4px;white-space:pre-wrap;word-break:break-word}
+.msg{font-size:12.5px;margin-top:10px;padding:9px 12px;border-radius:5px;background:var(--surface2)}
+.msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
+.log{font-size:12px;color:var(--text-2);max-height:220px;overflow:auto}
+.log div{padding:4px 0;border-bottom:1px solid var(--line)}
+.log b{color:var(--text)}
+.muted{font-size:11.5px;color:var(--text-3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><span class="mk">TRACE</span><span class="sub">Sync &amp; updates</span><a href="home.html">← Home</a></header>
+<div class="lede">Keeps your devices aligned without overwriting anything. Updates from Claude arrive as small
+<b>patch files</b> that change only what they list. Another device's export can be <b>merged</b> — you choose what to take.</div>
+<div class="warn"><b>Close Studio and Compose in other tabs first.</b> They hold a copy of your data in memory and would
+save over this page's changes. After syncing, reload them.</div>
+
+<div class="card">
+  <h2>This device</h2>
+  <div class="stats" id="stats"></div>
+  <div class="row">
+    <label class="muted">Device name</label>
+    <input type="text" id="dev" placeholder="e.g. laptop, phone" style="width:160px">
+    <button id="exp">Download this device's data</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>1 · Apply an update from Claude</h2>
+  <p class="d">Choose a <b>trace-patch</b> file. You'll see every change before anything is written, and can untick any line.
+  Applying the same patch twice is safe — anything already present is skipped.</p>
+  <div class="row"><input type="file" id="pf" accept=".json,application/json"></div>
+  <div id="pmeta" class="muted" style="margin-top:8px"></div>
+  <div class="plan" id="pplan"></div>
+  <div class="row" style="margin-top:10px"><button class="pri" id="papply" disabled>Apply selected changes</button></div>
+  <div id="pmsg"></div>
+</div>
+
+<div class="card">
+  <h2>2 · Merge another device's data</h2>
+  <p class="d">Export from your other device (Studio → export, or the button above on that device), then choose the file here.
+  New items are ticked; items that differ are unticked — tick them to take the other device's version.</p>
+  <div class="row"><input type="file" id="mf" accept=".json,application/json"></div>
+  <div class="plan" id="mplan"></div>
+  <div class="row" style="margin-top:10px"><button class="pri" id="mapply" disabled>Merge selected</button></div>
+  <div id="mmsg"></div>
+</div>
+
+<div class="card">
+  <h2>History on this device</h2>
+  <div class="log" id="log"></div>
+</div>
+</div>
+
+<script>
+const KEY='trace:studio', SKEY='trace:sync';
+const Store={
+ async get(k){if(window.storage){try{const r=await window.storage.get(k,false);return r?r.value:null}catch(e){}}
+  try{return localStorage.getItem(k)}catch(e){return null}},
+ async set(k,v){if(window.storage){try{await window.storage.set(k,v,false);return true}catch(e){}}
+  try{localStorage.setItem(k,v);return true}catch(e){return false}}};
+const $=s=>document.querySelector(s);
+const nk=s=>String(s==null?'':s).trim().toLowerCase();
+const uid=()=>Math.random().toString(36).slice(2,9);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const blank=v=>v===undefined||v===null||v===''||v===false;
+const eq=(a,b)=>JSON.stringify(blank(a)?null:a)===JSON.stringify(blank(b)?null:b);
+// defaults an accord or formula has when a field was never set
+const normF=(c,k,v)=>blank(v)?(k==='conc'&&c==='acc'?100:(k==='mac'&&c==='acc'?0:null)):v;
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const trunc=(s,n)=>{s=typeof s==='string'?s:JSON.stringify(s);return s&&s.length>n?s.slice(0,n)+'…':s;};
+let D=null, SY=null, PATCH=null, PLAN=[], OTHER=null, MPLAN=[];
+
+function ensure(x){x=x||{};['mat','acc','form','bat','notes'].forEach(k=>{if(!Array.isArray(x[k]))x[k]=[]});return x;}
+const findMat=(X,n)=>X.mat.find(m=>nk(m.name)===nk(n));
+const namesOf=(X,items)=>{const by={};X.mat.forEach(m=>by[m.id]=m.name);return (items||[]).map(i=>({name:by[i.ref]||'?',pct:i.pct}));};
+function refsOf(X,items){const out=[],miss=[];(items||[]).forEach(i=>{const m=findMat(X,i.name);if(m)out.push({ref:m.id,acc:false,pct:i.pct});else miss.push(i.name);});return{out,miss};}
+function log(action,detail){SY.log.unshift({when:new Date().toISOString(),action,detail});SY.log=SY.log.slice(0,200);}
+
+// ---------- patch operations: each returns {status, detail, diffs} and mutates X ----------
+function runOp(X,op){
+ switch(op.op){
+ case 'add_mat':{ if(findMat(X,op.name))return{status:'same'};
+   X.mat.push(Object.assign({id:uid(),name:op.name},clone(op.fields||{})));return{status:'add',detail:'new material'}; }
+ case 'set_mat':{ const m=findMat(X,op.name); if(!m)return{status:'warn',detail:'material not in your library'};
+   const diffs=[];Object.entries(op.fields||{}).forEach(([k,v])=>{if(!eq(m[k],v)){diffs.push([k,m[k],v]);m[k]=clone(v);}});
+   return diffs.length?{status:'update',detail:diffs.map(x=>x[0]).join(', '),diffs}:{status:'same'}; }
+ case 'upsert_form': case 'upsert_acc':{
+   const coll=op.op==='upsert_form'?'form':'acc'; const {out,miss}=refsOf(X,op.items);
+   if(miss.length)return{status:'warn',detail:'missing materials: '+miss.join(', ')};
+   const ex=X[coll].find(f=>nk(f.name)===nk(op.name));
+   const fields={conc:op.conc,mac:op.mac,parked:op.parked||'',note:op.note||''};
+   if(!ex){X[coll].push(Object.assign({id:uid(),name:op.name},fields,{items:out}));return{status:'add',detail:op.items.length+' materials'};}
+   const diffs=[];Object.entries(fields).forEach(([k,v])=>{if(!eq(normF(coll,k,ex[k]),normF(coll,k,v))){diffs.push([k,ex[k],v]);ex[k]=v;}});
+   const before=namesOf(X,ex.items);
+   if(!eq(before,op.items)){diffs.push(['materials',before.map(i=>i.name+' '+i.pct).join(', '),op.items.map(i=>i.name+' '+i.pct).join(', ')]);ex.items=out;}
+   return diffs.length?{status:'update',detail:diffs.map(x=>x[0]).join(', '),diffs}:{status:'same'}; }
+ case 'upsert_batch':{
+   const fo=X.form.find(f=>nk(f.name)===nk(op.form)); let b=X.bat.find(x=>String(x.no)===String(op.no));
+   const snap=(op.snapshot||[]).map(s=>{const m=findMat(X,s.name);return{name:s.name,ref:m?m.id:null,pct:s.pct};});
+   if(!b){ if(!fo)return{status:'warn',detail:'formula "'+op.form+'" not found'};
+     X.bat.push({id:uid(),no:op.no,date:op.date,wt:op.wt,form:fo.id,note:op.note||'',evals:[],snapshot:snap,snapshot_note:op.snapshot_note||''});
+     return{status:'add',detail:(op.form||'')+' · '+op.date}; }
+   const diffs=[];
+   [['date',op.date],['wt',op.wt],['note',op.note||''],['snapshot_note',op.snapshot_note||'']].forEach(([k,v])=>{if(!eq(b[k],v)){diffs.push([k,b[k],v]);b[k]=v;}});
+   const sb=(b.snapshot||[]).map(s=>({name:s.name,pct:s.pct}));
+   if(snap.length&&!eq(sb,op.snapshot)){diffs.push(['snapshot',sb.length+' materials',snap.length+' materials']);b.snapshot=snap;}
+   if(fo&&b.form!==fo.id){const cur=X.form.find(f=>f.id===b.form);if(!cur||nk(cur.name)!==nk(fo.name)){diffs.push(['formula',cur?cur.name:'—',fo.name]);b.form=fo.id;}}
+   return diffs.length?{status:'update',detail:diffs.map(x=>x[0]).join(', '),diffs}:{status:'same'}; }
+ case 'batch_eval':{ const b=X.bat.find(x=>String(x.no)===String(op.no)); if(!b)return{status:'warn',detail:'batch '+op.no+' not found'};
+   b.evals=b.evals||[]; if(b.evals.some(e=>e.t===op.t&&e.n===op.n))return{status:'same'};
+   b.evals.push({t:op.t,n:op.n});return{status:'add',detail:'batch '+op.no+' · '+op.t}; }
+ case 'add_note':{ if(X.notes.some(n=>n.id===op.id||n.text===op.text))return{status:'same'};
+   X.notes.push({id:op.id||uid(),text:op.text});return{status:'add',detail:trunc(op.text,90)}; }
+ default: return{status:'warn',detail:'unknown operation '+op.op};
+ }}
+const GROUPS=[['add_mat','Materials added'],['set_mat','Material data updated'],['upsert_form','Formulas'],['upsert_acc','Accords'],
+ ['upsert_batch','Batch records'],['batch_eval','Batch evaluations'],['add_note','Notes']];
+const label=o=>o.name||(o.no?('Batch '+o.no):'')||(o.op==='add_note'?'note':'');
+
+function showDiffs(row,diffs){if(!diffs||!diffs.length)return;const d=el('details','x');d.append(el('summary',null,'show changes'));
+ diffs.slice(0,6).forEach(([k,a,b])=>{const x=el('div','b');x.textContent=k+'\n  was: '+trunc(a,400)+'\n  now: '+trunc(b,400);d.append(x);});row.querySelector('.dt').append(d);}
+
+function renderPatchPlan(){
+ const box=$('#pplan');box.innerHTML='';const sim=clone(D);let n={add:0,update:0,same:0,warn:0};
+ PLAN=PATCH.ops.map((op,i)=>{const r=runOp(sim,op);n[r.status]++;return Object.assign({i,op,on:r.status==='add'||r.status==='update'},r);});
+ const s=el('div','muted');s.textContent=`${n.add} to add · ${n.update} to update · ${n.same} already up to date (hidden) · ${n.warn} need attention`;box.append(s);
+ GROUPS.forEach(([k,title])=>{const rows=PLAN.filter(p=>p.op.op===k&&p.status!=='same');if(!rows.length)return;
+  const g=el('div','grp');g.append(document.createTextNode(title+' · '+rows.length));
+  const all=el('button',null,'all');all.onclick=()=>{rows.forEach(r=>{if(r.status!=='warn')r.on=true});renderRows();};
+  const none=el('button',null,'none');none.onclick=()=>{rows.forEach(r=>r.on=false);renderRows();};g.append(all,none);box.append(g);
+  const list=el('div');list.dataset.k=k;box.append(list);});
+ renderRows();$('#papply').disabled=!PLAN.some(p=>p.on);
+ function renderRows(){box.querySelectorAll('div[data-k]').forEach(list=>{list.innerHTML='';
+  PLAN.filter(p=>p.op.op===list.dataset.k&&p.status!=='same').forEach(p=>{
+   const r=el('label','it');const cb=el('input');cb.type='checkbox';cb.checked=p.on;cb.disabled=p.status==='warn';cb.onchange=()=>{p.on=cb.checked;$('#papply').disabled=!PLAN.some(x=>x.on);};
+   r.append(cb,el('span','nm',label(p.op)),el('span','chip c-'+p.status,p.status));const dt=el('span','dt',p.detail||'');r.append(dt);showDiffs(r,p.diffs);list.append(r);});});}
+}
+async function applyPatch(){
+ const X=clone(D);const res={add:0,update:0,warn:[]};
+ PLAN.filter(p=>p.on).forEach(p=>{const r=runOp(X,p.op);if(r.status==='add')res.add++;else if(r.status==='update')res.update++;else if(r.status==='warn')res.warn.push(label(p.op)+': '+r.detail);});
+ D=X;const ok=await Store.set(KEY,JSON.stringify(D));
+ SY.applied[PATCH.id]=new Date().toISOString();log('Applied patch',`${PATCH.id} — ${res.add} added, ${res.update} updated`+(res.warn.length?`, ${res.warn.length} skipped`:''));await saveSY();
+ const m=$('#pmsg');m.className='msg '+(ok?'ok':'err');m.textContent=ok?`Done — ${res.add} added, ${res.update} updated.`+(res.warn.length?' Skipped: '+res.warn.join('; '):'')+' Reload Studio and Compose if they are open.':'Could not save — storage is full or blocked.';
+ renderPatchPlan();refresh();
+}
+
+// ---------- merge another device ----------
+function mergePlan(){
+ const O=ensure(OTHER), rows=[];
+ O.mat.forEach(o=>{const l=findMat(D,o.name);
+  if(!l)rows.push({k:'mat',name:o.name,action:'add',on:true,o});
+  else{const keys=[...new Set([...Object.keys(o),...Object.keys(l)])].filter(k=>k!=='id');const diffs=keys.filter(k=>!blank(o[k])&&!eq(l[k],o[k])).map(k=>[k,l[k],o[k]]);
+   if(diffs.length)rows.push({k:'mat',name:o.name,action:'differs',on:false,o,diffs});}});
+ [['form','Formulas'],['acc','Accords']].forEach(([c])=>{O[c].forEach(o=>{const l=D[c].find(x=>nk(x.name)===nk(o.name));
+  const oi=namesOf(O,o.items);
+  if(!l)rows.push({k:c,name:o.name,action:'add',on:true,o,oi});
+  else{const li=namesOf(D,l.items);const diffs=[];['conc','mac','parked','note'].forEach(k=>{if(!eq(normF(c,k,l[k]),normF(c,k,o[k])))diffs.push([k,l[k],o[k]]);});
+   if(!eq(li,oi))diffs.push(['materials',li.map(i=>i.name+' '+i.pct).join(', '),oi.map(i=>i.name+' '+i.pct).join(', ')]);
+   if(diffs.length)rows.push({k:c,name:o.name,action:'differs',on:false,o,oi,diffs});}});});
+ const ofn={};O.form.forEach(f=>ofn[f.id]=f.name);
+ O.bat.forEach(o=>{const l=D.bat.find(x=>String(x.no)===String(o.no));
+  if(!l)rows.push({k:'bat',name:'Batch '+o.no,action:'add',on:true,o,fname:ofn[o.form]});
+  else{const diffs=[];['date','wt','note','snapshot_note'].forEach(k=>{if(!eq(l[k],o[k]))diffs.push([k,l[k],o[k]]);});
+   if(diffs.length)rows.push({k:'bat',name:'Batch '+o.no,action:'differs',on:false,o,fname:ofn[o.form],diffs});
+   const newE=(o.evals||[]).filter(e=>!(l.evals||[]).some(x=>x.t===e.t&&x.n===e.n));
+   if(newE.length)rows.push({k:'eval',name:'Batch '+o.no,action:'add',on:true,no:o.no,evals:newE,detail:newE.length+' evaluation(s) only on the other device'});}});
+ O.notes.forEach(o=>{if(!D.notes.some(n=>n.id===o.id||n.text===o.text))rows.push({k:'note',name:'note',action:'add',on:true,o,detail:trunc(o.text,90)});});
+ return rows;
+}
+function renderMerge(){
+ const box=$('#mplan');box.innerHTML='';
+ const onlyHere={mat:D.mat.filter(m=>!findMat(ensure(OTHER),m.name)).length,form:D.form.filter(f=>!OTHER.form.some(o=>nk(o.name)===nk(f.name))).length};
+ box.append(el('div','muted',`${MPLAN.filter(r=>r.action==='add').length} new from the other device · ${MPLAN.filter(r=>r.action==='differs').length} different on both · kept only here: ${onlyHere.mat} materials, ${onlyHere.form} formulas`));
+ [['mat','Materials'],['form','Formulas'],['acc','Accords'],['bat','Batch records'],['eval','Batch evaluations'],['note','Notes']].forEach(([k,title])=>{
+  const rows=MPLAN.filter(r=>r.k===k);if(!rows.length)return;const g=el('div','grp');g.append(document.createTextNode(title+' · '+rows.length));
+  const all=el('button',null,'take all');all.onclick=()=>{rows.forEach(r=>r.on=true);renderMerge();};
+  const none=el('button',null,'keep mine');none.onclick=()=>{rows.forEach(r=>r.on=false);renderMerge();};g.append(all,none);box.append(g);
+  rows.forEach(r=>{const row=el('label','it');const cb=el('input');cb.type='checkbox';cb.checked=r.on;cb.onchange=()=>{r.on=cb.checked;$('#mapply').disabled=!MPLAN.some(x=>x.on);};
+   row.append(cb,el('span','nm',r.name),el('span','chip c-'+(r.action==='add'?'add':'differs'),r.action==='add'?'new':'differs'));
+   row.append(el('span','dt',r.detail||(r.diffs?r.diffs.map(x=>x[0]).join(', '):'')));showDiffs(row,r.diffs);box.append(row);});});
+ $('#mapply').disabled=!MPLAN.some(x=>x.on);
+}
+async function applyMerge(){
+ const X=clone(D), O=ensure(OTHER), warn=[]; const oName={};O.mat.forEach(m=>oName[m.id]=m.name);
+ const mapItems=(items)=>{const out=[];(items||[]).forEach(i=>{const m=findMat(X,oName[i.ref]);if(m)out.push({ref:m.id,acc:!!i.acc,pct:i.pct});else warn.push('missing '+oName[i.ref]);});return out;};
+ MPLAN.filter(r=>r.on&&r.k==='mat').forEach(r=>{const l=findMat(X,r.o.name);if(!l)X.mat.push(Object.assign(clone(r.o),{id:X.mat.some(m=>m.id===r.o.id)?uid():r.o.id}));else Object.keys(r.o).forEach(k=>{if(k!=='id')l[k]=clone(r.o[k]);});});
+ // materials the other device's formulas need but you didn't tick — bring them in anyway
+ MPLAN.filter(r=>r.on&&(r.k==='form'||r.k==='acc')).forEach(r=>(r.o.items||[]).forEach(i=>{const n=oName[i.ref];if(n&&!findMat(X,n)){const om=O.mat.find(m=>m.id===i.ref);X.mat.push(Object.assign(clone(om),{id:uid()}));}}));
+ MPLAN.filter(r=>r.on&&(r.k==='form'||r.k==='acc')).forEach(r=>{const c=r.k,l=X[c].find(x=>nk(x.name)===nk(r.o.name));const items=mapItems(r.o.items);
+  if(!l)X[c].push(Object.assign(clone(r.o),{id:X[c].some(x=>x.id===r.o.id)?uid():r.o.id,items}));else{['conc','mac','parked','note'].forEach(k=>l[k]=clone(r.o[k]));l.items=items;}});
+ MPLAN.filter(r=>r.on&&r.k==='bat').forEach(r=>{const fo=X.form.find(f=>nk(f.name)===nk(r.fname));const l=X.bat.find(b=>String(b.no)===String(r.o.no));
+  const snap=(r.o.snapshot||[]).map(s=>{const m=findMat(X,s.name);return Object.assign({},s,{ref:m?m.id:null});});
+  if(!l){if(!fo){warn.push('batch '+r.o.no+': formula '+r.fname+' missing');return;}X.bat.push(Object.assign(clone(r.o),{id:uid(),form:fo.id,snapshot:snap}));}
+  else{['date','wt','note','snapshot_note'].forEach(k=>l[k]=clone(r.o[k]));if(snap.length)l.snapshot=snap;if(fo)l.form=fo.id;}});
+ MPLAN.filter(r=>r.on&&r.k==='eval').forEach(r=>{const b=X.bat.find(x=>String(x.no)===String(r.no));if(b){b.evals=(b.evals||[]).concat(clone(r.evals));}});
+ MPLAN.filter(r=>r.on&&r.k==='note').forEach(r=>X.notes.push(clone(r.o)));
+ D=X;const ok=await Store.set(KEY,JSON.stringify(D));const taken=MPLAN.filter(r=>r.on).length;
+ log('Merged device export',`${taken} item(s) taken`+(warn.length?`, ${warn.length} warning(s)`:''));await saveSY();
+ const m=$('#mmsg');m.className='msg '+(ok?'ok':'err');m.textContent=ok?`Merged ${taken} item(s).`+(warn.length?' Notes: '+[...new Set(warn)].join('; '):'')+' Reload Studio and Compose if they are open.':'Could not save.';
+ MPLAN=mergePlan();renderMerge();refresh();
+}
+
+// ---------- device ----------
+async function saveSY(){await Store.set(SKEY,JSON.stringify(SY));}
+function refresh(){
+ const s=$('#stats');s.innerHTML='';
+ [['materials',D.mat.length],['formulas',D.form.length],['accords',D.acc.length],['batches',D.bat.length],['notes',D.notes.length],['patches applied',Object.keys(SY.applied).length]]
+  .forEach(([k,v])=>{const d=el('div');d.append(el('i',null,k));d.append(document.createTextNode(v));s.append(d);});
+ const L=$('#log');L.innerHTML='';if(!SY.log.length)L.append(el('div',null,'Nothing yet.'));
+ SY.log.forEach(e=>{const d=el('div');d.innerHTML='<b>'+new Date(e.when).toLocaleString()+'</b> — ';d.append(document.createTextNode(e.action+': '+e.detail));L.append(d);});
+}
+function download(){
+ const name=(SY.device||'device').replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+ const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const a=el('a');a.href=URL.createObjectURL(blob);
+ a.download=`trace-${new Date().toISOString().slice(0,10)}-${name}.json`;a.click();log('Exported','downloaded this device\'s data');saveSY();refresh();
+}
+function readFile(input,cb){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{cb(JSON.parse(r.result),f.name)}catch(e){alert('That file is not valid JSON.')}};r.readAsText(f);input.value='';}
+
+(async()=>{
+ try{D=JSON.parse(await Store.get(KEY)||'null')}catch(e){D=null}
+ D=ensure(D);
+ try{SY=JSON.parse(await Store.get(SKEY)||'null')}catch(e){SY=null}
+ SY=SY||{device:'',applied:{},log:[]};SY.applied=SY.applied||{};SY.log=SY.log||[];
+ $('#dev').value=SY.device||'';$('#dev').onchange=()=>{SY.device=$('#dev').value.trim();saveSY();};
+ $('#exp').onclick=download;
+ $('#pf').onchange=e=>readFile(e.target,(j,fn)=>{
+  if(j.type!=='trace-patch'||!Array.isArray(j.ops)){alert('This is not a TRACE patch. To bring in another device\'s data, use section 2.');return;}
+  PATCH=j;$('#pmsg').innerHTML='';
+  $('#pmeta').textContent=(j.title||fn)+(j.summary?' — '+j.summary:'')+(SY.applied[j.id]?' · Already applied here on '+new Date(SY.applied[j.id]).toLocaleDateString()+' — re-applying is safe.':'');
+  renderPatchPlan();});
+ $('#papply').onclick=applyPatch;
+ $('#mf').onchange=e=>readFile(e.target,j=>{
+  if(j.type==='trace-patch'){alert('That is a patch — use section 1.');return;}
+  if(!j.mat){alert('This does not look like a TRACE data export.');return;}
+  OTHER=ensure(j);MPLAN=mergePlan();$('#mmsg').innerHTML='';renderMerge();});
+ $('#mapply').onclick=applyMerge;
+ refresh();
+})();
+</script>
+</body>
+</html>
