@@ -24,7 +24,7 @@ h2{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--text
 .sw div{border-radius:6px;overflow:hidden;border:1px solid var(--line);font-size:10.5px;background:var(--surface)}
 .sw i{display:block;height:46px}
 .sw span{display:block;padding:6px 8px;color:var(--text-2)}
-.foilbar{height:54px;border-radius:8px;background:var(--foil-deep, linear-gradient(90deg,var(--primary),var(--secondary)));
+.foilbar{height:54px;border-radius:8px;background:var(--foil, linear-gradient(90deg,var(--primary),var(--secondary)));
  background-size:200% 100%;animation:foil-shift 14s linear infinite;margin-top:8px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);
@@ -51,13 +51,22 @@ td:first-child{color:var(--text)} td.n{text-align:right;font-variant-numeric:tab
 .label{width:230px;height:300px;border-radius:6px;background:#15131D;position:relative;padding:26px 22px;
  box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;flex-direction:column;justify-content:space-between}
 .label .lw{font-family:var(--font-display);font-size:26px;letter-spacing:9px;font-weight:600;
- background:linear-gradient(115deg,#E6D2B8 0%,#E8C3BE 25%,#CFC3E3 50%,#BFD6CD 75%,#E6D2B8 100%);
+ background:linear-gradient(115deg,#F2A57E 0%,#F4CB7E 33%,#EC93A8 66%,#F2A57E 100%);
  background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:foil-shift 14s linear infinite}
-.label .hl{height:1px;background:linear-gradient(90deg,#E6D2B8,#CFC3E3,#BFD6CD);opacity:.8}
+.label .hl{height:1px;background:linear-gradient(90deg,#F2A57E,#F4CB7E,#EC93A8);opacity:.8}
 .label .nm{font-size:13px;letter-spacing:3px;color:#EDEBE6;text-transform:uppercase}
 .label .sp{font-size:10px;letter-spacing:1.5px;color:#A9A1BF;text-transform:uppercase}
 .note{font-size:12px;color:var(--text-2);line-height:1.6;max-width:520px}
 .note b{color:var(--text)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-bottom:8px}
+.opt{background:var(--bg);color:var(--text);border-radius:12px;padding:18px 16px;border:1px solid var(--line)}
+.opt .mk{font-size:26px;letter-spacing:8px}
+.opt .on-t{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--text-3);margin:4px 0 12px}
+.opt p{font-size:12.5px;color:var(--text-2);line-height:1.55;margin:10px 0}
+.opt .card{padding:12px 13px}
+.opt .row{margin-top:10px}
+.opt .use{margin-top:12px;width:100%}
+.opt .fams span{margin-right:10px;font-size:11.5px}
 @media (prefers-reduced-motion: reduce){.foilbar,.label .lw{animation:none}}
 </style>
 </head>
@@ -67,6 +76,36 @@ td:first-child{color:var(--text)} td.n{text-align:right;font-variant-numeric:tab
 <div class="lede">Theme preview. Every building block of the app suite, shown in whichever theme is selected.
 Switch below — the choice is remembered and applies across all the apps.</div>
 <div class="pick" id="pick"></div>
+<h2>Foil options — compare side by side</h2>
+<div class="opts">
+  <div class="opt foil fv-slate">
+    <span class="mk">TRACE</span><div class="on-t">Slate · copper, gold, rose</div>
+    <a class="card" href="#"><span class="tag">Learn</span><b>Encyclopedia</b><span class="d">Every material — smell, dose, pairings, what to avoid.</span></a>
+    <div class="row"><button class="pri">Apply changes</button><button class="chip on">Floral</button><button class="chip">Wood</button></div>
+    <p>Cool blue-grey ground. The warm metallic foil stands out most here. Body text sits here so you can judge legibility at reading size, not just the headline colours.</p>
+    <div class="msg m-w">Watch — DHM + Calone · you are at 6.00%</div>
+    <div class="fams"><span><span class="dot" style="background:var(--fam-citrus)"></span>Citrus</span><span><span class="dot" style="background:var(--fam-floral)"></span>Floral</span><span><span class="dot" style="background:var(--fam-wood)"></span>Wood</span><span><span class="dot" style="background:var(--fam-musk)"></span>Musk</span></div>
+    <button class="gh use" data-v="slate">Use Slate across the suite</button>
+  </div>
+  <div class="opt foil fv-dusk">
+    <span class="mk">TRACE</span><div class="on-t">Dusk · rose, lavender, aqua</div>
+    <a class="card" href="#"><span class="tag">Learn</span><b>Encyclopedia</b><span class="d">Every material — smell, dose, pairings, what to avoid.</span></a>
+    <div class="row"><button class="pri">Apply changes</button><button class="chip on">Floral</button><button class="chip">Wood</button></div>
+    <p>Warm plum-grey ground with a pearlescent, iridescent foil. Body text sits here so you can judge legibility at reading size, not just the headline colours.</p>
+    <div class="msg m-w">Watch — DHM + Calone · you are at 6.00%</div>
+    <div class="fams"><span><span class="dot" style="background:var(--fam-citrus)"></span>Citrus</span><span><span class="dot" style="background:var(--fam-floral)"></span>Floral</span><span><span class="dot" style="background:var(--fam-wood)"></span>Wood</span><span><span class="dot" style="background:var(--fam-musk)"></span>Musk</span></div>
+    <button class="gh use" data-v="dusk">Use Dusk across the suite</button>
+  </div>
+  <div class="opt foil fv-stone">
+    <span class="mk">TRACE</span><div class="on-t">Stone · mint, periwinkle, orchid</div>
+    <a class="card" href="#"><span class="tag">Learn</span><b>Encyclopedia</b><span class="d">Every material — smell, dose, pairings, what to avoid.</span></a>
+    <div class="row"><button class="pri">Apply changes</button><button class="chip on">Floral</button><button class="chip">Wood</button></div>
+    <p>The lightest of the three — closest to a mid-tone, with a cool holographic foil. Body text sits here so you can judge legibility at reading size, not just the headline colours.</p>
+    <div class="msg m-w">Watch — DHM + Calone · you are at 6.00%</div>
+    <div class="fams"><span><span class="dot" style="background:var(--fam-citrus)"></span>Citrus</span><span><span class="dot" style="background:var(--fam-floral)"></span>Floral</span><span><span class="dot" style="background:var(--fam-wood)"></span>Wood</span><span><span class="dot" style="background:var(--fam-musk)"></span>Musk</span></div>
+    <button class="gh use" data-v="stone">Use Stone across the suite</button>
+  </div>
+</div>
 
 <h2>Colour</h2>
 <div class="sw" id="sw"></div>
@@ -116,7 +155,7 @@ Switch below — the choice is remembered and applies across all the apps.</div>
   would then share one signature. <b>On the label itself</b>, the settled direction is blind embossing; foil would be a
   deliberate, separate decision, not a default.<br><br>
   <b>How it's used here:</b> foil only on brand moments — the wordmark, the primary action, selected chips, card edges.
-  Never behind body text. Two foils: a deep metallic one for the wordmark and lines, a pale pearl one under dark text on buttons.</div>
+  Never behind body text, and dark ink on every foil fill stays above 8:1.</div>
 </div>
 </div>
 <script>
@@ -132,6 +171,7 @@ SW.forEach(([v,l])=>{const d=document.createElement('div');const i=document.crea
 const F=document.getElementById('fams');
 [['--fam-citrus','Citrus'],['--fam-floral','Floral'],['--fam-fruity','Fruity'],['--fam-spice','Spice'],['--fam-wood','Wood'],['--fam-musk','Musk']]
  .forEach(([v,l])=>{const s=document.createElement('span');s.innerHTML='<span class="dot" style="background:var('+v+')"></span>'+l;F.append(s);});
+document.querySelectorAll('.use').forEach(b=>b.onclick=()=>{window.TRACEtheme.setFoil(b.dataset.v);mark();document.querySelectorAll('.use').forEach(x=>x.textContent=x.dataset.v===b.dataset.v?'In use across the suite':'Use '+x.dataset.v[0].toUpperCase()+x.dataset.v.slice(1)+' across the suite');});
 document.addEventListener('trace:theme',mark);
 document.addEventListener('DOMContentLoaded',mark);mark();
 </script>
