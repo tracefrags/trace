@@ -147,83 +147,90 @@ a{ color:var(--secondary); }
 @media print{ .themeToggle{display:none} }
 
 /* ==========================================================
-   FOIL — bold colour on deep ink, with iridescent foil
-   gradients on the brand moments: wordmark, primary actions,
-   selected chips, card edges. A TRACE original in the spirit
-   of foil-stamped print. Toggle adds .foil to <html>.
-   RULES
-   · Foil is for moments, not surfaces — never behind body text.
-   · Text on foil is always --foil-ink; every stop is light
-     enough to keep it above 9:1.
-   · Motion is slow and stops for prefers-reduced-motion.
+   FOIL — a light pearl ground with muted colour and a refined,
+   narrow-hue foil: bronze, rose, mauve and slate-teal, never the
+   full spectrum. Two foils:
+     --foil-deep  metallic, for the wordmark and fine lines
+                  (every stop ≥ 4.3:1 on the page)
+     --foil       pale pearl, for button and chip fills under
+                  dark ink (every stop ≥ 11:1)
+   Motion: a slow drift on the wordmark and rules, a glint that
+   sweeps primary actions. Stops for prefers-reduced-motion.
+   Toggle adds .foil to <html>.
    ========================================================== */
 :root.foil{
-  --bg:       #0E0C16;
-  --surface:  #181524;
-  --surface2: #1D1A2B;
-  --surface3: #231F34;
-  --surface4: #2B263F;
-  --surface5: #342E4B;
-  --line:     #2C2640;
+  --bg:       #ECEAF1;
+  --surface:  #F8F7FA;
+  --surface2: #F2F0F5;
+  --surface3: #E6E3EC;
+  --surface4: #DDD9E4;
+  --surface5: #FFFFFF;
+  --line:     #D7D3DF;
 
-  --primary:   #FF5A3C;  --primary-d: #E0412A;  --primary-t: #FFB6A3;
-  --secondary: #A096FF;  --secondary-d:#7E70F5; --secondary-t:#C4BDFF;
+  --primary:   #A0452F;  --primary-d: #83361F;  --primary-t: #8C3A28;
+  --secondary: #534C95;  --secondary-d:#423C80; --secondary-t:#8C84C8;
 
-  --text:   #F4F1FB;
-  --text-2: #BAB3CC;
-  --text-3: #A9A1BF;
+  --text:   #1E1A26;
+  --text-2: #4E495B;
+  --text-3: #5B556B;
 
-  --good: #5FE3A1;  --warn: #FFC857;  --bad: #FF7D6B;
-  --goodbg: #15271F; --warnbg: #2A2214; --badbg: #2D1718;
+  --good: #2E6A4D;  --warn: #765517;  --bad: #A1402D;
+  --goodbg: #E1EDE6; --warnbg: #F3EBD9; --badbg: #F5E3DF;
 
-  --fam-citrus: #FFD166; --fam-floral: #FF7EB6; --fam-fruity: #FF8C5A;
-  --fam-spice:  #F2B33D; --fam-wood:   #C9A77C; --fam-musk:   #B3A9C9;
-  --band-a: #14121E; --band-b: #181524; --block: #231F34;
+  --fam-citrus: #BF9748; --fam-floral: #AE7390; --fam-fruity: #BC7C58;
+  --fam-spice:  #9E7D33; --fam-wood:   #857152; --fam-musk:   #8A8497;
+  --band-a: #F3F1F6; --band-b: #ECEAF1; --block: #E3E0EA;
 
-  --foil: linear-gradient(115deg,#FF9A7A 0%,#FFD36E 18%,#C9F27B 34%,#7EE8D8 50%,#9DB4FF 66%,#DDA0FF 82%,#FF9A7A 100%);
-  --foil-soft: linear-gradient(115deg,rgba(255,154,122,.55),rgba(255,211,110,.55),rgba(201,242,123,.55),
-               rgba(126,232,216,.55),rgba(157,180,255,.55),rgba(221,160,255,.55),rgba(255,154,122,.55));
-  --foil-ink: #120F1C;
+  --foil-deep: linear-gradient(115deg,#8A6843 0%,#9A5A56 25%,#6E5B91 50%,#4D726D 75%,#8A6843 100%);
+  --foil:      linear-gradient(115deg,#EAD8C2 0%,#EBCAC5 25%,#D8CCE6 50%,#C8DAD3 75%,#EAD8C2 100%);
+  --foil-soft: linear-gradient(115deg,rgba(138,104,67,.45),rgba(154,90,86,.45),rgba(110,91,145,.45),rgba(77,114,109,.45),rgba(138,104,67,.45));
+  --foil-glint: linear-gradient(105deg,transparent 42%,rgba(255,255,255,.75) 50%,transparent 58%);
+  --foil-ink: #1E1A26;
 }
 @keyframes foil-shift{ from{background-position:0% 50%} to{background-position:200% 50%} }
+@keyframes foil-glint{ 0%,70%{background-position:160% 0,0% 50%} 100%{background-position:-60% 0,0% 50%} }
 
-/* wordmarks — every app */
+/* wordmarks — every app. Sized to the letters so the foil runs across them. */
 :root.foil .mark, :root.foil .mk, :root.foil .wordmark, :root.foil h1{
-  background:var(--foil); background-size:200% auto;
+  background:var(--foil-deep); background-size:200% auto;
   -webkit-background-clip:text; background-clip:text; color:transparent;
-  animation:foil-shift 14s linear infinite;
-  display:inline-block;   /* size the gradient to the letters, not the row */
+  animation:foil-shift 16s linear infinite; display:inline-block;
 }
-/* the rule under the home wordmark */
-:root.foil .rule{ background:var(--foil)!important; background-size:200% auto; animation:foil-shift 14s linear infinite; }
+:root.foil .rule{ background:var(--foil-deep)!important; background-size:200% auto; animation:foil-shift 16s linear infinite; }
 
-/* cards get a foil hairline; full foil on hover */
+/* cards: a fine metallic edge; brighter on hover */
 :root.foil .card{
   border:1px solid transparent!important;
   background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--foil-soft) border-box!important;
   background-size:100% 100%, 200% 100%!important;
+  box-shadow:0 1px 2px rgba(30,26,38,.04);
 }
 :root.foil a.card:hover, :root.foil .card:hover{
-  background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--foil) border-box!important;
+  background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--foil-deep) border-box!important;
   background-size:100% 100%, 200% 100%!important;
+  box-shadow:0 4px 14px rgba(30,26,38,.07);
 }
 
-/* primary actions + selected chips */
+/* primary actions + selected chips: pearl foil, dark ink, a glint that sweeps across */
 :root.foil button.pri, :root.foil .chip.on, :root.foil .foil-fill, :root.foil .btn:not(.gh), :root.foil .act:not(.ghost){
-  background:var(--foil)!important; background-size:200% 100%!important; color:var(--foil-ink)!important;
-  border-color:transparent!important; font-weight:600; transition:background-position .6s ease;
+  background:var(--foil-glint), var(--foil)!important;
+  background-size:250% 100%, 200% 100%!important;
+  color:var(--foil-ink)!important; border:1px solid rgba(110,91,145,.35)!important; font-weight:600;
+  animation:foil-glint 7s ease-in-out infinite;
 }
-:root.foil button.pri:hover, :root.foil .chip.on:hover, :root.foil .foil-fill:hover, :root.foil .btn:not(.gh):hover, :root.foil .act:not(.ghost):hover{ background-position:100% 50%!important; }
-:root.foil .foil-text{ background:var(--foil); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; }
-:root.foil ::selection{ background:#DDA0FF; color:var(--foil-ink); }
+:root.foil button.pri:hover, :root.foil .chip.on:hover, :root.foil .foil-fill:hover, :root.foil .btn:not(.gh):hover, :root.foil .act:not(.ghost):hover{
+  border-color:rgba(110,91,145,.7)!important; box-shadow:0 2px 10px rgba(110,91,145,.18);
+}
+:root.foil .foil-text{ background:var(--foil-deep); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; }
+:root.foil ::selection{ background:#D8CCE6; color:var(--foil-ink); }
 
-/* the theme button itself */
 :root.foil .themeToggle{
   border:1px solid transparent;
-  background:linear-gradient(var(--surface3),var(--surface3)) padding-box, var(--foil) border-box;
+  background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--foil-deep) border-box;
   color:var(--text);
 }
 @media (prefers-reduced-motion: reduce){
-  :root.foil .mark, :root.foil .mk, :root.foil .wordmark, :root.foil h1, :root.foil .rule{ animation:none; }
+  :root.foil .mark, :root.foil .mk, :root.foil .wordmark, :root.foil h1, :root.foil .rule,
+  :root.foil button.pri, :root.foil .chip.on, :root.foil .btn:not(.gh), :root.foil .act:not(.ghost){ animation:none; }
 }
 @media print{ :root.foil .mark,:root.foil .mk,:root.foil h1{ color:#000; background:none; } }

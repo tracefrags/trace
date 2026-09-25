@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>TRACE — Theme preview</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{padding:22px 16px 70px}
+.wrap{max-width:1000px;margin:0 auto}
+header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.mk{font-family:var(--font-display);font-size:30px;letter-spacing:10px;font-weight:600}
+header a{margin-left:auto;color:var(--primary-t);text-decoration:none;font-size:12px}
+.lede{font-size:12.5px;color:var(--text-2);margin:6px 0 16px;max-width:720px;line-height:1.55}
+.pick{display:flex;gap:6px;margin-bottom:22px}
+.pick button{font:inherit;font-size:12px;padding:7px 16px;border-radius:18px;border:1px solid var(--line);
+ background:var(--surface);color:var(--text-2);cursor:pointer}
+.pick button.cur{background:var(--text);color:var(--bg);border-color:var(--text)}
+h2{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--text-2);margin:26px 0 10px;font-weight:600}
+.sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.sw div{border-radius:6px;overflow:hidden;border:1px solid var(--line);font-size:10.5px;background:var(--surface)}
+.sw i{display:block;height:46px}
+.sw span{display:block;padding:6px 8px;color:var(--text-2)}
+.foilbar{height:54px;border-radius:8px;background:var(--foil-deep, linear-gradient(90deg,var(--primary),var(--secondary)));
+ background-size:200% 100%;animation:foil-shift 14s linear infinite;margin-top:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);
+ border-radius:8px;padding:15px 16px}
+.card .tag{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--primary-t)}
+.card b{display:block;font-size:16px;margin:6px 0 5px}
+.card span.d{font-size:12px;color:var(--text-2);line-height:1.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.pri,button.gh{font:inherit;font-size:12.5px;padding:8px 16px;border-radius:6px;cursor:pointer}
+button.pri{background:var(--text);color:var(--bg);border:1px solid var(--text)}
+button.gh{background:var(--surface3);color:var(--text);border:1px solid var(--line)}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:14px;padding:4px 11px;font:inherit;font-size:11.5px;cursor:pointer}
+.chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--surface);border-radius:8px;overflow:hidden}
+th{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3);text-align:left;padding:8px 12px;background:var(--surface3)}
+td{padding:7px 12px;border-top:1px solid var(--line);color:var(--text-2)}
+td:first-child{color:var(--text)} td.n{text-align:right;font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.msg{font-size:12.5px;padding:9px 12px;border-radius:6px;margin-bottom:6px}
+.m-ok{background:var(--goodbg);color:var(--good)} .m-w{background:var(--warnbg);color:var(--warn)} .m-b{background:var(--badbg);color:var(--bad)}
+.tagp{font-size:9px;letter-spacing:1px;padding:1px 6px;border-radius:2px;border:1px solid currentColor;font-weight:600;margin-right:6px}
+.fams span{display:inline-flex;align-items:center;font-size:12px;color:var(--text-2);margin:0 14px 6px 0}
+.labelwrap{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.label{width:230px;height:300px;border-radius:6px;background:#15131D;position:relative;padding:26px 22px;
+ box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;flex-direction:column;justify-content:space-between}
+.label .lw{font-family:var(--font-display);font-size:26px;letter-spacing:9px;font-weight:600;
+ background:linear-gradient(115deg,#E6D2B8 0%,#E8C3BE 25%,#CFC3E3 50%,#BFD6CD 75%,#E6D2B8 100%);
+ background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:foil-shift 14s linear infinite}
+.label .hl{height:1px;background:linear-gradient(90deg,#E6D2B8,#CFC3E3,#BFD6CD);opacity:.8}
+.label .nm{font-size:13px;letter-spacing:3px;color:#EDEBE6;text-transform:uppercase}
+.label .sp{font-size:10px;letter-spacing:1.5px;color:#A9A1BF;text-transform:uppercase}
+.note{font-size:12px;color:var(--text-2);line-height:1.6;max-width:520px}
+.note b{color:var(--text)}
+@media (prefers-reduced-motion: reduce){.foilbar,.label .lw{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><span class="mk">TRACE</span><a href="home.html">← Home</a></header>
+<div class="lede">Theme preview. Every building block of the app suite, shown in whichever theme is selected.
+Switch below — the choice is remembered and applies across all the apps.</div>
+<div class="pick" id="pick"></div>
+
+<h2>Colour</h2>
+<div class="sw" id="sw"></div>
+<div class="foilbar" title="Foil gradient — foil theme only"></div>
+
+<h2>Home cards</h2>
+<div class="grid">
+  <a class="card" href="#"><span class="tag">Build</span><b>Compose</b><span class="d">The spatial map. Build a formula, see pairings, check IFRA live.</span></a>
+  <a class="card" href="#"><span class="tag">Library</span><b>Studio</b><span class="d">Materials, formulas, accords and the batch log.</span></a>
+  <a class="card" href="#"><span class="tag">Learn</span><b>Encyclopedia</b><span class="d">Every material — smell, dose, pairings, what to avoid.</span></a>
+</div>
+
+<h2>Actions</h2>
+<div class="row">
+  <button class="pri">Apply selected changes</button>
+  <button class="gh">Download data</button>
+  <button class="chip on">Floral</button><button class="chip">Wood</button><button class="chip">Musk</button>
+</div>
+
+<h2>Data</h2>
+<table>
+ <tr><th>Material</th><th>%</th><th>Actual</th><th>In bottle</th></tr>
+ <tr><td><span class="dot" style="background:var(--fam-spice)"></span>Black Pepper EO</td><td class="n">5</td><td class="n">5.00%</td><td class="n">1.000%</td></tr>
+ <tr><td><span class="dot" style="background:var(--secondary)"></span>Calone 10%</td><td class="n">4</td><td class="n">0.40%</td><td class="n">0.080%</td></tr>
+ <tr><td><span class="dot" style="background:var(--fam-floral)"></span>Rose Oxide 10%</td><td class="n">5</td><td class="n">0.50%</td><td class="n">0.100%</td></tr>
+ <tr><td><span class="dot" style="background:var(--fam-musk)"></span>Habanolide</td><td class="n">5</td><td class="n">5.00%</td><td class="n">1.000%</td></tr>
+</table>
+
+<h2>Checks and sources</h2>
+<div class="msg m-ok">IFRA limits clear.</div>
+<div class="msg m-w">Watch — DHM + Calone · safe while DHM stays under 8% actual — you are at 6.00%</div>
+<div class="msg m-b">Over threshold — Cashmeran + Orange EO</div>
+<div style="margin-top:8px;font-size:12px">
+ <span class="tagp" style="color:var(--good)">BIOSHOP</span><span class="tagp" style="color:var(--secondary)">YOUR LIBRARY</span>
+ <span class="tagp" style="color:var(--primary-t)">COMPOSE</span><span class="tagp" style="color:var(--warn)">GENERAL KNOWLEDGE</span>
+</div>
+
+<h2>Scent families on the map</h2>
+<div class="fams" id="fams"></div>
+
+<h2>Beyond the screen — a foil label</h2>
+<div class="labelwrap">
+  <div class="label"><div><div class="lw">TRACE</div><div class="hl" style="margin-top:12px"></div></div>
+   <div><div class="nm">Sea Serpent</div><div class="sp" style="margin-top:6px">Eau de parfum · 20% · Batch 008</div></div></div>
+  <div class="note"><b>Why foil fits TRACE.</b> Hot-foil stamping is a print finish as well as a screen effect. The same
+  iridescent wordmark could appear as a small foil detail on the collectible card or the sleeve — the apps and the product
+  would then share one signature. <b>On the label itself</b>, the settled direction is blind embossing; foil would be a
+  deliberate, separate decision, not a default.<br><br>
+  <b>How it's used here:</b> foil only on brand moments — the wordmark, the primary action, selected chips, card edges.
+  Never behind body text. Two foils: a deep metallic one for the wordmark and lines, a pale pearl one under dark text on buttons.</div>
+</div>
+</div>
+<script>
+const P=document.getElementById('pick');
+[['dark','Dark'],['light','Light'],['foil','Foil']].forEach(([k,l])=>{const b=document.createElement('button');b.textContent=l;b.dataset.k=k;
+ b.onclick=()=>{window.TRACEtheme.set(k);mark();};P.append(b);});
+function mark(){P.querySelectorAll('button').forEach(b=>b.classList.toggle('cur',b.dataset.k===window.TRACEtheme.get()));}
+const SW=[['--bg','Page'],['--surface','Surface'],['--surface3','Raised'],['--primary','Primary'],['--primary-t','Primary label'],
+ ['--secondary','Secondary'],['--text','Text'],['--text-2','Text 2'],['--good','Good'],['--warn','Watch'],['--bad','Alert']];
+const sw=document.getElementById('sw');
+SW.forEach(([v,l])=>{const d=document.createElement('div');const i=document.createElement('i');i.style.background='var('+v+')';
+ const s=document.createElement('span');s.textContent=l;d.append(i,s);sw.append(d);});
+const F=document.getElementById('fams');
+[['--fam-citrus','Citrus'],['--fam-floral','Floral'],['--fam-fruity','Fruity'],['--fam-spice','Spice'],['--fam-wood','Wood'],['--fam-musk','Musk']]
+ .forEach(([v,l])=>{const s=document.createElement('span');s.innerHTML='<span class="dot" style="background:var('+v+')"></span>'+l;F.append(s);});
+document.addEventListener('trace:theme',mark);
+document.addEventListener('DOMContentLoaded',mark);mark();
+</script>
+</body>
+</html>

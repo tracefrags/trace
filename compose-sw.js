@@ -1,4 +1,4 @@
-const CACHE = 'trace-compose-v5';
+const CACHE = 'trace-compose-v6';
 const FILES = ['./home.html', './theme.css', './theme.js', './compose-map.html', './compose-manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
