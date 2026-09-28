@@ -125,7 +125,7 @@ const $=s=>document.querySelector(s);
 const FAMORDER=['citrus','aromatic','green','marine','floral','fruity','gourmand','spice','wood','amber','musk','animalic','solvent','other'];
 const FAMCOL={citrus:'--fam-citrus',floral:'--fam-floral',fruity:'--fam-fruity',spice:'--fam-spice',wood:'--fam-wood',musk:'--fam-musk'};
 const EXTRA={other:'#8A8782',aromatic:'#8FB37A',green:'#6FBF73',marine:'#3CCEE8',gourmand:'#E0A33C',amber:'#C98A4B',animalic:'#B06A5A',solvent:'#8A8782'};
-const famColor=f=>FAMCOL[f]?getComputedStyle(document.documentElement).getPropertyValue(FAMCOL[f]).trim():EXTRA[f];
+const famColor=f=>getComputedStyle(document.documentElement).getPropertyValue('--fam-'+f).trim()||EXTRA[f];
 const nrm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 let LIVE=null, famSel='all', openName=null;
 

@@ -1,17 +1,18 @@
-/* TRACE — theme switch. Three themes: dark (default), light (long sessions), foil.
-   The button cycles dark → light → foil. window.TRACEtheme.set('foil') sets one directly. */
+/* TRACE — theme. The house theme is Brutalist (chosen 24 Sept): Paper by day, Night for evenings.
+   The button switches between them; window.TRACEtheme.set('night') sets one directly.
+   The older dark / light / foil themes remain in theme.css but are no longer offered. */
 (function(){
-  var KEY='trace:theme', ORDER=['dark','light','foil'], NAMES={dark:'Dark',light:'Light',foil:'Foil'};
+  var KEY='trace:theme', ORDER=['paper','night'], NAMES={paper:'Paper',night:'Night'};
   function apply(t){
     var r=document.documentElement;
-    r.classList.toggle('light', t==='light');
-    r.classList.toggle('foil',  t==='foil');
+    r.classList.add('brutal'); r.classList.toggle('night', t==='night');
+    r.classList.remove('light','foil');
     var b=document.querySelector('.themeToggle');
     if(b) b.textContent = NAMES[ORDER[(ORDER.indexOf(t)+1)%ORDER.length]];
   }
   function get(){
     try{ var v=localStorage.getItem(KEY); if(ORDER.indexOf(v)>=0) return v; }catch(e){}
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    return 'paper';                      /* older saved choices (dark, light, foil) start on Paper */
   }
   var cur=get(); apply(cur);
   function set(t){

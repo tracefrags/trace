@@ -179,7 +179,7 @@ function famColour(k){
 let FAM=FAMKEYS.map(([k,n])=>[k,n,famColour(k)]);
 function refreshFam(){ FAM=FAMKEYS.map(([k,n])=>[k,n,famColour(k)]); }
 const BAND=[['top','TOP','0–30 min',55],['heart','HEART','30 min – 3 hr',255],['base','BASE','3 hr +',455]];
-const TYPES=[['Cologne',4],['EdT',10],['EdP',15],['EdP intense',18],['Extrait',22],['Extrait',25],['Extrait',28],['Accord neat',100]];
+const TYPES=[['Cologne',4],['EdT',10],['EdP',15],['EdP intense',18],['EdP intense',20],['Extrait',22],['Extrait',24],['Extrait',25],['Extrait',28],['Accord neat',100]];
 const ETH_G=1.65;
 
 const INFO={
@@ -620,7 +620,10 @@ function drawMap(){
   const l=mk('text',{x:12,y:by+13,'font-size':10,'font-weight':700,'letter-spacing':1.4,fill:cssVar('--text')});l.textContent=bn;svg.append(l);
   const t=mk('text',{x:12,y:by+25,'font-size':9,fill:cssVar('--text-3')});t.textContent=bt;svg.append(t);
  });
- FAM.forEach(([fk,fn,fc],fi)=>{const t=mk('text',{x:X0+fi*COLW+9,y:46,'font-size':9,'letter-spacing':.5,fill:fc,'font-weight':600});
+ const brut=document.documentElement.classList.contains('brutal');   // Brutalist: ink label + pastel swatch (colour as fill, never as text)
+ FAM.forEach(([fk,fn,fc],fi)=>{const x=X0+fi*COLW+9;
+  if(brut)svg.append(mk('rect',{x,y:38,width:9,height:9,fill:fc,stroke:cssVar('--text'),'stroke-width':1.2}));
+  const t=mk('text',{x:brut?x+14:x,y:46,'font-size':9,'letter-spacing':.5,fill:brut?cssVar('--text'):fc,'font-weight':brut?700:600});
   t.textContent=fn.toUpperCase();svg.append(t)});
  const ord={top:0,heart:1,base:2};
  const pts=Object.keys(sel).map(n=>({n,...P[n]})).sort((a,b)=>ord[a.band]-ord[b.band]||a.x-b.x);
@@ -720,7 +723,7 @@ function refresh(){
  $('#pmeta').textContent=names.length?names.length+' materials · '+conc()+'% · '+W()+'g':'Click nodes on the map';
  const bt={top:0,heart:0,base:0};names.forEach(n=>bt[P[n].band]+=sh[n]);
  const sp=$('#sp');sp.innerHTML='';
- [['top',cssVar('--fam-citrus')],['heart',cssVar('--fam-floral')],['base',cssVar('--scent-blood')]].forEach(([k,c])=>{
+ [['top',cssVar('--tier-top')],['heart',cssVar('--tier-heart')],['base',cssVar('--tier-base')]].forEach(([k,c])=>{
   const i=document.createElement('i');i.style.width=bt[k]+'%';i.style.background=c;sp.append(i)});
  $('#sl').textContent=names.length?`top ${Math.round(bt.top)} · heart ${Math.round(bt.heart)} · base ${Math.round(bt.base)}`:'—';
  const ss=$('#ss');ss.textContent=names.length?(Math.abs(su-100)<.5?'100%':su.toFixed(1)+'% → normalised'):'0%';
@@ -898,7 +901,7 @@ function buildPDF(){
  };
  buildBlockSel();
  // an accord is stored at 100%; ask what share of the formula it should take
- const SECTION={'OPT Top':17,'OPT Heart':32,'OPT Base':51};
+ const SECTION={'OPT Top':17,'OPT Heart':32,'OPT Base':51,'ST Top':9,'ST Heart':39,'ST Base':51,'ST Modifiers':1,'BM Top':13,'BM Heart':32,'BM Base':52.2,'BM Modifiers':2.8};
  bs.onchange=()=>{const v=bs.value;if(!v)return;
   if(v==='__new'){const n=prompt('Block name');if(n)blocks.push({id:bid++,n,m:[]})}
   else if(v.startsWith('lib:')){

@@ -1,4 +1,4 @@
-const CACHE = 'trace-v5';
+const CACHE = 'trace-v8';
 const FILES = ['./', './home.html', './encyclopedia.html', './sync.html', './foil-preview.html', './theme.js', './theme.css', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
@@ -15,15 +15,15 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// Network-first: always fetch the latest file when online, so uploads show immediately.
+// The cache is only a fallback for offline use.
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then(hit =>
-      hit || fetch(e.request).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
-        return res;
-      }).catch(() => hit)
-    )
+    fetch(e.request).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+      return res;
+    }).catch(() => caches.match(e.request))
   );
 });

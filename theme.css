@@ -147,90 +147,174 @@ a{ color:var(--secondary); }
 @media print{ .themeToggle{display:none} }
 
 /* ==========================================================
-   FOIL — a light pearl ground with muted colour and a refined,
-   narrow-hue foil: bronze, rose, mauve and slate-teal, never the
-   full spectrum. Two foils:
-     --foil-deep  metallic, for the wordmark and fine lines
-                  (every stop ≥ 4.3:1 on the page)
-     --foil       pale pearl, for button and chip fills under
-                  dark ink (every stop ≥ 11:1)
-   Motion: a slow drift on the wordmark and rules, a glint that
-   sweeps primary actions. Stops for prefers-reduced-motion.
-   Toggle adds .foil to <html>.
+   FOIL — mid-tone grounds, three-hue foils (never a full rainbow),
+   colours lightly muted. Three variants; the suite uses the one
+   chosen in Themes (stored as trace:foilv, set as data-fv on <html>).
+     slate  cool blue-grey · copper, gold, rose foil   (default)
+     dusk   warm plum-grey · rose, lavender, aqua foil
+     stone  lightest grey  · mint, periwinkle, orchid foil
+   Every text pairing ≥ 4.5:1; foil wordmarks ≥ 5.4:1; dark ink on
+   foil fills ≥ 8:1. Motion: slow drift, a glint on primary actions.
    ========================================================== */
-:root.foil{
-  --bg:       #ECEAF1;
-  --surface:  #F8F7FA;
-  --surface2: #F2F0F5;
-  --surface3: #E6E3EC;
-  --surface4: #DDD9E4;
-  --surface5: #FFFFFF;
-  --line:     #D7D3DF;
-
-  --primary:   #A0452F;  --primary-d: #83361F;  --primary-t: #8C3A28;
-  --secondary: #534C95;  --secondary-d:#423C80; --secondary-t:#8C84C8;
-
-  --text:   #1E1A26;
-  --text-2: #4E495B;
-  --text-3: #5B556B;
-
-  --good: #2E6A4D;  --warn: #765517;  --bad: #A1402D;
-  --goodbg: #E1EDE6; --warnbg: #F3EBD9; --badbg: #F5E3DF;
-
-  --fam-citrus: #BF9748; --fam-floral: #AE7390; --fam-fruity: #BC7C58;
-  --fam-spice:  #9E7D33; --fam-wood:   #857152; --fam-musk:   #8A8497;
-  --band-a: #F3F1F6; --band-b: #ECEAF1; --block: #E3E0EA;
-
-  --foil-deep: linear-gradient(115deg,#8A6843 0%,#9A5A56 25%,#6E5B91 50%,#4D726D 75%,#8A6843 100%);
-  --foil:      linear-gradient(115deg,#EAD8C2 0%,#EBCAC5 25%,#D8CCE6 50%,#C8DAD3 75%,#EAD8C2 100%);
-  --foil-soft: linear-gradient(115deg,rgba(138,104,67,.45),rgba(154,90,86,.45),rgba(110,91,145,.45),rgba(77,114,109,.45),rgba(138,104,67,.45));
-  --foil-glint: linear-gradient(105deg,transparent 42%,rgba(255,255,255,.75) 50%,transparent 58%);
-  --foil-ink: #1E1A26;
+:root.foil, .fv-slate{
+  --bg:#2A2E38; --surface:#323743; --surface2:#373C49; --surface3:#3E4452;
+  --surface4:#434957; --surface5:#404653; --line:#454B59;
+  --primary:#F47A5E; --primary-d:#D9644A; --primary-t:#FFBBA8;
+  --secondary:#8CD3E2; --secondary-d:#6FB8C8; --secondary-t:#B6E4EE;
+  --text:#F3F4F7; --text-2:#CDD2DB; --text-3:#C2C8D1;
+  --good:#7FE0AE; --warn:#FFCF70; --bad:#FFA894;
+  --goodbg:#2D3F3A; --warnbg:#413C31; --badbg:#45363A;
+  --fam-citrus:#F2C46B; --fam-floral:#F29BBE; --fam-fruity:#F6A37A; --fam-spice:#E8BE5E; --fam-wood:#D6B98E; --fam-musk:#C8C3D2;
+  --band-a:#2F3440; --band-b:#323743; --block:#3A4050;
+  --foil: linear-gradient(115deg,#F2A57E 0%,#F4CB7E 33%,#EC93A8 66%,#F2A57E 100%);
+  --foil-soft: linear-gradient(115deg,rgba(242,165,126,0.6),rgba(244,203,126,0.6),rgba(236,147,168,0.6),rgba(242,165,126,0.6));
+  --foil-glint: linear-gradient(105deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);
+  --foil-ink:#16141B;
+}
+:root.foil[data-fv="dusk"], .fv-dusk{
+  --bg:#322A37; --surface:#3A3140; --surface2:#403746; --surface3:#483F4F;
+  --surface4:#4D4454; --surface5:#473E4E; --line:#51475A;
+  --primary:#F2826A; --primary-d:#D96B54; --primary-t:#FFBEAB;
+  --secondary:#C6BBF8; --secondary-d:#A99BE6; --secondary-t:#DCD4FA;
+  --text:#F7F2F6; --text-2:#D8CED6; --text-3:#CBC1CA;
+  --good:#84E2B3; --warn:#FFD27A; --bad:#FFA893;
+  --goodbg:#33403A; --warnbg:#463C37; --badbg:#4A363A;
+  --fam-citrus:#F2C46B; --fam-floral:#F29BBE; --fam-fruity:#F6A37A; --fam-spice:#E8BE5E; --fam-wood:#D6B98E; --fam-musk:#C8C3D2;
+  --band-a:#372F3C; --band-b:#3A3140; --block:#443B4B;
+  --foil: linear-gradient(115deg,#F4B3C6 0%,#C9B6F6 33%,#9FD9E1 66%,#F4B3C6 100%);
+  --foil-soft: linear-gradient(115deg,rgba(244,179,198,0.6),rgba(201,182,246,0.6),rgba(159,217,225,0.6),rgba(244,179,198,0.6));
+  --foil-glint: linear-gradient(105deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);
+  --foil-ink:#16141B;
+}
+:root.foil[data-fv="stone"], .fv-stone{
+  --bg:#3D4049; --surface:#464953; --surface2:#4B4E59; --surface3:#4F525E;
+  --surface4:#555864; --surface5:#4E515C; --line:#565965;
+  --primary:#FF8A70; --primary-d:#E0735A; --primary-t:#FFCDBF;
+  --secondary:#ABE6F0; --secondary-d:#8FD0DC; --secondary-t:#CDEFF5;
+  --text:#F7F7F8; --text-2:#DEDFE4; --text-3:#D4D5DB;
+  --good:#9FEFC8; --warn:#FFDC92; --bad:#FFC4B5;
+  --goodbg:#3F514A; --warnbg:#534D41; --badbg:#574549;
+  --fam-citrus:#F2C46B; --fam-floral:#F29BBE; --fam-fruity:#F6A37A; --fam-spice:#E8BE5E; --fam-wood:#D6B98E; --fam-musk:#C8C3D2;
+  --band-a:#42454F; --band-b:#464953; --block:#4D505C;
+  --foil: linear-gradient(115deg,#8FE8DA 0%,#A2BCFF 33%,#DDA7FF 66%,#8FE8DA 100%);
+  --foil-soft: linear-gradient(115deg,rgba(143,232,218,0.6),rgba(162,188,255,0.6),rgba(221,167,255,0.6),rgba(143,232,218,0.6));
+  --foil-glint: linear-gradient(105deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);
+  --foil-ink:#16141B;
 }
 @keyframes foil-shift{ from{background-position:0% 50%} to{background-position:200% 50%} }
 @keyframes foil-glint{ 0%,70%{background-position:160% 0,0% 50%} 100%{background-position:-60% 0,0% 50%} }
 
-/* wordmarks — every app. Sized to the letters so the foil runs across them. */
-:root.foil .mark, :root.foil .mk, :root.foil .wordmark, :root.foil h1{
-  background:var(--foil-deep); background-size:200% auto;
+/* wordmarks — sized to the letters so the foil runs across them */
+.foil .mark, .foil .mk, .foil .wordmark, :root.foil h1{
+  background:var(--foil); background-size:200% auto;
   -webkit-background-clip:text; background-clip:text; color:transparent;
-  animation:foil-shift 16s linear infinite; display:inline-block;
+  animation:foil-shift 14s linear infinite; display:inline-block;
 }
-:root.foil .rule{ background:var(--foil-deep)!important; background-size:200% auto; animation:foil-shift 16s linear infinite; }
+:root.foil .rule{ background:var(--foil)!important; background-size:200% auto; animation:foil-shift 14s linear infinite; }
 
-/* cards: a fine metallic edge; brighter on hover */
-:root.foil .card{
+.foil .card{
   border:1px solid transparent!important;
   background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--foil-soft) border-box!important;
   background-size:100% 100%, 200% 100%!important;
-  box-shadow:0 1px 2px rgba(30,26,38,.04);
 }
-:root.foil a.card:hover, :root.foil .card:hover{
-  background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--foil-deep) border-box!important;
+.foil a.card:hover, .foil .card:hover{
+  background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--foil) border-box!important;
   background-size:100% 100%, 200% 100%!important;
-  box-shadow:0 4px 14px rgba(30,26,38,.07);
 }
-
-/* primary actions + selected chips: pearl foil, dark ink, a glint that sweeps across */
-:root.foil button.pri, :root.foil .chip.on, :root.foil .foil-fill, :root.foil .btn:not(.gh), :root.foil .act:not(.ghost){
+.foil button.pri, .foil .chip.on, .foil .foil-fill, .foil .btn:not(.gh), .foil .act:not(.ghost){
   background:var(--foil-glint), var(--foil)!important;
   background-size:250% 100%, 200% 100%!important;
-  color:var(--foil-ink)!important; border:1px solid rgba(110,91,145,.35)!important; font-weight:600;
+  color:var(--foil-ink)!important; border-color:transparent!important; font-weight:600;
   animation:foil-glint 7s ease-in-out infinite;
 }
-:root.foil button.pri:hover, :root.foil .chip.on:hover, :root.foil .foil-fill:hover, :root.foil .btn:not(.gh):hover, :root.foil .act:not(.ghost):hover{
-  border-color:rgba(110,91,145,.7)!important; box-shadow:0 2px 10px rgba(110,91,145,.18);
+.foil button.pri:hover, .foil .chip.on:hover, .foil .foil-fill:hover, .foil .btn:not(.gh):hover, .foil .act:not(.ghost):hover{
+  box-shadow:0 0 0 1px rgba(255,255,255,.25), 0 4px 16px rgba(0,0,0,.25);
 }
-:root.foil .foil-text{ background:var(--foil-deep); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; }
-:root.foil ::selection{ background:#D8CCE6; color:var(--foil-ink); }
-
-:root.foil .themeToggle{
-  border:1px solid transparent;
-  background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--foil-deep) border-box;
-  color:var(--text);
-}
+.foil .foil-text{ background:var(--foil); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; }
+:root.foil ::selection{ background:var(--secondary); color:var(--foil-ink); }
+:root.foil .themeToggle{ border:1px solid transparent;
+  background:linear-gradient(var(--surface3),var(--surface3)) padding-box, var(--foil) border-box; color:var(--text); }
 @media (prefers-reduced-motion: reduce){
-  :root.foil .mark, :root.foil .mk, :root.foil .wordmark, :root.foil h1, :root.foil .rule,
-  :root.foil button.pri, :root.foil .chip.on, :root.foil .btn:not(.gh), :root.foil .act:not(.ghost){ animation:none; }
+  .foil .mark, .foil .mk, .foil .wordmark, :root.foil h1, :root.foil .rule,
+  .foil button.pri, .foil .chip.on, .foil .btn:not(.gh), .foil .act:not(.ghost){ animation:none; }
 }
 @media print{ :root.foil .mark,:root.foil .mk,:root.foil h1{ color:#000; background:none; } }
+
+
+/* ==========================================================
+   BRUTALIST — the house theme (chosen 24 Sept):  Paper · Data colour
+   The interface is monotone ink on paper. Colour appears only where it
+   carries meaning: material families, formula structure, statuses.
+   Night is its evening pair — same structure, inverted.
+   Applied by theme.js as <html class="brutal"> (+ "night").
+   ========================================================== */
+:root{ --tier-top:#E8B14F; --tier-heart:#E087A8; --tier-base:#B01E4A; }   /* structure bar in the older themes */
+:root.brutal{
+  --bg:#F2F0EB; --surface:#FBFAF7; --surface2:#F6F4EF; --surface3:#ECE9E3; --surface4:#E4E0D8; --surface5:#FFFFFF;
+  --primary:#1F1F1F; --primary-d:#000000; --primary-t:#1F1F1F;
+  --secondary:#2E4A6B; --secondary-d:#243A55; --secondary-t:#2E4A6B;
+  --text:#1F1F1F; --text-2:#333333; --text-3:#4D4D4D; --line:#1F1F1F;
+  --good:#28603A; --warn:#5F470F; --bad:#883226; --goodbg:#DCE8DE; --warnbg:#EFE6CF; --badbg:#F0DCD6;
+  --fam-citrus:#F2DE7A;
+  --fam-floral:#F2B6C9;
+  --fam-fruity:#F3C2B4;
+  --fam-spice:#E6CFA2;
+  --fam-wood:#D8C3A5;
+  --fam-musk:#D2CBEF;
+  --fam-green:#B6DDBF;
+  --fam-marine:#A9CFEF;
+  --fam-amber:#EBCD95;
+  --fam-gourmand:#E9C9A7;
+  --fam-aromatic:#C9DDB0;
+  --fam-animalic:#DDBDB3;
+  --fam-other:#D6D3CC;
+  --fam-solvent:#D6D3CC;
+  --tier-top:#A9CFEF; --tier-heart:#F2B6C9; --tier-base:#D8C3A5;
+  --band-a:#F2F0EB; --band-b:#ECE9E3; --block:#ECE9E3;
+  --emboss-face:#EEECE7; --emboss-hi:rgba(255,255,255,.35); --emboss-lo:rgba(0,0,0,.065);
+  --wordmark-spacing:0px;
+}
+:root.brutal.night{
+  --bg:#151A24; --surface:#1B2130; --surface2:#1E2534; --surface3:#212838; --surface4:#283042; --surface5:#10141C;
+  --primary:#E4E7EE; --primary-d:#FFFFFF; --primary-t:#E4E7EE;
+  --secondary:#9FC3E8; --secondary-d:#86AFD9; --secondary-t:#9FC3E8;
+  --text:#E4E7EE; --text-2:#C5CAD6; --text-3:#A9B0BF; --line:#E4E7EE;
+  --good:#8CCB9E; --warn:#D9BD72; --bad:#E39A8C; --goodbg:#1F2C24; --warnbg:#2C281C; --badbg:#2E201E;
+  --band-a:#151A24; --band-b:#1B2130; --block:#212838;
+  --emboss-face:#181D27; --emboss-hi:rgba(255,255,255,.04); --emboss-lo:rgba(0,0,0,.4);
+}
+/* one faint, blind-embossed TRACE behind every app — visible if you look for it */
+:root.brutal body::before{content:'TRACE';position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);z-index:-1;pointer-events:none;
+  font:700 min(62vh,27vw)/1 var(--font-display);letter-spacing:-.02em;white-space:nowrap;color:var(--emboss-face);
+  text-shadow:-1.5px -1.5px 0 var(--emboss-hi),1.5px 1.5px 0 var(--emboss-lo)}
+/* structure: square corners, ink lines, hard shadows used sparingly */
+:root.brutal *{border-radius:0!important}
+:root.brutal :is(.mark,.wordmark,h1.brand){font-weight:700;letter-spacing:-.5px}
+:root.brutal :is(.card,a.card,.panel,.blk,.mapbox,.sec,.item,.it,.note,.branch,.sum,.clock,.prog,details.intro){border-width:2px!important;border-color:var(--line)!important}
+:root.brutal :is(a.card,.card){transition:transform .08s,box-shadow .08s}
+:root.brutal a.card:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--line)}
+:root.brutal :is(button,.btn,.bar button,.grp button,.pair button,nav button){border-width:2px;font-weight:600}
+:root.brutal :is(button.act,.btn,button.pri,.bar button.on,.chip.on,nav button.on){letter-spacing:.3px}
+:root.brutal :is(button,.btn):active{transform:translate(1px,1px)}
+:root.brutal :is(input,select,textarea){border:2px solid var(--line)!important;background:var(--surface5)!important;color:var(--text)}
+:root.brutal :is(input,select,textarea,button,a,.card,summary):focus-visible{outline:3px solid var(--text)!important;outline-offset:2px}
+:root.brutal th{background:var(--text);color:var(--bg)}
+:root.brutal :is(.pill,.chip,.tag,.badge){border-width:1.5px}
+:root.brutal :is(.dot,.legend i){box-shadow:0 0 0 1.5px var(--line)}
+:root.brutal ::selection{background:var(--text);color:var(--bg)}
+:root.brutal .themeToggle{border:2px solid var(--line);background:var(--surface);color:var(--text);font-weight:700}
+/* Home: the wordmark as the one bold element */
+:root.brutal body.home .wrap{max-width:980px}
+:root.brutal body.home header{text-align:left}
+:root.brutal body.home .mark{font-size:56px;letter-spacing:-1.5px;line-height:1}
+:root.brutal body.home .sub{color:var(--text);font-weight:700;letter-spacing:2px}
+:root.brutal body.home .rule{max-width:none;height:6px;margin:14px 0 24px;background:var(--text)}
+:root.brutal body.home a.card{border:2px solid var(--line);background:var(--surface)}
+:root.brutal body.home a.card .tag{color:var(--text);font-weight:700}
+:root.brutal body.home a.card b{font-weight:700}
+:root.brutal body.home .foot{text-align:left;color:var(--text-2)}
+@media (prefers-reduced-motion:reduce){:root.brutal a.card:hover{transform:none}}
+/* elements that used the line colour as a fill: tracks and muted blocks get paper-grey, so text and progress stay visible */
+:root.brutal :is(.mac,.split,.prog){background:var(--surface3)!important;box-shadow:inset 0 0 0 1.5px var(--line)}
+:root.brutal .note.n{background:var(--surface3)!important}
+:root.brutal .opt.no{background:var(--surface3)!important;color:var(--text-2)!important}
