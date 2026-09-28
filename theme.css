@@ -250,10 +250,10 @@ a{ color:var(--secondary); }
    ========================================================== */
 :root{ --tier-top:#E8B14F; --tier-heart:#E087A8; --tier-base:#B01E4A; }   /* structure bar in the older themes */
 :root.brutal{
-  --bg:#F2F0EB; --surface:#FBFAF7; --surface2:#F6F4EF; --surface3:#ECE9E3; --surface4:#E4E0D8; --surface5:#FFFFFF;
+  --bg:#F2F0EB; --surface:#FFFFFF; --surface2:#FAF9F6; --surface3:#E9E6DF; --surface4:#E0DCD3; --surface5:#FFFFFF;
   --primary:#1F1F1F; --primary-d:#000000; --primary-t:#1F1F1F;
   --secondary:#2E4A6B; --secondary-d:#243A55; --secondary-t:#2E4A6B;
-  --text:#1F1F1F; --text-2:#333333; --text-3:#4D4D4D; --line:#1F1F1F;
+  --text:#1F1F1F; --text-2:#2A2A2A; --text-3:#3D3D3D; --line:#1F1F1F;
   --good:#28603A; --warn:#5F470F; --bad:#883226; --goodbg:#DCE8DE; --warnbg:#EFE6CF; --badbg:#F0DCD6;
   --fam-citrus:#F2DE7A;
   --fam-floral:#F2B6C9;
@@ -271,7 +271,7 @@ a{ color:var(--secondary); }
   --fam-solvent:#D6D3CC;
   --tier-top:#A9CFEF; --tier-heart:#F2B6C9; --tier-base:#D8C3A5;
   --band-a:#F2F0EB; --band-b:#ECE9E3; --block:#ECE9E3;
-  --emboss-face:#EEECE7; --emboss-hi:rgba(255,255,255,.35); --emboss-lo:rgba(0,0,0,.065);
+  --emboss-face:#F0EEE9; --emboss-hi:rgba(255,255,255,.28); --emboss-lo:rgba(0,0,0,.045);
   --wordmark-spacing:0px;
 }
 :root.brutal.night{
@@ -281,7 +281,7 @@ a{ color:var(--secondary); }
   --text:#E4E7EE; --text-2:#C5CAD6; --text-3:#A9B0BF; --line:#E4E7EE;
   --good:#8CCB9E; --warn:#D9BD72; --bad:#E39A8C; --goodbg:#1F2C24; --warnbg:#2C281C; --badbg:#2E201E;
   --band-a:#151A24; --band-b:#1B2130; --block:#212838;
-  --emboss-face:#181D27; --emboss-hi:rgba(255,255,255,.04); --emboss-lo:rgba(0,0,0,.4);
+  --emboss-face:#171C26; --emboss-hi:rgba(255,255,255,.03); --emboss-lo:rgba(0,0,0,.3);
 }
 /* one faint, blind-embossed TRACE behind every app — visible if you look for it */
 :root.brutal body::before{content:'TRACE';position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);z-index:-1;pointer-events:none;
@@ -318,3 +318,34 @@ a{ color:var(--secondary); }
 :root.brutal :is(.mac,.split,.prog){background:var(--surface3)!important;box-shadow:inset 0 0 0 1.5px var(--line)}
 :root.brutal .note.n{background:var(--surface3)!important}
 :root.brutal .opt.no{background:var(--surface3)!important;color:var(--text-2)!important}
+
+/* ---- Brutalist, strengthened to match the preview ---- */
+:root.brutal :is(.card,.panel,.mapbox){box-shadow:5px 5px 0 var(--line)}
+:root.brutal :is(.sec,.glance div,.famgrid div,.stats div,.it){border:2px solid var(--line)!important;background:var(--surface)!important}
+:root.brutal :is(.sec h3,.group h2,.blkh,.dd-h){color:var(--text);font-weight:700}
+:root.brutal .badge{border:1.5px solid currentColor;font-weight:700;background:var(--surface)!important;color:var(--text)}
+:root.brutal .badge.warn{background:var(--warnbg)!important;color:var(--warn)}
+:root.brutal .badge.bad{background:var(--badbg)!important;color:var(--bad)}
+:root.brutal .badge.good{background:var(--goodbg)!important;color:var(--good)}
+:root.brutal .tag{border-width:1.5px;font-weight:700}
+:root.brutal :is(.alert,.msg,.warn:not(.badge)){border:2px solid currentColor!important;border-left-width:8px!important;font-weight:600}
+/* Encyclopedia: families as solid pastel blocks, like the preview */
+:root.brutal .chip.fam{background:var(--fc)!important;color:#1C1C1C!important;border:2px solid var(--line)!important;font-weight:600}
+:root.brutal .chip.fam.on{box-shadow:3px 3px 0 var(--line);transform:translate(-1px,-1px);font-weight:700}
+:root.brutal .chip:not(.fam){border:2px solid var(--line)!important;font-weight:600}
+:root.brutal .group h2{display:inline-block;background:var(--fc);color:#1C1C1C;border:2px solid var(--line);padding:2px 9px;letter-spacing:1px}
+:root.brutal .group span{color:var(--text);font-weight:700}
+:root.brutal div.item.item{border-left:12px solid var(--fc)!important}   /* outranks the generic 2px container rule */
+:root.brutal .item .dot{width:12px;height:12px}
+:root.brutal .famgrid div{background:var(--fc)!important;color:#1C1C1C}
+:root.brutal .famgrid div b{color:#1C1C1C}
+:root.brutal.night :is(.famgrid div,.group h2,.chip.fam){color:#1C1C1C!important}
+
+/* ---- theme menu: four themes, pick directly ---- */
+.themeMenu{position:fixed;right:14px;bottom:52px;z-index:9999;display:none;flex-direction:column;min-width:150px;
+  background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.themeMenu.open{display:flex}
+.themeMenu button{all:unset;cursor:pointer;padding:7px 10px;font:12.5px/1.2 var(--font-body);color:var(--text);border-radius:4px;display:flex;justify-content:space-between;gap:12px}
+.themeMenu button:hover,.themeMenu button:focus-visible{background:var(--surface4)}
+.themeMenu button[aria-checked="true"]::after{content:'✓';font-weight:700}
+:root.brutal .themeMenu{border:2px solid var(--line);box-shadow:4px 4px 0 var(--line)}

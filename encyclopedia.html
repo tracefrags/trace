@@ -126,6 +126,7 @@ const FAMORDER=['citrus','aromatic','green','marine','floral','fruity','gourmand
 const FAMCOL={citrus:'--fam-citrus',floral:'--fam-floral',fruity:'--fam-fruity',spice:'--fam-spice',wood:'--fam-wood',musk:'--fam-musk'};
 const EXTRA={other:'#8A8782',aromatic:'#8FB37A',green:'#6FBF73',marine:'#3CCEE8',gourmand:'#E0A33C',amber:'#C98A4B',animalic:'#B06A5A',solvent:'#8A8782'};
 const famColor=f=>getComputedStyle(document.documentElement).getPropertyValue('--fam-'+f).trim()||EXTRA[f];
+const famVar=f=>'var(--fam-'+f+','+(EXTRA[f]||getComputedStyle(document.documentElement).getPropertyValue('--fam-'+f).trim()||'#8A8782')+')';
 const nrm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 let LIVE=null, famSel='all', openName=null;
 
@@ -254,11 +255,11 @@ function render(){
   FAMORDER.forEach(f=>{
     const items=shown.filter(e=>e.family===f).sort((a,b)=>a.name.localeCompare(b.name));
     if(!items.length)return;
-    const gh=el('div','group');gh.append(el('h2',null,D.families[f][0]));gh.append(el('span',null,items.length));list.append(gh);
+    const gh=el('div','group');gh.style.setProperty('--fc',famVar(f));gh.append(el('h2',null,D.families[f][0]));gh.append(el('span',null,items.length));list.append(gh);
     items.forEach(e=>{
-      const it=el('div','item'+(e.owned?'':' ref'));it.id='m-'+nrm(e.name);
+      const it=el('div','item'+(e.owned?'':' ref'));it.style.setProperty('--fc',famVar(e.family));it.id='m-'+nrm(e.name);
       const r=el('button','row');r.setAttribute('aria-expanded','false');
-      const dot=el('span','dot');dot.style.background=famColor(e.family);r.append(dot);
+      const dot=el('span','dot');dot.style.background=famVar(e.family);r.append(dot);
       r.append(el('span','nm',e.name));
       r.append(el('span','fx',e.page?(e.page.facets||''):((libEntry(e)||{}).note||'').split('.')[0]));
       if(e.page&&e.page.position)r.append(el('span','badge',e.page.position.split(/[—(]/)[0].trim()));
@@ -290,11 +291,11 @@ function openItem(name,scroll){
 function drawChips(){
   const c=$('#chips');c.innerHTML='';
   [['all','All']].concat(FAMORDER.map(f=>[f,D.families[f][0]])).forEach(([k,lbl])=>{
-    const b=el('button','chip'+(famSel===k?' on':''),lbl);b.onclick=()=>{famSel=k;drawChips();render();};c.append(b);});
+    const b=el('button','chip'+(famSel===k?' on':''),lbl);if(k!=='all'){b.style.setProperty('--fc',famVar(k));b.classList.add('fam');}b.onclick=()=>{famSel=k;drawChips();render();};c.append(b);});
 }
 (async()=>{
   D.families.other=['Not yet classified','Added to Studio after this page was built. Ask Claude to add its BioShop page, family and industry notes.'];
-  const fg=$('#fams');FAMORDER.forEach(f=>{const d=el('div');d.style.borderLeftColor=famColor(f);
+  const fg=$('#fams');FAMORDER.forEach(f=>{const d=el('div');d.style.setProperty('--fc',famVar(f));d.style.borderLeftColor=famVar(f);
     d.append(el('b',null,D.families[f][0]));d.append(document.createTextNode(D.families[f][1]));fg.append(d);});
   try{const v=await Store.get('trace:studio');if(v){const j=JSON.parse(v);if(j&&j.mat)LIVE=j;}}catch(e){}
   if(LIVE){LIVE.mat.forEach(m=>{const n=(m.name||'').trim();
