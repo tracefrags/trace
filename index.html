@@ -224,6 +224,7 @@ function migrate(){
  if(changed)save();
 }
 function save(){clearTimeout(saveT);saveT=setTimeout(async()=>{
+ try{const cur=JSON.parse(await Store.get(KEY)||'null');if(cur&&Array.isArray(cur.tests))D.tests=cur.tests;}catch(e){}
  const ok=await Store.set(KEY,JSON.stringify(D));sync(ok?'Saved':'Save failed',ok?'ok':'err')},400)}
 
 const M=id=>D.mat.find(x=>x.id===id);

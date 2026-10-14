@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14151A">
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>TRACE — Bench</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;padding:22px 16px 80px}
+.wrap{max-width:1240px;margin:0 auto}
+header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+.mk{font-family:var(--font-display);font-size:19px;letter-spacing:6px;font-weight:600}
+.sub{font-size:10px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase}
+header a{margin-left:auto;color:var(--primary-t);text-decoration:none;font-size:12px}
+.lede{font-size:13px;color:var(--text-2);margin:8px 0 16px;max-width:760px}
+button{font:inherit;font-size:13px;cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--text);padding:7px 12px}
+button.pri{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+select,input,textarea{font:inherit;font-size:13px;color:var(--text);background:var(--surface5);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
+textarea{width:100%;min-height:58px;resize:vertical}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+@media(max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stats div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.stats b{display:block;font-family:var(--font-display);font-size:26px;line-height:1.1;font-weight:700}
+.stats i{font-style:normal;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-3)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.tabs{display:flex;gap:0;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.tabs button{border:0;border-radius:0;border-right:1px solid var(--line);background:var(--surface)}
+.tabs button:last-child{border-right:0}
+.tabs button.on{background:var(--text);color:var(--bg);font-weight:600}
+.bar .sp{flex:1}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--text-2);margin:0 0 14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.vk{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:3px;font-size:10px;font-weight:700;line-height:1;border:1.5px solid var(--line)}
+.v-win{background:var(--good);color:var(--bg);border-color:var(--good)}
+.v-pass{background:var(--goodbg);color:var(--good);border-color:var(--good)}
+.v-partial{background:var(--warnbg);color:var(--warn);border-color:var(--warn)}
+.v-fail{background:var(--badbg);color:var(--bad);border-color:var(--bad)}
+.v-planned{background:transparent;color:var(--text-3);border-style:dashed;border-color:var(--text-3)}
+.v-paused{background:var(--surface3);color:var(--text-2);border-style:dashed;border-color:var(--text-3)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+@media(max-width:1000px){.layout{grid-template-columns:minmax(0,1fr)}}
+.panel{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.panel h2{font-size:13px;font-weight:600;margin-bottom:10px}
+.muted{color:var(--text-3);font-size:12px}
+/* wall */
+.lane{border-top:1px solid var(--line);padding:12px 0 8px}
+.lane:first-child{border-top:0;padding-top:0}
+.lh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.lh b{font-size:14px}
+.lh .cnt{font-size:12px;color:var(--text-2);flex:1 1 200px;min-width:0}
+.mini{display:flex;gap:2px;width:160px;max-width:40vw;height:8px;flex:none}
+.mini i{display:block;height:100%;border-radius:2px}
+.strips{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 6px;align-items:flex-end}
+.stage{display:flex;flex-direction:column;gap:3px;flex:none}
+.stage .sn{font-size:10.5px;color:var(--text-3);white-space:nowrap;letter-spacing:.3px}
+.stage .row{display:flex;gap:5px;align-items:flex-end}
+.strip{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;width:30px;border-radius:4px;padding:2px 0}
+.strip:hover,.strip:focus-visible{background:var(--surface3)}
+.strip:focus-visible{outline:2px solid var(--text);outline-offset:1px}
+.strip.sel{background:var(--surface4);box-shadow:0 0 0 2px var(--text)}
+.strip svg{display:block}
+.strip .id{font-size:9.5px;color:var(--text-2);white-space:nowrap;max-width:44px;overflow:hidden;text-overflow:ellipsis}
+.strip .ic{font-size:10px;line-height:1;height:12px}
+/* lineage */
+.lin{overflow:auto;max-height:640px}
+.lin svg text{font-family:var(--font-body)}
+.node{cursor:pointer}
+.node:focus{outline:none}
+.node:focus-visible rect.box{stroke-width:3}
+/* failures */
+.fbar{display:grid;grid-template-columns:150px 1fr 34px;gap:8px;align-items:center;font-size:12.5px;padding:3px 0}
+.fbar .tr{height:14px;background:var(--surface3);border-radius:3px;position:relative}
+.fbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--bad);border-radius:3px}
+.fbar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--text-2)}
+.sbar{display:grid;grid-template-columns:190px 1fr 120px;gap:8px;align-items:center;font-size:12.5px;padding:3px 0}
+.sbar .st{display:flex;gap:2px;height:14px}
+.sbar .st i{display:block;height:100%;border-radius:2px}
+.sbar .n{font-size:11.5px;color:var(--text-2)}
+.lesson{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-top:8px;font-size:12.5px}
+.lesson .arr{font-size:16px;color:var(--text-3)}
+.lesson .ids{display:flex;flex-wrap:wrap;gap:5px}
+.pill{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;border:1px solid var(--line);border-radius:5px;padding:2px 6px;background:var(--surface)}
+.pill:hover,.pill:focus-visible{background:var(--surface3)}
+.flag{display:inline-block;font-size:11px;border:1px solid var(--bad);color:var(--bad);border-radius:4px;padding:0 6px;margin:2px 4px 2px 0}
+/* table */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-3);font-weight:600}
+td.idc{white-space:nowrap;font-weight:600}
+tr.clk{cursor:pointer}
+tr.clk:hover{background:var(--surface3)}
+/* detail */
+.det .top{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.det .top .vk{width:22px;height:22px;font-size:13px}
+.det .nm{font-size:18px;font-weight:700;font-family:var(--font-display)}
+.det .meta{font-size:12px;color:var(--text-2)}
+.det h3{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-3);margin:12px 0 5px;font-weight:600}
+.det .rec{font-size:13px}
+.det .res{font-size:13.5px;font-weight:500}
+.grid{width:auto!important;border-collapse:separate;border-spacing:2px;font-size:11.5px}
+.grid th,.sg th{border:0!important;padding:2px 6px 2px 0;font-size:10.5px;text-transform:none;letter-spacing:0;color:var(--text-2)!important;background:transparent!important;font-weight:500;text-align:left;white-space:nowrap}
+.grid td{border:0;width:38px;height:28px;text-align:center;border-radius:4px;font-weight:700;font-variant-numeric:tabular-nums;padding:0}
+.grid td.na{background:transparent;color:var(--text-3);font-weight:400}
+.spk{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.spk div{font-size:11px;color:var(--text-2)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.empty{padding:30px 10px;text-align:center;color:var(--text-2)}
+.empty b{display:block;font-size:15px;color:var(--text);margin-bottom:6px}
+.tip{white-space:pre-line;position:fixed;z-index:50;pointer-events:none;background:var(--text);color:var(--bg);font-size:12px;line-height:1.4;padding:6px 9px;border-radius:6px;max-width:300px;opacity:0;transition:opacity .08s}
+.tip.on{opacity:1}
+/* form */
+dialog{margin:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);padding:0;width:min(760px,96vw);max-height:92vh}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.fm{padding:16px 18px;overflow:auto;max-height:92vh}
+.fm h2{font-size:16px;margin-bottom:10px}
+.fr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:10px}
+@media(max-width:640px){.fr{grid-template-columns:1fr 1fr}}
+.fr label,.fl{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--text-3)}
+.fr .w2{grid-column:span 2}.fr .w4{grid-column:1/-1}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{padding:4px 9px;font-size:12px;display:inline-flex;gap:6px;align-items:center}
+.chips button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.sg{overflow-x:auto;margin-top:6px}
+.sg table{width:auto}
+.sg td,.sg th{border:0;padding:2px}
+.sg input{width:54px;padding:5px;text-align:center}
+.fmacts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;position:sticky;bottom:0;background:var(--surface);padding-top:8px}
+.hint{font-size:11.5px;color:var(--text-3);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="mk">TRACE</span><span class="sub">Bench</span>
+  <a href="home.html">← Home</a>
+</header>
+<p class="lede">Every blotter strip as a picture. Colour and symbol show how it went, the liquid line shows its best score, lineage shows how each recipe was revised, and the failure board shows what keeps going wrong.</p>
+
+<div class="stats" id="stats"></div>
+
+<div class="bar">
+  <div class="tabs" role="tablist" id="tabs">
+    <button data-v="wall" class="on" role="tab">Wall</button>
+    <button data-v="lineage" role="tab">Lineage</button>
+    <button data-v="fail" role="tab">Failures</button>
+    <button data-v="table" role="tab">Table</button>
+  </div>
+  <select id="series" aria-label="Series"></select>
+  <span class="sp"></span>
+  <button id="exp" title="Download every strip as a patch file: send it to Claude, or apply it on another device in Sync">Export results</button>
+  <button class="pri" id="new">+ Log a strip</button>
+</div>
+<div class="legend" id="legend"></div>
+
+<div class="layout">
+  <div class="panel" id="main"></div>
+  <div class="panel det" id="det"><div class="muted">Select a strip to see its recipe, scores and what came of it.</div></div>
+</div>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<dialog id="dlg"><form class="fm" id="fm" method="dialog">
+  <h2 id="fmTitle">Log a strip</h2>
+  <div class="fr">
+    <label class="w2">Series<input id="fSeries" list="seriesList" required placeholder="e.g. Smoked Apple"></label>
+    <label>Strip ID<input id="fId" required placeholder="e.g. SA-RA"></label>
+    <label>Date<input id="fDate" type="date"></label>
+    <label class="w2">Stage<input id="fStage" placeholder="e.g. 1 · Apple core"></label>
+    <label>Built on<input id="fParent" list="idList" placeholder="parent strip"></label>
+    <label>Change from it<input id="fChange" placeholder="+1 Birch Tar 1%"></label>
+    <label class="w4">Recipe<textarea id="fRecipe" placeholder="4 Fructone 1:9 + 1 beta-Damascone 1% + 1 Ethyl Maltol 1%"></textarea></label>
+  </div>
+  <div class="fl">Verdict<div class="chips" id="fVerdict"></div></div>
+  <div class="fr" style="margin-top:10px">
+    <label class="w4">Result, in a line<input id="fResult" placeholder="What it smelled like and what it means"></label>
+  </div>
+  <div class="fl">Scores (0–3, halves allowed)
+    <div class="fr" style="margin:4px 0 0">
+      <label class="w2">Qualities, comma-separated<input id="fQuals" placeholder="apple, crisp, ripe, juicy"></label>
+      <label class="w2">Readings<select id="fMode"><option value="">One reading</option><option value="AD">Arm's length + direct</option></select></label>
+    </div>
+    <div class="chips" id="fTimes" style="margin-top:6px"></div>
+    <div class="sg" id="fGrid"></div>
+  </div>
+  <div class="fl" style="margin-top:10px">What went wrong (if anything)<div class="chips" id="fFlags"></div>
+    <input id="fFlagNew" placeholder="Add another, then press Enter" style="margin-top:6px;max-width:300px"></div>
+  <div class="fr" style="margin-top:10px">
+    <label class="w4">Notes, decisions<textarea id="fNote"></textarea></label>
+    <label class="w2" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="fBlind" style="width:auto"> Blind tester(s)</label>
+  </div>
+  <datalist id="seriesList"></datalist><datalist id="idList"></datalist>
+  <div class="fmacts"><button type="button" id="fCancel">Cancel</button><button type="button" class="pri" id="fSave">Save strip</button></div>
+</form></dialog>
+
+<script>
+const KEY='trace:studio';
+const Store={
+ async get(k){if(window.storage){try{const r=await window.storage.get(k,false);return r?r.value:null}catch(e){}}
+  try{return localStorage.getItem(k)}catch(e){return null}},
+ async set(k,v){if(window.storage){try{await window.storage.set(k,v,false);return true}catch(e){}}
+  try{localStorage.setItem(k,v);return true}catch(e){return false}}};
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
+const SVGNS='http://www.w3.org/2000/svg';
+const sv=(t,a)=>{const n=document.createElementNS(SVGNS,t);for(const k in a)n.setAttribute(k,a[k]);return n};
+const nk=s=>String(s==null?'':s).trim().toLowerCase();
+
+const V={win:{l:'Win',i:'★'},pass:{l:'Works',i:'✓'},partial:{l:'Partial',i:'◐'},fail:{l:'Fail',i:'✕'},planned:{l:'Planned',i:'○'},paused:{l:'Paused',i:'‖'}};
+const VORDER=['win','pass','partial','fail','paused','planned'];
+const VCOL={win:'var(--good)',pass:'color-mix(in srgb,var(--good) 45%,var(--surface))',partial:'var(--warn)',fail:'var(--bad)',paused:'var(--surface3)',planned:'transparent'};
+const DONE=v=>['win','pass','partial','fail'].includes(v);
+const FLAGS=['metallic','salty','sharp','medicinal','bug spray','muddy','flat','raw','bitter','buried','too strong','too weak','cloying','coffee','overdose','no change'];
+const TORDER=['2m','5m','10m','15m','30m','40m','1h','2h','3h','6h','24h','48h','d0','d1','d7','d14','d15','d30'];
+const tIdx=t=>{const i=TORDER.indexOf(t);return i<0?999:i};
+// qualities where a high score is bad: they never count as the strip's best score
+const NEG=new Set(['salt','salty','sharp','metallic','medicinal','bug spray','bitter','harsh','cloying','rubbery','muddy','sunscreen','burnt','waxy','soapy']);
+const isNeg=q=>NEG.has(nk(q));
+
+let D=null, TESTS=[], VIEW='wall', SERIES='', SEL=null;
+
+/* ---------- storage ---------- */
+async function load(){
+ try{D=JSON.parse(await Store.get(KEY)||'null')}catch(e){D=null}
+ D=D||{};TESTS=Array.isArray(D.tests)?D.tests:[];
+}
+async function persist(){
+ let cur=null;try{cur=JSON.parse(await Store.get(KEY)||'null')}catch(e){}
+ cur=cur||{mat:[],acc:[],form:[],bat:[],notes:[]};cur.tests=TESTS;
+ return Store.set(KEY,JSON.stringify(cur));
+}
+
+/* ---------- helpers ---------- */
+const byId=id=>TESTS.find(t=>nk(t.id)===nk(id));
+const best=t=>{const v=(t.readings||[]).filter(r=>!isNeg(r.q)).map(r=>+r.v).filter(x=>!isNaN(x));return v.length?Math.max(...v):null};
+function seriesList(){
+ const m={};TESTS.forEach(t=>{(m[t.series]=m[t.series]||[]).push(t)});
+ return Object.entries(m).map(([name,ts])=>{ts.sort((a,b)=>(a.seq||0)-(b.seq||0)||String(a.id).localeCompare(b.id));
+   const dates=ts.filter(t=>DONE(t.verdict)).map(t=>t.date).filter(Boolean).sort();const waiting=ts.some(t=>t.verdict==='planned');
+   const first=Math.min(...ts.map(t=>TESTS.indexOf(t)));
+   return{name,ts,last:dates[dates.length-1]||'',waiting,first};})
+  .sort((a,b)=>(b.waiting-a.waiting)||(a.waiting?a.first-b.first:(b.last>a.last?1:b.last<a.last?-1:a.first-b.first)));
+}
+const visible=()=>seriesList().filter(s=>!SERIES||s.name===SERIES);
+function counts(ts){const c={};VORDER.forEach(v=>c[v]=0);ts.forEach(t=>c[t.verdict]=(c[t.verdict]||0)+1);return c;}
+const fmtD=d=>{if(!d)return'';const x=new Date(d+'T00:00:00');return isNaN(x)?d:x.toLocaleDateString(undefined,{day:'numeric',month:'short'})};
+
+/* ---------- tooltip ---------- */
+const TIP=$('#tip');
+function tipOn(e,txt){TIP.textContent=txt;TIP.classList.add('on');tipMove(e)}
+function tipMove(e){if(!TIP.classList.contains('on'))return;let x,y;
+ if(e&&e.clientX!=null&&e.type!=='focus'){x=e.clientX+14;y=e.clientY+14}else{const r=e.target.getBoundingClientRect();x=r.right+8;y=r.top}
+ const w=TIP.offsetWidth,h=TIP.offsetHeight;if(x+w>innerWidth-8)x=Math.max(8,x-w-28);if(y+h>innerHeight-8)y=innerHeight-h-8;TIP.style.left=x+'px';TIP.style.top=y+'px'}
+function tipOff(){TIP.classList.remove('on')}
+function tippy(n,txt){n.addEventListener('pointerenter',e=>tipOn(e,txt));n.addEventListener('pointermove',tipMove);n.addEventListener('pointerleave',tipOff);
+ n.addEventListener('focus',e=>tipOn(e,txt));n.addEventListener('blur',tipOff)}
+
+/* ---------- stats + legend ---------- */
+function drawStats(){
+ const ts=SERIES?TESTS.filter(t=>t.series===SERIES):TESTS, c=counts(ts), done=ts.filter(t=>DONE(t.verdict)).length;
+ const rate=done?Math.round(100*(c.win+c.pass)/done):0;
+ const s=$('#stats');s.innerHTML='';
+ [['Strips smelled',done],['Wins',c.win],['Fails',c.fail],['Waiting to smell',c.planned+c.paused],['Worked (win + works)',done?rate+'%':'—']]
+  .forEach(([k,v])=>{const d=el('div');d.append(el('b',null,v),el('i',null,k));s.append(d)});
+ const L=$('#legend');L.innerHTML='';
+ VORDER.forEach(v=>{const sp=el('span');sp.append(vk(v),document.createTextNode(V[v].l));L.append(sp)});
+ const sp=el('span');sp.append(stripSVG({verdict:'win',readings:[{v:2}]},14,40),document.createTextNode('liquid line = best score (0–3)'));L.append(sp);
+}
+function vk(v){return el('span','vk v-'+v,V[v]?V[v].i:'?')}
+
+/* ---------- blotter strip glyph ---------- */
+function stripSVG(t,w=22,h=96){
+ const s=sv('svg',{width:w,height:h,viewBox:`0 0 22 96`,'aria-hidden':'true'});
+ const outline='M3 4 Q3 1 6 1 L16 1 Q19 1 19 4 L19 80 L11 95 L3 80 Z';
+ const v=t.verdict||'planned', b=best(t), dashed=(v==='planned'||v==='paused');
+ const clipId='c'+Math.random().toString(36).slice(2,8);
+ const cp=sv('clipPath',{id:clipId});cp.append(sv('path',{d:outline}));s.append(cp);
+ s.append(sv('path',{d:outline,style:'fill:var(--surface5)'}));
+ if(!dashed){
+  const frac=b==null?0.55:Math.max(.12,b/3); const top=95-frac*86;
+  s.append(sv('rect',{x:0,y:top,width:22,height:96-top,'clip-path':`url(#${clipId})`,style:`fill:${VCOL[v]}`}));
+  if(b==null)s.append(sv('line',{x1:3,y1:top,x2:19,y2:top,style:'stroke:var(--surface5);stroke-width:1.5;stroke-dasharray:2 2'}));
+ }else if(v==='paused'){s.append(sv('rect',{x:0,y:0,width:22,height:96,'clip-path':`url(#${clipId})`,style:'fill:var(--surface3)'}));}
+ s.append(sv('path',{d:outline,style:`fill:none;stroke:${dashed?'var(--text-3)':'var(--line)'};stroke-width:1.5;${dashed?'stroke-dasharray:3 3':''}`}));
+ if((t.flags||[]).length&&!dashed){s.append(sv('circle',{cx:16.5,cy:6.5,r:3.6,style:'fill:var(--bad);stroke:var(--surface5);stroke-width:1.2'}));}
+ return s;
+}
+
+/* ---------- WALL ---------- */
+function drawWall(M){
+ const SL=visible();
+ SL.forEach(S=>{
+  const lane=el('section','lane');const lh=el('div','lh');lh.append(el('b',null,S.name));
+  const c=counts(S.ts), done=S.ts.filter(t=>DONE(t.verdict)).length;
+  const mini=el('div','mini');VORDER.forEach(v=>{if(c[v]){const i=el('i');i.style.flex=c[v];i.style.background=v==='planned'?'var(--surface)':VCOL[v];
+   if(v==='planned'||v==='paused')i.style.boxShadow='inset 0 0 0 1px var(--text-3)';mini.append(i)}});
+  lh.append(mini);
+  const bits=[];if(done)bits.push(done+' smelled');if(c.win)bits.push(c.win+' win'+(c.win>1?'s':''));if(c.fail)bits.push(c.fail+' fail'+(c.fail>1?'s':''));if(c.planned+c.paused)bits.push((c.planned+c.paused)+' waiting');
+  if(S.last)bits.push('last '+fmtD(S.last));
+  lh.append(el('span','cnt',bits.join(' · ')));lane.append(lh);
+  const row=el('div','strips');
+  const groups=[];S.ts.forEach(t=>{const g=groups[groups.length-1];if(g&&g.stage===(t.stage||''))g.ts.push(t);else groups.push({stage:t.stage||'',ts:[t]})});
+  groups.forEach(g=>{const st=el('div','stage');const dates=[...new Set(g.ts.map(t=>t.date).filter(Boolean))];
+   st.append(el('div','sn',(g.stage||'—')+(dates.length?' · '+fmtD(dates[0]):'')));const r=el('div','row');
+   g.ts.forEach(t=>r.append(stripBtn(t)));st.append(r);row.append(st)});
+  lane.append(row);M.append(lane);
+ });
+}
+function stripBtn(t){
+ const b=el('button','strip'+(SEL&&nk(SEL)===nk(t.id)?' sel':''));b.type='button';
+ b.setAttribute('aria-label',`${t.id}: ${V[t.verdict]?V[t.verdict].l:t.verdict}. ${t.result||''}`);
+ b.append(el('span','ic',V[t.verdict]?V[t.verdict].i:''),stripSVG(t),el('span','id',t.id));
+ const bs=best(t);
+ tippy(b,`${t.id} · ${V[t.verdict]?V[t.verdict].l:t.verdict}${bs!=null?' · best '+bs:''}\n${t.result||t.recipe||''}`);
+ b.onclick=()=>select(t.id);return b;
+}
+
+/* ---------- LINEAGE ---------- */
+function drawLineage(M){
+ const SL=seriesList();if(!SL.length)return;
+ const S=SL.find(s=>s.name===SERIES)||SL.find(s=>s.ts.some(t=>t.parent))||SL[0];
+ const head=el('div','lh');head.append(el('b',null,S.name),el('span','cnt',SERIES?'':'Pick a series above to switch. Thick line = the path to the latest win.'));M.append(head);
+ const ts=S.ts, ids=new Set(ts.map(t=>nk(t.id)));
+ const kids={};ts.forEach(t=>{const p=t.parent&&ids.has(nk(t.parent))?nk(t.parent):'';(kids[p]=kids[p]||[]).push(t)});
+ const pos={};let leaf=0, maxD=0;
+ (function place(p,d){(kids[p]||[]).forEach(t=>{const k=nk(t.id);if(pos[k])return;const ch=kids[k]||[];
+   if(!ch.length){pos[k]={d,y:leaf++,t}}else{const y0=leaf;place(k,d+1);const ys=ch.map(c=>pos[nk(c.id)]).filter(Boolean).map(q=>q.y);pos[k]={d,y:ys.length?(Math.min(...ys)+Math.max(...ys))/2:leaf++,t}}
+   maxD=Math.max(maxD,d)})})('',0);
+ // path to the latest win
+ const wins=ts.filter(t=>t.verdict==='win');const hot=new Set();
+ if(wins.length){let cur=wins[wins.length-1];while(cur){hot.add(nk(cur.id));cur=cur.parent?byId(cur.parent):null;if(cur&&!ids.has(nk(cur.id)))break}}
+ const NW=156,NH=50,GAP=112,CW=NW+GAP,RH=62,P=14;
+ const W=P*2+(maxD+1)*CW-GAP, H=P*2+Math.max(1,leaf)*RH-14;
+ const box=el('div','lin');const s=sv('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Revision tree for '+S.name});
+ const X=q=>P+q.d*CW, Y=q=>P+q.y*RH;
+ Object.values(pos).forEach(q=>{const t=q.t;if(!t.parent)return;const pq=pos[nk(t.parent)];if(!pq)return;
+  const x1=X(pq)+NW,y1=Y(pq)+NH/2,x2=X(q),y2=Y(q)+NH/2,mx=(x1+x2)/2;const on=hot.has(nk(t.id))&&hot.has(nk(t.parent));
+  s.append(sv('path',{d:`M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`,style:`fill:none;stroke:${on?'var(--text)':'var(--text-3)'};stroke-width:${on?3:1.5};${(t.verdict==='planned'||t.verdict==='paused')?'stroke-dasharray:4 4':''}`}));
+  if(t.change){const tx=sv('text',{x:mx,y:(y1+y2)/2-5,'text-anchor':'middle','font-size':9.5,style:'fill:var(--text-2)'});tx.textContent=t.change.length>19?t.change.slice(0,18)+'…':t.change;
+   tippy(tx,t.change);const bg=sv('rect',{x:mx-52,y:(y1+y2)/2-15,width:104,height:13,rx:3,style:'fill:var(--surface)'});s.append(bg,tx)}});
+ Object.values(pos).forEach(q=>{const t=q.t,v=t.verdict,dashed=(v==='planned'||v==='paused');
+  const g=sv('g',{class:'node',transform:`translate(${X(q)},${Y(q)})`,tabindex:0,role:'button','aria-label':`${t.id}: ${V[v]?V[v].l:v}. ${t.result||''}`});
+  g.append(sv('rect',{class:'box',width:NW,height:NH,rx:7,style:`fill:var(--surface5);stroke:${SEL&&nk(SEL)===nk(t.id)?'var(--text)':dashed?'var(--text-3)':'var(--line)'};stroke-width:${SEL&&nk(SEL)===nk(t.id)?3:1.5};${dashed?'stroke-dasharray:4 3':''}`}));
+  g.append(sv('rect',{width:8,height:NH,rx:3,style:`fill:${v==='planned'?'var(--surface3)':VCOL[v]}`}));
+  const a=sv('text',{x:16,y:18,'font-size':12,'font-weight':700,style:'fill:var(--text)'});a.textContent=(V[v]?V[v].i+' ':'')+t.id;g.append(a);
+  const bs=best(t);if(bs!=null){const sc=sv('text',{x:NW-8,y:18,'text-anchor':'end','font-size':11,'font-weight':700,style:'fill:var(--text-2)'});sc.textContent=bs+'/3';g.append(sc)}
+  const r=sv('text',{x:16,y:36,'font-size':10.5,style:'fill:var(--text-2)'});const txt=t.result||t.recipe||'';r.textContent=txt.length>26?txt.slice(0,25)+'…':txt;g.append(r);
+  g.addEventListener('click',()=>select(t.id));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(t.id)}});
+  tippy(g,`${t.id} · ${V[v]?V[v].l:v}\n${t.recipe||''}\n${t.result||''}`);s.append(g)});
+ box.append(s);M.append(box);
+}
+
+/* ---------- FAILURES ---------- */
+function drawFail(M){
+ const ts=SERIES?TESTS.filter(t=>t.series===SERIES):TESTS;
+ const fc={};ts.filter(t=>DONE(t.verdict)).forEach(t=>(t.flags||[]).forEach(f=>{(fc[f]=fc[f]||[]).push(t.id)}));
+ const rows=Object.entries(fc).sort((a,b)=>b[1].length-a[1].length);
+ const h=el('h2',null,'What went wrong, across '+(SERIES||'all series'));M.append(h);
+ if(!rows.length)M.append(el('div','muted','No problems recorded yet.'));
+ const mx=rows.length?rows[0][1].length:1;
+ rows.forEach(([f,ids])=>{const r=el('div','fbar');r.append(el('span',null,f));const tr=el('div','tr');const i=el('i');i.style.width=(100*ids.length/mx)+'%';tr.append(i);r.append(tr,el('span','n',ids.length));
+  tippy(r,f+': '+ids.join(', '));M.append(r)});
+ if(!SERIES){
+  M.append(el('h2',null,'How each series went'));M.lastChild.style.marginTop='18px';
+  seriesList().forEach(S=>{const c=counts(S.ts);const r=el('div','sbar');r.append(el('span',null,S.name));const st=el('div','st');
+   VORDER.forEach(v=>{if(c[v]){const i=el('i');i.style.flex=c[v];i.style.background=v==='planned'?'var(--surface)':VCOL[v];if(v==='planned'||v==='paused')i.style.boxShadow='inset 0 0 0 1px var(--text-3)';tippy(i,`${S.name}: ${c[v]} ${V[v].l.toLowerCase()}`);st.append(i)}});
+   r.append(st,el('span','n',VORDER.filter(v=>c[v]).map(v=>V[v].i+' '+c[v]).join('  ')));M.append(r)});
+ }
+ const fails=ts.filter(t=>t.verdict==='fail'||(t.verdict==='partial'&&(t.flags||[]).length));
+ M.append(el('h2',null,'What each problem led to'));M.lastChild.style.marginTop='18px';
+ fails.forEach(t=>{const L=el('div','lesson');const a=el('div');const p=el('button','pill');p.type='button';p.append(vk(t.verdict),document.createTextNode(t.id));p.onclick=()=>select(t.id);
+  a.append(p,el('div',null,t.result||''));(t.flags||[]).forEach(f=>a.append(el('span','flag',f)));
+  const kids=TESTS.filter(k=>k.parent&&nk(k.parent)===nk(t.id));const b=el('div','ids');
+  if(kids.length)kids.forEach(k=>{const q=el('button','pill');q.type='button';q.append(vk(k.verdict),document.createTextNode(k.id+(k.change?' · '+k.change:'')));q.onclick=()=>select(k.id);b.append(q)});
+  else b.append(el('span','muted',t.note?t.note:'No follow-up strip yet'));
+  L.append(a,el('span','arr','→'),b);M.append(L)});
+}
+
+/* ---------- TABLE ---------- */
+function drawTable(M){
+ const tb=el('table');const tr=el('tr');['Strip','Series','Date','Verdict','Best','Result','Problems'].forEach(h=>tr.append(el('th',null,h)));const th=el('thead');th.append(tr);tb.append(th);
+ const body=el('tbody');visible().forEach(S=>S.ts.forEach(t=>{const r=el('tr','clk');r.tabIndex=0;r.onclick=()=>select(t.id);r.onkeydown=e=>{if(e.key==='Enter')select(t.id)};
+  r.append(el('td','idc',t.id),el('td',null,t.series),el('td',null,fmtD(t.date)));const v=el('td');v.append(vk(t.verdict),document.createTextNode(' '+(V[t.verdict]?V[t.verdict].l:t.verdict)));r.append(v);
+  const bs=best(t);r.append(el('td',null,bs==null?'—':bs),el('td',null,t.result||''),el('td',null,(t.flags||[]).join(', ')));body.append(r)}));
+ tb.append(body);const w=el('div');w.style.overflowX='auto';w.append(tb);M.append(w);
+}
+
+/* ---------- DETAIL ---------- */
+function shade(v,neg){const p=Math.round(10+86*Math.min(3,Math.max(0,v))/3);return `color-mix(in srgb,${neg?'var(--bad)':'var(--text)'} ${p}%,var(--surface))`}
+function drawDetail(){
+ const P=$('#det');P.innerHTML='';const t=SEL&&byId(SEL);
+ if(!t){P.append(el('div','muted','Select a strip to see its recipe, scores and what came of it.'));return}
+ const top=el('div','top');top.append(vk(t.verdict));const nm=el('div');nm.append(el('div','nm',t.id),el('div','meta',[t.series,t.stage,fmtD(t.date)||'not smelled yet'].filter(Boolean).join(' · ')));top.append(nm);P.append(top);
+ const vb=el('div','meta',(V[t.verdict]?V[t.verdict].l:t.verdict)+(t.blind?' · blind tester(s)':''));P.append(vb);
+ if(t.result){P.append(el('h3',null,DONE(t.verdict)?'Result':'What to check'),el('div','res',t.result))}
+ P.append(el('h3',null,'Recipe'),el('div','rec',t.recipe||'—'));
+ const par=t.parent&&byId(t.parent), kids=TESTS.filter(k=>k.parent&&nk(k.parent)===nk(t.id));
+ if(par||t.parent||kids.length){P.append(el('h3',null,'Revisions'));const w=el('div','chips');
+  if(t.parent){const b=el('button','pill');b.type='button';if(par)b.append(vk(par.verdict));b.append(document.createTextNode('← '+t.parent+(t.change?' · '+t.change:'')));b.onclick=()=>par&&select(par.id);w.append(b)}
+  kids.forEach(k=>{const b=el('button','pill');b.type='button';b.append(vk(k.verdict),document.createTextNode(k.id+(k.change?' · '+k.change:'')+' →'));b.onclick=()=>select(k.id);w.append(b)});P.append(w)}
+ // score grid
+ const rd=t.readings||[];
+ P.append(el('h3',null,'Scores'));
+ if(!rd.length)P.append(el('div','muted','No scores recorded.'));
+ else{
+  const times=[...new Set(rd.map(r=>r.t))].sort((a,b)=>tIdx(a)-tIdx(b));const rows=[];
+  [...new Set(rd.map(r=>r.q))].forEach(q=>{const ms=[...new Set(rd.filter(r=>r.q===q).map(r=>r.m||''))];ms.forEach(m=>rows.push({q,m}))});
+  const g=el('table','grid');const hr=el('tr');hr.append(el('th'));times.forEach(x=>hr.append(el('th',null,x)));g.append(hr);
+  rows.forEach(({q,m})=>{const r=el('tr');r.append(el('th',null,q+(m==='A'?' · arm':m==='D'?' · direct':'')+(isNeg(q)?' ↓':'')));
+   times.forEach(x=>{const f=rd.find(z=>z.q===q&&(z.m||'')===m&&z.t===x);const c=el('td');
+    if(!f){c.className='na';c.textContent='·'}else{c.textContent=f.v;c.style.background=shade(+f.v,isNeg(q));c.style.color=(+f.v>=1.5)?'var(--surface)':'var(--text)';tippy(c,`${q}${m?' ('+(m==='A'?'arm':'direct')+')':''} at ${x}: ${f.v} of 3`)}
+    r.append(c)});g.append(r)});
+  P.append(g);if(rows.some(r=>isNeg(r.q)))P.append(el('div','muted','↓ red rows: lower is better. They never count as the best score.'));
+  // sparklines: one per quality, only when scored at 2+ times
+  const sp=rows.filter(({q,m})=>new Set(rd.filter(z=>z.q===q&&(z.m||'')===m).map(z=>z.t)).size>1);
+  if(sp.length){P.append(el('h3',null,'Over time'));const w=el('div','spk');
+   sp.forEach(({q,m})=>{const pts=rd.filter(z=>z.q===q&&(z.m||'')===m).sort((a,b)=>tIdx(a.t)-tIdx(b.t));const d=el('div');d.append(el('div',null,q+(m?' · '+(m==='A'?'arm':'direct'):'')));
+    const W=150,H=44,s=sv('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`});s.append(sv('line',{x1:4,y1:H-6,x2:W-4,y2:H-6,style:'stroke:var(--line);stroke-width:1'}));
+    const xs=i=>4+i*(W-8)/Math.max(1,pts.length-1), ys=v=>H-6-(v/3)*(H-12);
+    s.append(sv('polyline',{points:pts.map((p,i)=>xs(i)+','+ys(+p.v)).join(' '),style:'fill:none;stroke:var(--text);stroke-width:2'}));
+    pts.forEach((p,i)=>{const c=sv('circle',{cx:xs(i),cy:ys(+p.v),r:4.5,style:'fill:var(--text);stroke:var(--surface);stroke-width:2'});const hit=sv('circle',{cx:xs(i),cy:ys(+p.v),r:11,style:'fill:transparent'});tippy(hit,`${q} at ${p.t}: ${p.v}`);s.append(c,hit)});
+    d.append(s);w.append(d)});P.append(w)}
+ }
+ if((t.flags||[]).length){P.append(el('h3',null,'Problems'));const w=el('div');t.flags.forEach(f=>w.append(el('span','flag',f)));P.append(w)}
+ if(t.note){P.append(el('h3',null,'Notes'),el('div','rec',t.note))}
+ const acts=el('div','acts');
+ const ed=el('button',DONE(t.verdict)?'':'pri',DONE(t.verdict)?'Edit':'Log the result');ed.onclick=()=>openForm(t);
+ const nx=el('button',null,'Next strip from this');nx.onclick=()=>openForm({series:t.series,stage:t.stage,parent:t.id,recipe:t.recipe?t.recipe+' + ':'',verdict:''},true);
+ const del=el('button',null,'Delete');del.onclick=async()=>{if(!confirm('Delete strip '+t.id+'?'))return;TESTS=TESTS.filter(x=>x!==t);SEL=null;await persist();render()};
+ acts.append(ed,nx,del);P.append(acts);
+}
+function select(id){SEL=id;render();if(innerWidth<1000)$('#det').scrollIntoView({behavior:'smooth',block:'start'})}
+
+/* ---------- FORM ---------- */
+let F=null, EDIT=null;
+const TIMES=['2m','10m','30m','1h','24h'];
+function openForm(t,isNew){
+ EDIT=isNew||!t?null:t; F={verdict:t&&t.verdict&&DONE(t.verdict)?t.verdict:'',flags:new Set((t&&t.flags)||[]),
+  times:new Set(t&&t.readings&&t.readings.length?t.readings.map(r=>r.t):['2m','30m']), grid:{}};
+ (t&&t.readings||[]).forEach(r=>F.grid[r.q+'|'+(r.m||'')+'|'+r.t]=r.v);
+ $('#fmTitle').textContent=EDIT?(DONE(EDIT.verdict)?'Edit ':'Log the result for ')+EDIT.id:'Log a strip';
+ $('#fSeries').value=t&&t.series||SERIES||'';$('#fId').value=EDIT?EDIT.id:'';$('#fId').disabled=!!EDIT;
+ $('#fDate').value=(t&&t.date)||new Date().toISOString().slice(0,10);$('#fStage').value=t&&t.stage||'';$('#fParent').value=t&&t.parent||'';
+ $('#fChange').value=EDIT?(t.change||''):'';$('#fRecipe').value=t&&t.recipe||'';$('#fResult').value=EDIT?(t.result&&DONE(t.verdict)?t.result:''):'';
+ $('#fNote').value=EDIT?(t.note||''):'';$('#fBlind').checked=!!(t&&t.blind);
+ const qs=[...new Set((t&&t.readings||[]).map(r=>r.q))];$('#fQuals').value=qs.join(', ');
+ $('#fMode').value=(t&&t.readings||[]).some(r=>r.m)?'AD':'';
+ $('#seriesList').innerHTML='';[...new Set(TESTS.map(x=>x.series))].forEach(s=>{const o=el('option');o.value=s;$('#seriesList').append(o)});
+ $('#idList').innerHTML='';TESTS.forEach(x=>{const o=el('option');o.value=x.id;$('#idList').append(o)});
+ $('#fGrid').innerHTML='';drawVerdict();drawTimes();drawGrid();drawFlags();$('#dlg').showModal();
+}
+function drawVerdict(){const w=$('#fVerdict');w.innerHTML='';['win','pass','partial','fail','planned','paused'].forEach(v=>{const b=el('button',F.verdict===v?'on':'');b.type='button';b.append(vk(v),document.createTextNode(V[v].l));b.onclick=()=>{F.verdict=v;drawVerdict()};w.append(b)})}
+function drawTimes(){const w=$('#fTimes');w.innerHTML='';const all=[...new Set([...TIMES,...F.times])].sort((a,b)=>tIdx(a)-tIdx(b));
+ all.forEach(x=>{const b=el('button',F.times.has(x)?'on':'',x);b.type='button';b.onclick=()=>{F.times.has(x)?F.times.delete(x):F.times.add(x);drawTimes();drawGrid()};w.append(b)});
+ const add=el('input');add.placeholder='+ time, e.g. 15m';add.style.width='110px';add.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const v=add.value.trim();if(v){F.times.add(v);drawTimes();drawGrid()}}};w.append(add)}
+function readGrid(){$('#fGrid').querySelectorAll('input').forEach(i=>{if(i.value==='')delete F.grid[i.dataset.k];else F.grid[i.dataset.k]=i.value})}
+function drawGrid(){readGrid&&$('#fGrid').querySelector('input')&&readGrid();
+ const qs=$('#fQuals').value.split(',').map(s=>s.trim()).filter(Boolean), ms=$('#fMode').value==='AD'?['A','D']:[''], ts=[...F.times].sort((a,b)=>tIdx(a)-tIdx(b));
+ const w=$('#fGrid');w.innerHTML='';if(!qs.length||!ts.length){w.append(el('div','hint','Add qualities and pick the times you smelled it to get a score grid.'));return}
+ const tb=el('table');const hr=el('tr');hr.append(el('th'));ts.forEach(x=>hr.append(el('th',null,x)));tb.append(hr);
+ qs.forEach(q=>ms.forEach(m=>{const r=el('tr');r.append(el('th',null,q+(m==='A'?' · arm':m==='D'?' · direct':'')));
+  ts.forEach(x=>{const k=q+'|'+m+'|'+x;const i=el('input');i.type='number';i.min=0;i.max=3;i.step=0.5;i.dataset.k=k;i.setAttribute('aria-label',`${q} ${m} ${x}`);if(F.grid[k]!=null)i.value=F.grid[k];const td=el('td');td.append(i);r.append(td)});tb.append(r)}));
+ w.append(tb)}
+function drawFlags(){const w=$('#fFlags');w.innerHTML='';[...new Set([...FLAGS,...F.flags])].forEach(f=>{const b=el('button',F.flags.has(f)?'on':'',f);b.type='button';b.onclick=()=>{F.flags.has(f)?F.flags.delete(f):F.flags.add(f);drawFlags()};w.append(b)})}
+$('#fQuals').oninput=()=>drawGrid();$('#fMode').onchange=()=>drawGrid();
+$('#fFlagNew').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const v=e.target.value.trim().toLowerCase();if(v){F.flags.add(v);e.target.value='';drawFlags()}}};
+$('#fCancel').onclick=()=>$('#dlg').close();
+$('#fSave').onclick=async()=>{
+ readGrid();const id=(EDIT?EDIT.id:$('#fId').value.trim()), series=$('#fSeries').value.trim();
+ if(!id||!series){alert('A strip needs a series and an ID.');return}
+ if(!EDIT&&byId(id)){alert('There is already a strip called '+id+'. Pick another ID, or open that strip to edit it.');return}
+ if(!F.verdict){alert('Pick a verdict.');return}
+ const readings=[];Object.entries(F.grid).forEach(([k,v])=>{const [q,m,t]=k.split('|');const qs=$('#fQuals').value.split(',').map(s=>s.trim());if(v!==''&&!isNaN(+v)&&qs.includes(q)&&F.times.has(t))readings.push({t,q,v:Math.max(0,Math.min(3,+v)),m})});
+ const rec=EDIT||{id};
+ Object.assign(rec,{series,date:$('#fDate').value,stage:$('#fStage').value.trim(),parent:$('#fParent').value.trim(),change:$('#fChange').value.trim(),
+  recipe:$('#fRecipe').value.trim(),verdict:F.verdict,result:$('#fResult').value.trim(),readings,flags:[...F.flags],note:$('#fNote').value.trim(),blind:$('#fBlind').checked,updated:new Date().toISOString()});
+ if(!EDIT){const same=TESTS.filter(t=>t.series===series);rec.seq=(same.length?Math.max(...same.map(t=>t.seq||0)):0)+1;TESTS.push(rec)}
+ const ok=await persist();$('#dlg').close();SEL=rec.id;if(!ok)alert('Could not save: storage is full or blocked.');render();
+};
+
+/* ---------- export ---------- */
+$('#exp').onclick=()=>{
+ if(!TESTS.length){alert('Nothing to export yet.');return}
+ const day=new Date().toISOString().slice(0,10);
+ const p={type:'trace-patch',id:'bench-'+day+'-'+Math.random().toString(36).slice(2,6),created:day,title:'Bench results to '+day,
+  summary:TESTS.length+' blotter strips from the Bench app. Safe to apply twice.',ops:TESTS.map(t=>{const f=Object.assign({},t);delete f.id;return{op:'upsert_test',id:t.id,fields:f}})};
+ const a=el('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(p,null,1)],{type:'application/json'}));a.download='trace-bench-'+day+'.json';a.click();
+};
+
+/* ---------- render ---------- */
+function render(){
+ tipOff();
+ const sel=$('#series');const cur=SERIES;sel.innerHTML='';const o=el('option',null,'All series');o.value='';sel.append(o);
+ seriesList().forEach(s=>{const x=el('option',null,s.name);x.value=s.name;sel.append(x)});sel.value=cur;
+ document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===VIEW));
+ drawStats();const M=$('#main');M.innerHTML='';
+ if(!TESTS.length){const e=el('div','empty');e.append(el('b',null,'No strips yet'));
+  e.append(el('div',null,'Apply trace-patch-2026-10-14-bench-history.json in Sync to load the 95 strips recorded so far, or log your first strip.'));
+  const a=el('a',null,'Open Sync →');a.href='sync.html';a.style.color='var(--primary-t)';a.style.display='inline-block';a.style.marginTop='8px';e.append(a);M.append(e);drawDetail();return}
+ ({wall:drawWall,lineage:drawLineage,fail:drawFail,table:drawTable})[VIEW](M);drawDetail();
+}
+window.draw=render;
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{VIEW=b.dataset.v;render()});
+$('#series').onchange=e=>{SERIES=e.target.value;render()};
+$('#new').onclick=()=>openForm({series:SERIES,verdict:''},true);
+window.addEventListener('storage',async e=>{if(e.key===KEY){await load();render()}});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+(async()=>{await load();render()})();
+</script>
+</body>
+</html>

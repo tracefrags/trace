@@ -120,7 +120,7 @@ const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=nu
 const trunc=(s,n)=>{s=typeof s==='string'?s:JSON.stringify(s);return s&&s.length>n?s.slice(0,n)+'…':s;};
 let D=null, SY=null, PATCH=null, PLAN=[], OTHER=null, MPLAN=[];
 
-function ensure(x){x=x||{};['mat','acc','form','bat','notes'].forEach(k=>{if(!Array.isArray(x[k]))x[k]=[]});return x;}
+function ensure(x){x=x||{};['mat','acc','form','bat','notes','tests'].forEach(k=>{if(!Array.isArray(x[k]))x[k]=[]});return x;}
 const findMat=(X,n)=>X.mat.find(m=>nk(m.name)===nk(n));
 const namesOf=(X,items)=>{const by={};X.mat.forEach(m=>by[m.id]=m.name);return (items||[]).map(i=>({name:by[i.ref]||'?',pct:i.pct}));};
 function refsOf(X,items){const out=[],miss=[];(items||[]).forEach(i=>{const m=findMat(X,i.name);if(m)out.push({ref:m.id,acc:false,pct:i.pct});else miss.push(i.name);});return{out,miss};}
@@ -159,13 +159,17 @@ function runOp(X,op){
  case 'batch_eval':{ const b=X.bat.find(x=>String(x.no)===String(op.no)); if(!b)return{status:'warn',detail:'batch '+op.no+' not found'};
    b.evals=b.evals||[]; if(b.evals.some(e=>e.t===op.t&&e.n===op.n))return{status:'same'};
    b.evals.push({t:op.t,n:op.n});return{status:'add',detail:'batch '+op.no+' · '+op.t}; }
+ case 'upsert_test':{ X.tests=X.tests||[]; const ex=X.tests.find(t=>nk(t.id)===nk(op.id));
+   if(!ex){X.tests.push(Object.assign({id:op.id},clone(op.fields||{})));return{status:'add',detail:((op.fields||{}).series||'')+' · '+((op.fields||{}).verdict||'')};}
+   const diffs=[];Object.entries(op.fields||{}).forEach(([k,v])=>{if(!eq(ex[k],v)){diffs.push([k,ex[k],v]);ex[k]=clone(v);}});
+   return diffs.length?{status:'update',detail:diffs.map(x=>x[0]).join(', '),diffs}:{status:'same'}; }
  case 'add_note':{ if(X.notes.some(n=>n.id===op.id||n.text===op.text))return{status:'same'};
    X.notes.push({id:op.id||uid(),text:op.text});return{status:'add',detail:trunc(op.text,90)}; }
  default: return{status:'warn',detail:'unknown operation '+op.op};
  }}
 const GROUPS=[['add_mat','Materials added'],['set_mat','Material data updated'],['upsert_form','Formulas'],['upsert_acc','Accords'],
- ['upsert_batch','Batch records'],['batch_eval','Batch evaluations'],['add_note','Notes']];
-const label=o=>o.name||(o.no?('Batch '+o.no):'')||(o.op==='add_note'?'note':'');
+ ['upsert_batch','Batch records'],['batch_eval','Batch evaluations'],['upsert_test','Blotter tests'],['add_note','Notes']];
+const label=o=>o.name||(o.no?('Batch '+o.no):'')||(o.op==='upsert_test'?o.id:'')||(o.op==='add_note'?'note':'');
 
 function showDiffs(row,diffs){if(!diffs||!diffs.length)return;const d=el('details','x');d.append(el('summary',null,'show changes'));
  diffs.slice(0,6).forEach(([k,a,b])=>{const x=el('div','b');x.textContent=k+'\n  was: '+trunc(a,400)+'\n  now: '+trunc(b,400);d.append(x);});row.querySelector('.dt').append(d);}
@@ -215,13 +219,17 @@ function mergePlan(){
    const newE=(o.evals||[]).filter(e=>!(l.evals||[]).some(x=>x.t===e.t&&x.n===e.n));
    if(newE.length)rows.push({k:'eval',name:'Batch '+o.no,action:'add',on:true,no:o.no,evals:newE,detail:newE.length+' evaluation(s) only on the other device'});}});
  O.notes.forEach(o=>{if(!D.notes.some(n=>n.id===o.id||n.text===o.text))rows.push({k:'note',name:'note',action:'add',on:true,o,detail:trunc(o.text,90)});});
+ (O.tests||[]).forEach(o=>{const l=(D.tests||[]).find(t=>nk(t.id)===nk(o.id));
+  if(!l)rows.push({k:'test',name:o.id,action:'add',on:true,o,detail:(o.series||'')+' · '+(o.verdict||'')});
+  else{const keys=[...new Set([...Object.keys(o),...Object.keys(l)])];const diffs=keys.filter(k=>!eq(l[k],o[k])).map(k=>[k,l[k],o[k]]);
+   if(diffs.length){const newer=(o.updated||'')>(l.updated||'');rows.push({k:'test',name:o.id,action:'differs',on:newer,o,diffs,detail:(newer?'newer on the other device · ':'')+diffs.map(x=>x[0]).join(', ')});}}});
  return rows;
 }
 function renderMerge(){
  const box=$('#mplan');box.innerHTML='';
  const onlyHere={mat:D.mat.filter(m=>!findMat(ensure(OTHER),m.name)).length,form:D.form.filter(f=>!OTHER.form.some(o=>nk(o.name)===nk(f.name))).length};
  box.append(el('div','muted',`${MPLAN.filter(r=>r.action==='add').length} new from the other device · ${MPLAN.filter(r=>r.action==='differs').length} different on both · kept only here: ${onlyHere.mat} materials, ${onlyHere.form} formulas`));
- [['mat','Materials'],['form','Formulas'],['acc','Accords'],['bat','Batch records'],['eval','Batch evaluations'],['note','Notes']].forEach(([k,title])=>{
+ [['mat','Materials'],['form','Formulas'],['acc','Accords'],['bat','Batch records'],['eval','Batch evaluations'],['test','Blotter tests'],['note','Notes']].forEach(([k,title])=>{
   const rows=MPLAN.filter(r=>r.k===k);if(!rows.length)return;const g=el('div','grp');g.append(document.createTextNode(title+' · '+rows.length));
   const all=el('button',null,'take all');all.onclick=()=>{rows.forEach(r=>r.on=true);renderMerge();};
   const none=el('button',null,'keep mine');none.onclick=()=>{rows.forEach(r=>r.on=false);renderMerge();};g.append(all,none);box.append(g);
@@ -244,6 +252,7 @@ async function applyMerge(){
   else{['date','wt','note','snapshot_note'].forEach(k=>l[k]=clone(r.o[k]));if(snap.length)l.snapshot=snap;if(fo)l.form=fo.id;}});
  MPLAN.filter(r=>r.on&&r.k==='eval').forEach(r=>{const b=X.bat.find(x=>String(x.no)===String(r.no));if(b){b.evals=(b.evals||[]).concat(clone(r.evals));}});
  MPLAN.filter(r=>r.on&&r.k==='note').forEach(r=>X.notes.push(clone(r.o)));
+ MPLAN.filter(r=>r.on&&r.k==='test').forEach(r=>{X.tests=X.tests||[];const i=X.tests.findIndex(t=>nk(t.id)===nk(r.o.id));if(i<0)X.tests.push(clone(r.o));else X.tests[i]=clone(r.o);});
  D=X;const ok=await Store.set(KEY,JSON.stringify(D));const taken=MPLAN.filter(r=>r.on).length;
  log('Merged device export',`${taken} item(s) taken`+(warn.length?`, ${warn.length} warning(s)`:''));await saveSY();
  const m=$('#mmsg');m.className='msg '+(ok?'ok':'err');m.textContent=ok?`Merged ${taken} item(s).`+(warn.length?' Notes: '+[...new Set(warn)].join('; '):'')+' Reload Studio and Compose if they are open.':'Could not save.';
@@ -254,7 +263,7 @@ async function applyMerge(){
 async function saveSY(){await Store.set(SKEY,JSON.stringify(SY));}
 function refresh(){
  const s=$('#stats');s.innerHTML='';
- [['materials',D.mat.length],['formulas',D.form.length],['accords',D.acc.length],['batches',D.bat.length],['notes',D.notes.length],['patches applied',Object.keys(SY.applied).length]]
+ [['materials',D.mat.length],['formulas',D.form.length],['accords',D.acc.length],['batches',D.bat.length],['blotter tests',(D.tests||[]).length],['notes',D.notes.length],['patches applied',Object.keys(SY.applied).length]]
   .forEach(([k,v])=>{const d=el('div');d.append(el('i',null,k));d.append(document.createTextNode(v));s.append(d);});
  const L=$('#log');L.innerHTML='';if(!SY.log.length)L.append(el('div',null,'Nothing yet.'));
  SY.log.forEach(e=>{const d=el('div');d.innerHTML='<b>'+new Date(e.when).toLocaleString()+'</b> — ';d.append(document.createTextNode(e.action+': '+e.detail));L.append(d);});
