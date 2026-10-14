@@ -183,6 +183,9 @@ const TYPES=[['Cologne',4],['EdT',10],['EdP',15],['EdP intense',18],['EdP intens
 const ETH_G=1.65;
 
 const INFO={
+ 'alpha-Damascone 10%':['0.5–3%','Rose Oxide; Geraniol; Citronellol; Iso E Super; Hedione','BioShop: rosy, apple-like fruitiness drying to woody-spicy warmth; 0.05–0.3% actual, over 0.5% turns sharp. Counts with beta-Damascone for IFRA (rose ketones).'],
+ 'Datilat 10%':['1–50%','beta-Damascone; alpha-Damascone; floral accords','Symrise: dried fruit with a brandy-like nuance; enhances damascone-like aspects. 0.1–5% of the composition — start at the low end.'],
+ 'Ambrocenide 10%':['1–10%','Ambroxan; Iso E Super; Galaxolide; woody bases','BioShop: dense, dry, mineral amber-wood with an oud-like depth; 0.1–1% actual (traces up to 2%). Overdose flattens a blend fast. 10% in IPM — counts toward the ~20% IPM limit with Ambroxan.'],
  'DHM':['4–25%','citrus tops; Ambroxan; oakmoss','Heat-stable citrus. Cool Water runs it at 23% — strong enough to lead a fragrance alone.'],
  'Citral':['0.5–4%','DHM; bergamot; petitgrain','Sharp lemon, harsh neat. Sharpens another material\'s edge rather than standing alone.'],
  'Bergamot EO':['3–30%','lavender; oakmoss; rose','PHOTOTOXIC unless bergapten-free. Confirm the grade before wearing in sun.'],
@@ -225,7 +228,7 @@ const INFO={
  'Rose Oxide':['0.5–4%','geraniol; PEA; damascone','Metallic-green sparkle. Trace only; more reads harsh.'],
  'Damascone':['1–8%','rose pillars; Ald. C14','Jammy rose depth. Overdose goes stewed.'],
 };
-const DESC={'DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citrus','Petitgrain':'green,dry-citrus',
+const DESC={'alpha-Damascone':'apple-rose,fresh','Datilat':'dried-fruit,brandy','Ambrocenide':'dry-amber,mineral','DHM':'fresh,clean','Citral':'sharp,lemony','Bergamot':'bright,citrus','Petitgrain':'green,dry-citrus',
  'Orange EO':'juicy,sweet-citrus','Calone':'marine,ozonic','Linalool':'floral,camphorous','Hedione':'radiant,airy',
  'PEA':'rosy,honeyed','Geraniol':'rosy,green','Citronellol':'rosy,soft','Rose oxide':'metallic,sparkling',
  'damascone':'jammy,boozy','C14':'peachy,creamy','C18':'coconut,milky','Ethyl Maltol':'caramel,candy',
@@ -308,6 +311,9 @@ function sameMaterial(a,b){
 }
 
 const PAIRS={
+ 'alpha-Damascone 10%':['Rose Oxide','Geraniol','Citronellol','Iso E Super','Hedione','Galaxolide','Fructone'],
+ 'Datilat 10%':['beta-Damascone','alpha-Damascone 10%','Fructone','Ethyl Maltol'],
+ 'Ambrocenide 10%':['Ambroxan','Iso E Super','Galaxolide','Guaiacwood','Vetiver EO'],
  'DHM':['Petitgrain EO','Sweet Orange EO','Ambroxan','Iso E Super','Calone'],
  'Citral':['DHM','Bergamot EO','Petitgrain EO'],
  'Bergamot EO':['Linalool','Oakmoss alt.','Coumarin','PEA'],
@@ -373,6 +379,7 @@ function pairsFor(n){
 // (coumarin 3–20% neat would need 30–200% of a 10% stock). These are the
 // achievable ranges for the stock as sold, with the neat equivalent noted.
 const STOCK_RANGE={
+ 'alpha-Damascone 10%':'0.5–3%','Datilat 10%':'1–50%','Ambrocenide 10%':'1–10%',
  'Ambroxan':'3–15%','Coumarin':'4–25%','Ethyl Maltol':'1–20%','Calone':'0.5–5%',
  'Rose Oxide':'1–8%','beta-Damascone':'1–10%','Guaiacwood':'2–15%','Oakmoss':'2–15%',
 };
@@ -411,6 +418,7 @@ function suggested(){
 // for B too, which is not how the source data reads.
 const TEN=/galaxolide|ambroxan|cashmeran|benzoin|vanillin|maltol|habanolide|iso e|styrax|guaiac|oakmoss|patchouli|brassylate/i;
 const CONFLICTS=[
+ ['alpha-Damascone 10%','beta-Damascone','rose ketones stack — the cumulative effect quickly turns overpowering, and IFRA restricts them together',{'alpha-Damascone 10%':0.15},'B','BioShop beta-Damascone AVOID statement; the 0.15% actual threshold is a TRACE estimate'],
  ['DHM','Calone','over-saturates the fresh register',{'DHM':8},'B','their marine accord specifies DHM 5-8%'],
  ['DHM','AAG','two green-aquatic drivers compete',{'DHM':8},'E','no figure given; mirrors the Calone threshold'],
  ['Calone','AAG','both ozonic — 4:1 AAG:Calone is the accord, beyond that it muddles',{'AAG':0.3},'D','from their 4:1 AAG:Calone accord ratio'],
@@ -525,6 +533,7 @@ const PLACE={'DHM':['citrus','top'],'Citral':['citrus','top'],'Bergamot':['citru
  'Benzyl Benzoate':['musk','base'],'Civetone':['musk','base']};
 // exact names from the real library take priority — checked before any substring guess
 const PLACE_EXACT={
+ 'alpha-Damascone 10%':['fruity','heart'],'Datilat 10%':['fruity','heart'],'Ambrocenide 10%':['wood','base'],
  'Ald. C14 (peach)':['fruity','heart'],'Ald. C18 (coconut)':['fruity','heart'],
  'PEA (Phenylethyl alcohol)':['floral','heart'],'Iso Eugenol':['spice','heart'],
  'Iso E Super':['wood','base'],'Rose Oxide':['floral','heart'],
