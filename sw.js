@@ -1,4 +1,4 @@
-const CACHE = 'trace-v14';
+const CACHE = 'trace-v16';
 const FILES = ['./', './home.html', './encyclopedia.html', './wheel.html', './bench.html', './sync.html', './foil-preview.html', './theme.js', './theme.css', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
